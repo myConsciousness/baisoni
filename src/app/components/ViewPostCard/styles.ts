@@ -7,7 +7,7 @@ export const viewPostCard = tv({
             PostAuthor: 'w-[100%-16px] h-[28px] items-center flex relative select-none',
                 PostAuthorIcon: 'h-[28px] w-[28px] rounded-[10px] object-cover overflow-hidden',
                 PostAuthorDisplayName:'ml-[9px] ',
-                PostAuthorHandle: 'text-[#909090] font-light',
+                PostAuthorHandle: 'text-[#909090] font-light text-[12px]',
                 PostCreatedAt: 'text-[#B8B8B8] font-light absolute right-[17px] ',
                 OptionButton: 'text-[#B8B8B8] font-light absolute right-[17px]',
             PostContent: 'w-[100%-5px] h-full ml-[25px] mr-[17px] ',

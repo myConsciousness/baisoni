@@ -79,6 +79,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
 
                     >
                         <input
+                            id={'searchBar'}
                             className={HeaderInputArea({color:color})}
                             value={searchText}
                             autoFocus={true}
@@ -89,6 +90,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                             onKeyDown={(e) => {
                                 if (e.key !== "Enter" || isComposing) return; //1
                                 props.setSearchText(searchText)
+                                document.getElementById("searchBar")?.blur()
                                 console.log(searchText)
                             }}
                             onCompositionStart={() => setComposing(true)}

@@ -27,6 +27,7 @@ export const useRequiredSession = () => {
 
             setAgent(agent)
         } catch (error) {
+            //alert(error)
             console.error(error)
             if (router) {
                 router.push('/login')

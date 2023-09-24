@@ -97,8 +97,10 @@ export default function CreateLoginPage() {
       try{
         const storedData = localStorage.getItem('session');
         if(storedData) {
-          //const {session} = JSON.parse(storedData)
-          //await agent.resumeSession(session)
+
+          const {session} = JSON.parse(storedData)
+          await agent.resumeSession(session)
+
           location.href = '/home'
         }
       }catch (e) {

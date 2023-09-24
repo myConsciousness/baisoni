@@ -13,7 +13,7 @@ export const viewPostCard = tv({
             PostContent: 'w-[100%-5px] h-full ml-[25px] mr-[17px] ',
             PostContentText: '',
             PostReactionButtonContainer: 'w-full h-[20px] text-right right-[17px] ',
-            PostReactionButton: 'h-[16px] pl-[8px] pr-[8px] ml-[60px] text-[#909090] text-[12px] cursor-pointer select-none',
+            PostReactionButton: 'h-[16px] pl-[8px] pr-[8px] ml-[60px] text-[#909090] text-[14px] cursor-pointer select-none',
         dropdown: '',
         skeletonIcon: 'h-full w-full',
         skeletonName: 'h-3 w-2/5 rounded-lg ',

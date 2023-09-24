@@ -33,6 +33,7 @@ import {
 } from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
 import {useRequiredSession} from "@/app/lib/hooks/useRequiredSession";
+import {useAgent} from "@/app/atoms/agent";
 
 interface Props {
     className?: string
@@ -46,7 +47,7 @@ interface Props {
     isSkeleton?: boolean
 }
 export const ViewPostCard: React.FC<Props> = (props: Props) => {
-    const { agent } = useRequiredSession()
+    const [ agent ] = useAgent()
 
     const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;
@@ -56,7 +57,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         PostAuthorIcon, PostAuthorDisplayName, PostAuthorHandle, PostCreatedAt, dropdown,skeletonIcon, skeletonName, skeletonHandle, skeletonText1line, skeletonText2line } = viewPostCard();
 
     const [isLiked, setIsLiked] = useState<boolean>(postJson?.viewer?.like)
-    const [isRetweeted, setIsRetweeted] = useState<boolean>(postJson?.viewer?.repost)
+    const [isReposted, setIsReposted] = useState<boolean>(postJson?.viewer?.repost)
     const [postInfo, setPostInfo] = useState<any>(null)
 
 
@@ -68,7 +69,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                     className={'h-full bg-[#17BF63] text-white flex justify-center items-center cursor-pointer'}
 
                 >
-                    {isRetweeted ? 'un report' : 'repost'}
+                    {isReposted ? 'un report' : 'repost'}
                 </span>
             </SwipeAction>
         </LeadingActions>
@@ -101,20 +102,35 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         console.log(true)
     };
 
+    const handleRepost = async () => {
+        if(loading) return
+        setLoading(true)
+        if(isReposted){
+            setIsReposted(!isReposted)
+            const res = await agent?.deleteRepost(postJson?.viewer?.repost)
+            console.log(res)
+        }else{
+            setIsReposted(!isReposted)
+            const res = await agent?.repost(postJson?.uri, postJson?.cid)
+            console.log(res)
+        }
+        setLoading(false)
+    }
+
     const handleLike = async () => {
+        if(loading) return
+        setLoading(true)
         if(isLiked){
             setIsLiked(!isLiked)
             const res = await agent?.deleteLike(postJson?.viewer?.like)
             console.log(res)
-            return;
         }else{
             setIsLiked(!isLiked)
             const res = await agent?.like(postJson?.uri, postJson?.cid)
             console.log(res)
-            return;
         }
+        setLoading(false)
     }
-
   return (
       <main className={PostCard({color:color})}
             onMouseDown={handleTextSelect}
@@ -175,7 +191,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           <DropdownItem key='2' startContent={<FontAwesomeIcon icon={faLink}/>}
                                                         onClick={() => {
                                                             console.log(`https://bsky.app/profile/${postJson.author.did}/post/${postJson.uri.match(/\/(\w+)$/)?.[1] || ""}`)
-                                                            navigator.clipboard.writeText(`https://bsky.app/profile/${JSON.stringify(postJson.author.did)}/post/${JSON.stringify(postJson.uri).match(/\/(\w+)$/)?.[1] || ""}`)
+                                                            navigator.clipboard.writeText(`https://bsky.app/profile/${postJson.author.did}/post/${postJson.uri.match(/\/(\w+)$/)?.[1] || ""}`)
                                                         }}
 
                                           >
@@ -222,8 +238,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   <>
                                       <FontAwesomeIcon icon={faComment} className={PostReactionButton()}/>
                                       <FontAwesomeIcon icon={faRetweet} className={PostReactionButton()}
-                                                       onClick={() => {setIsRetweeted(!isRetweeted)}}
-                                                       style={{color:isRetweeted ? '#17BF63' : '#909090',}}/>
+                                                       onClick={() => {handleRepost()}}
+                                                       style={{color:isReposted ? '#17BF63' : '#909090',}}/>
                                       <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
                                                        onClick={() => {handleLike()}}
                                                        style={{color:isLiked ? '#E0245E' : '#909090',}}/>
@@ -234,8 +250,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <FontAwesomeIcon icon={faComment} className={PostReactionButton()}
                                                        style={{display: isHover && !isSkeleton ? undefined : 'none'}}/>
                                       <FontAwesomeIcon icon={faRetweet} className={PostReactionButton()}
-                                                       onClick={() => {setIsRetweeted(!isRetweeted)}}
-                                                       style={{color:isRetweeted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isRetweeted ? undefined : 'none'}}/>
+                                                       onClick={() => {handleRepost()}}
+                                                       style={{color:isReposted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isReposted ? undefined : 'none'}}/>
                                       <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
                                                        onClick={() => {handleLike()}}
                                                        style={{color:isLiked ? '#E0245E' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}/>

@@ -7,7 +7,7 @@ export default function Root() {
 
     return(
         <>
-            <ViewScreen color={"dark"} tab={'home'} isMobile={isMobile}/>
+            <ViewScreen color={"dark"} isMobile={isMobile}/>
         </>
     )
 }

@@ -26,6 +26,7 @@ interface Props {
     color: 'light' | 'dark'
     isMobile?: boolean
     open?: boolean
+    tab: 'home' | 'search' | 'inbox' | 'post'
     page: 'single' | 'profile' | 'home' | 'post' | 'search'
     isNextPage? : boolean
     setValue?: any
@@ -33,7 +34,7 @@ interface Props {
     setSearchText?: any
 }
 export const ViewHeader: React.FC<Props> = (props: Props) => {
-    const {className, color, isMobile, open, page, isNextPage, setValue, selectedTab} = props;
+    const {className, color, isMobile, open, tab, page, isNextPage, setValue, selectedTab} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;
     const [searchText, setSearchText] = useState("");
     const [loading, setLoading] = useState(false)
@@ -75,7 +76,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                 />
                 {selectedTab === 'search' ? (
                     <div
-                        className={'h-[40px] w-[60%] rounded-[10px] overflow-hidden text-black relative'}
+                        className={'h-[40px] w-[60%] rounded-[10px] overflow-hidden relative'}
 
                     >
                         <input
@@ -206,6 +207,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         <Tab key="1"
                              title={
                                  <div className="flex items-center pl-[15px] pr-[15px] w-[50%]">
+                                     {/* eslint-disable-next-line react/no-unescaped-entities */}
                                      <span>Author's</span>
                                  </div>
                              }
@@ -213,6 +215,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         <Tab key="2"
                              title={
                                  <div className="flex items-center pl-[15px] pr-[15px] w-[50%]">
+                                     {/* eslint-disable-next-line react/no-unescaped-entities */}
                                      <span>Other's</span>
                                  </div>
                              }

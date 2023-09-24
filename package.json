@@ -34,6 +34,7 @@
     "react-swipeable-list": "^1.9.1",
     "tailwind-variants": "^0.1.14",
     "tailwindcss": "3.3.3",
-    "typescript": "5.2.2"
+    "typescript": "5.2.2",
+    "use-dark-mode": "^2.3.1"
   }
 }

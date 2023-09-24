@@ -18,7 +18,7 @@ export const viewHeader = tv({
             },
             dark: {
                 footer: 'bg-[#2C2C2C]',
-                HeaderInputArea: 'text-white',
+                HeaderInputArea: 'text-white bg-[#1C1C1C]',
             },
         },
         isMobile: {

@@ -133,8 +133,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     }
   return (
       <main className={PostCard({color:color})}
-            onMouseDown={handleTextSelect}
-            onMouseUp={handleTextDeselect}
+            //onMouseDown={handleTextSelect}
+            //onMouseUp={handleTextDeselect}
 
       >
           <SwipeableList>
@@ -252,7 +252,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                        style={{color:isReposted ? '#17BF63' : '#909090',}}/>
                                       <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
                                                        onClick={() => {handleLike()}}
-                                                       style={{color:isLiked ? '#E0245E' : '#909090',}}/>
+                                                       style={{color:isLiked ? '#fd7e00' : '#909090',}}/>
                                   </>
                               )}
                               {!isMobile && (
@@ -264,7 +264,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                        style={{color:isReposted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isReposted ? undefined : 'none'}}/>
                                       <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
                                                        onClick={() => {handleLike()}}
-                                                       style={{color:isLiked ? '#E0245E' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}/>
+                                                       style={{color:isLiked ? '#fd7e00' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}/>
                                   </>
                               )}
                           </div>

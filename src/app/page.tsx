@@ -9,6 +9,7 @@ import {useAgent} from "@/app/atoms/agent";
 
 
 
+
 export default function Root(props:any) {
     const [agent, setAgent] = useAgent()
     const [loading, setLoading] = useState(false)
@@ -16,8 +17,22 @@ export default function Root(props:any) {
     const [availavleNewTimeline, setAvailableNewTimeline] = useState(false)
     const [newTimeline, setNewTimeline] = useState([])
     const [cursor, setCursor] = useState(null)
-    const darkMode = useDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const color = darkMode.value ? 'dark' : 'light'
+    const [darkMode, setDarkMode] = useState(false);
+    const color = darkMode ? 'dark' : 'light'
+
+    const modeMe = (e) => {
+        setDarkMode(!!e.matches);
+    };
+
+    useEffect(() => {
+        const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
+
+        setDarkMode(matchMedia.matches);
+        matchMedia.addEventListener("change", modeMe);
+
+        return () => matchMedia.removeEventListener("change", modeMe);
+    }, []);
+
 
 
     const handleRefresh = () => {

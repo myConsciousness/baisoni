@@ -6,14 +6,20 @@ import {useState} from "react";
 import useDarkMode from "use-dark-mode";
 import {isMobile} from "react-device-detect";
 import {useAgent} from "@/app/atoms/agent";
+import { useSearchParams } from 'next/navigation'
+
 
 export default function Root() {
     const [agent, setAgent] = useAgent()
     const [loading, setLoading] = useState(false)
     const [searchResult, setSearchResult] = useState([])
-    const [searchText, setSearchText] = useState('ブルスコ')
+    const searchParams = useSearchParams()
+    const search = searchParams.get('word')
+    console.log(search)
+    const [searchText, setSearchText] = useState(searchParams.get('word'))
     const darkMode = useDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
     const color = darkMode.value ? 'dark' : 'light'
+
 
     const fetchResult = async (query: string) => {
         try {
@@ -53,9 +59,15 @@ export default function Root() {
     };
 
     useEffect(() => {
+        setSearchText(search)
+    },[search])
+
+    useEffect(() => {
         console.log('Effect')
+        console.log(searchText)
+        if(searchText === '' || !searchText) return
         fetchResult(searchText);
-    }, [searchText]);
+    }, [agent, searchText]);
 
     return(
         <>

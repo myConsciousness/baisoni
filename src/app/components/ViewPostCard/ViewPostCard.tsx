@@ -4,8 +4,8 @@ import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import { faRetweet, faEllipsis, faFlag, faLink, faCode, faFont } from '@fortawesome/free-solid-svg-icons'
-import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
-import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons'
+import { faStar as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
+import { faStar as faHeartSolid } from '@fortawesome/free-solid-svg-icons'
 
 import 'react-circular-progressbar/dist/styles.css';
 import {
@@ -153,7 +153,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                        }}
                   >
                       {json?.reason && (
-                          <div className={'text-[13px] ml-[40px] text-[#909090]'}>
+                          <div className={'text-[13px] ml-[40px] text-[#909090] text-bold'}>
                               Reposted by {json.reason.by.displayName}
                           </div>
                       )}
@@ -227,12 +227,17 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <Skeleton className={skeletonText2line({color: color})}/>
                                   </div>
                           ) : (
-                              <div className={''}>{postJson?.record?.text}</div>
+                              <div className={''}>{postJson?.record?.text.split('\n').map((line:string, index: number) => (
+                                  <span key={index}>
+                                      {line}
+                                      <br />
+                                  </span>
+                              ))}</div>
                           )}
-                          {numbersOfImage > 0 && (
+                          {postJson?.embed?.images?.length > 0 && (
                               <div className={'mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden'}>
-                                  {numbersOfImage === 1 && (
-                                      <img className={'w-full h-full'} src={'https://av-cdn.bsky.app/img/feed_thumbnail/plain/did:plc:txandrhc7afdozk6a2itgltm/bafkreicjjy62rajw47mhgx4iaqvqywvmxdcfjttwhj3vu3y7c5spzapwwq@jpeg'}></img>
+                                  {postJson?.embed?.images?.length === 1 && (
+                                      <img className={'w-full h-full'} src={postJson.embed.images[0].thumb}></img>
                                   )}
                               </div>
                           )}

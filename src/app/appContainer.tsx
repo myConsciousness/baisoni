@@ -28,13 +28,17 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
 
         <main className={background({ color: color, isMobile: isMobile })}>
             <div className={'h-full max-w-[600px] min-w-[350px] w-full'}>
-                <ViewHeader color={color} page={'search'} tab={selectedTab} setValue={setValue} setSearchText={setSearchText} selectedTab={selectedTab}/>
+                {selectedTab !== 'post' && (
+                    <ViewHeader color={color} page={'search'} tab={selectedTab} setValue={setValue} setSearchText={setSearchText} selectedTab={selectedTab}/>
+                )}
                 <div className={'pt-[100px] h-[calc(100%-50px)] overflow-y-scroll'}>
                     {React.cloneElement(children as any, {
                         name: 'hoge',
                     })}
                 </div>
-                <TabBar color={color} selected={'search'} setValue={setSelectedTab}/>
+                {selectedTab !== 'post' && (
+                    <TabBar color={color} selected={'search'} setValue={setSelectedTab}/>
+                )}
             </div>
         </main>
     )

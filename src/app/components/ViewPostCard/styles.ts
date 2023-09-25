@@ -50,7 +50,7 @@ export const viewPostCard = tv({
             false: {
                 PostModal: "rounded-[10px] overflow-hidden min-h-[400px]",
                 background: "relative flex justify-center items-center",
-                PostContent: 'text-base mb-[6px]',
+                PostContent: 'text-[15px] mb-[6px]',
             },
         },
     }

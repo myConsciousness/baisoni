@@ -10,52 +10,41 @@ import {useAgent} from "@/app/atoms/agent";
 export default function Root() {
     const [agent, setAgent] = useAgent()
     const [loading, setLoading] = useState(false)
-    const [searchResult, setSearchResult] = useState([])
+    const [notification, setNotification] = useState([])
     const [searchText, setSearchText] = useState('ブルスコ')
     const darkMode = useDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
     const color = darkMode.value ? 'dark' : 'light'
 
-    const fetchResult = async (query: string) => {
-        try {
-            console.log(agent)
-            if (!agent) return;
-            setLoading(true);
-            if (query === '') return;
-            const res = await fetch(`https://search.bsky.social/search/posts?q=${query}&offset=0`);
-            const json = await res.json();
+    const fetchNotification = async () => {
+        try{
+            setLoading(true)
+            const res = await agent?.listNotifications()
+            if (res) {
+                const { data } = res;
+                console.log(data);
+                const replyNotifications = data.notifications.filter(notification => notification.reason === 'reply' || notification.reason === 'mention')
+                console.log(replyNotifications)
+                const hoge = await agent?.getPosts({ uris: replyNotifications.map((notification: any) => notification.uri) })
+                console.log(hoge)
+                setNotification(hoge?.data?.posts)
 
-            const outputArray = json.map((item: any) => `at://${item.user.did as string}/${item.tid as string}`);
-
-            if (outputArray.length === 0) return;
-
-            const maxBatchSize = 25; // 1つのリクエストに許容される最大数
-            const batches = [];
-            for (let i = 0; i < outputArray.length; i += maxBatchSize) {
-                const batch = outputArray.slice(i, i + maxBatchSize);
-                batches.push(batch);
+            } else {
+                // もしresがundefinedだった場合の処理
+                console.log('Responseがundefinedです。')
             }
-
-            const results = [];
-
-            for (const batch of batches) {
-                const { data } = await agent?.getPosts({ uris: batch });
-                const { posts } = data;
-                results.push(...posts);
-            }
-            console.log(results)
-
-            setSearchResult(results);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        } finally {
-            setLoading(false);
+            setLoading(false)
+            console.log(notification)
+        }catch(e){
+            setLoading(false)
+            console.log(e)
         }
-    };
+    }
 
     useEffect(() => {
+        if(!agent) return
         console.log('Effect')
-        fetchResult(searchText);
-    }, [searchText]);
+        fetchNotification();
+    }, [agent]);
 
     return(
         <>
@@ -71,7 +60,7 @@ export default function Root() {
                     />
                 ))
             ) : (
-                searchResult.map((post, index) => (
+                notification.map((post, index) => (
                     // eslint-disable-next-line react/jsx-key
                     <ViewPostCard key={index} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
                 ))

@@ -40,6 +40,6 @@ export const useRequiredSession = () => {
     useEffect(() => {
         restoreSession()
     }, [restoreSession])
-
+    console.log(agent)
     return { agent }
 }

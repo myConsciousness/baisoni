@@ -32,7 +32,6 @@ import {
     TrailingActions,
 } from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
-import {useRequiredSession} from "@/app/lib/hooks/useRequiredSession";
 import {useAgent} from "@/app/atoms/agent";
 
 interface Props {
@@ -45,11 +44,12 @@ interface Props {
     numbersOfImage: 0 | 1 | 2 | 3 | 4,
     postJson?: any
     isSkeleton?: boolean
+    json?: any
 }
 export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [ agent ] = useAgent()
 
-    const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton} = props;
+    const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;
     const [loading, setLoading] = useState(false)
     const [isHover, setIsHover] = useState<boolean>(false)
@@ -152,6 +152,11 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                            setIsHover(false)
                        }}
                   >
+                      {json?.reason && (
+                          <div className={'text-[13px] ml-[40px] text-[#909090]'}>
+                              Reposted by {json.reason.by.displayName}
+                          </div>
+                      )}
                       <div className={PostAuthor()}>
                           <div className={PostAuthorIcon()}>
                               {isSkeleton ? (
@@ -222,7 +227,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <Skeleton className={skeletonText2line({color: color})}/>
                                   </div>
                           ) : (
-                              <div className={''}>{postJson.record?.text}</div>
+                              <div className={''}>{postJson?.record?.text}</div>
                           )}
                           {numbersOfImage > 0 && (
                               <div className={'mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden'}>

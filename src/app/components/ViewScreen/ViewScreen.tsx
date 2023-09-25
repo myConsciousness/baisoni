@@ -20,11 +20,10 @@ interface Props {
     tab: "home" | "search" | "inbox" | "post";
 }
 import { useAgent } from '../../atoms/agent'
-import { useRequiredSession } from '../../lib/hooks/useRequiredSession'
 
 
 export const ViewScreen: React.FC<Props> = (props: Props) => {
-    const { agent } = useRequiredSession()
+    const [agent, setAgent] = useAgent()
     const { className, isMobile, uploadImageAvailable, tab } = props;
     const { background, tabbar } = viewScreen();
     const [loading, setLoading] = useState(true);
@@ -33,8 +32,6 @@ export const ViewScreen: React.FC<Props> = (props: Props) => {
     const [selectedTab, setSelectedTab] = useState(tab);
     const [searchText, setSearchText] = useState("");
     const darkMode = useDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-
     const color = darkMode.value ? 'dark' : 'light'
 
 

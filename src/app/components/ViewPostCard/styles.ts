@@ -27,6 +27,7 @@ export const viewPostCard = tv({
         color:{
             light: {
                 PostCard: 'bg-white',
+                PostAuthorDisplayName: 'text-black',
             },
             dark: {
                 PostCard: 'bg-[#2C2C2C] text-[#D7D7D7] border-[#181818]',

@@ -165,7 +165,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
 
                                   )}
                           </Link>
-                          <Link className={PostAuthorDisplayName()} style={{fontSize:'13px'}} href={`/profile/${postJson?.author.did}`}>
+                          <Link className={PostAuthorDisplayName({color: color})} style={{fontSize:'13px'}} href={`/profile/${postJson?.author.did}`}>
                                 {isSkeleton ? (
                                     <Skeleton className={skeletonName({color:color})}/>
                                     ) : (
@@ -173,7 +173,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                 )}
                           </Link>
                           <div className={'text-[#BABABA]'}>&nbsp;-&nbsp;</div>
-                          <Link className={PostAuthorHandle()} href={`/profile/${postJson?.author.did}`}>
+                          <Link className={PostAuthorHandle({color: color})} href={`/profile/${postJson?.author.did}`}>
                               {isSkeleton ? (
                                       <Skeleton className={skeletonHandle({color: color})}/>
                               ) : (

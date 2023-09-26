@@ -88,9 +88,6 @@ export default function Root(props:any) {
                 const {feed} = data
                 const filteredData = FormattingTimeline(feed)
                 setTimeline(filteredData);
-                filteredData.map((post: any) => {
-                    console.log(post)
-                })
             } else {
                 // もしresがundefinedだった場合の処理
                 console.log('Responseがundefinedです。')
@@ -117,6 +114,9 @@ export default function Root(props:any) {
                 return !timeline.some(oldItem => oldItem.post === newItem.post);
             });
 
+            console.log(timeline)
+            console.log(diffTimeline)
+
             //取得データをリストに追加
             setTimeline([...timeline, ...diffTimeline])
             setLoading2(false)
@@ -136,6 +136,10 @@ export default function Root(props:any) {
 
                 if(data.cursor && data.cursor !== cursor){
                     setNewCursor(data.cursor)
+                    const diffTimeline = filteredData.filter(newItem => {
+                        return !timeline.some(oldItem => oldItem.post.uri === newItem.post.uri);
+                    });
+                    console.log(diffTimeline);
                     setAvailableNewTimeline(true)
                     setNewTimeline(filteredData)
                 }
@@ -169,32 +173,34 @@ export default function Root(props:any) {
                     >New Posts</div>
                 </div>
             )}
-            {
-            loading ? (
-                Array.from({ length: 15 }, (_, index) => (
-                    <ViewPostCard
-                        key={`skeleton-${index}`}
-                        color={color}
-                        numbersOfImage={0}
-                        postJson={null}
-                        isMobile={isMobile}
-                        isSkeleton={true}
-                    />
-                ))
-            ) : (
-                <InfiniteScroll
-                    loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
-                    hasMore={!loading2}         //読み込みを行うかどうかの判定
-                    loader={<Spinner/>}
-                    threshold={1000}
-                    useWindow={true}
-                >
-                    {timeline.map((post, index) => (
-                        // eslint-disable-next-line react/jsx-key
-                        <ViewPostCard key={index} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
-                    ))}
-                </InfiniteScroll>
-            )}
+            <>
+                {
+                    (loading || !agent) ? (
+                        Array.from({ length: 15 }, (_, index) => (
+                            <ViewPostCard
+                                key={`skeleton-${index}`}
+                                color={color}
+                                numbersOfImage={0}
+                                postJson={null}
+                                isMobile={isMobile}
+                                isSkeleton={true}
+                            />
+                        ))
+                    ) : (
+                        <InfiniteScroll
+                            loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
+                            hasMore={!loading2}         //読み込みを行うかどうかの判定
+                            loader={<Spinner/>}
+                            threshold={1500}
+                            useWindow={false}
+                        >
+                            {timeline.map((post, index) => (
+                                // eslint-disable-next-line react/jsx-key
+                                <ViewPostCard color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
+                            ))}
+                        </InfiniteScroll>
+                    )}
+            </>
         </>
     )
 }

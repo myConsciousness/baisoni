@@ -9,18 +9,17 @@ import {usePathname, useRouter, useSearchParams} from 'next/navigation';
 
 export function AppConatiner({ children }: { children: React.ReactNode }) {
     const router = useRouter()
-    const location = usePathname();
-    const [searchResult, setSearchResult] = useState<any[]>([]);
-    const [value, setValue] = useState(false)
     let pathName = usePathname()
     const searchParams = useSearchParams()
     const target = searchParams.get('target')
+    const [value, setValue] = useState(false)
     const tab = pathName === '/' ? 'home' : (pathName === '/search' || pathName === '/inbox' || pathName === '/post') ? pathName.replace("/",'') : 'home';
     const [selectedTab, setSelectedTab] = useState<"home" | "search" | "inbox" | "post">(tab);
     const [searchText, setSearchText] = useState("");
-    const {background} = layout();
     const specificPaths = ['/post', '/login']
     const isMatchingPath = specificPaths.includes(pathName)
+    const {background} = layout();
+
     const [darkMode, setDarkMode] = useState(false);
     const color = darkMode ? 'dark' : 'light'
 
@@ -42,20 +41,19 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
 
         return () => matchMedia.removeEventListener("change", modeMe);
     }, []);
-
     return (
 
         <main className={background({ color: color, isMobile: isMobile })}>
             <div className={'h-full max-w-[600px] min-w-[350px] w-full'}>
-                {location !== '/post' && location !== '/login' && (
+                {pathName !== '/post' && pathName !== '/login' && (
                     <ViewHeader color={color} page={'search'} tab={selectedTab} setValue={setValue} setSearchText={setSearchText} selectedTab={selectedTab}/>
                 )}
-                <div className={`pt-[${isMatchingPath ? `0px` : `100px`}] overflow-y-scroll`}>
+                <div className={`pt-[${isMatchingPath ? `0px` : `100px`}] h-[calc(100%-50px)] overflow-y-scroll`}>
                     {React.cloneElement(children as any, {
                         name: 'hoge',
                     })}
                 </div>
-                {location !== '/post' && location !== '/login' && (
+                {pathName !== '/post' && pathName !== '/login' && (
                     <TabBar color={color} selected={'search'} setValue={setSelectedTab}/>
                 )}
             </div>

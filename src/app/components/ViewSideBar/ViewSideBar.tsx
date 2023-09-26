@@ -5,7 +5,6 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faImage, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { faBookmark, faVolumeXmark, faRss, faUser, faHand, faGear, faFlag, faCircleQuestion, faUsers, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { useDropzone, FileWithPath } from 'react-dropzone'
 import 'react-circular-progressbar/dist/styles.css';
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'

@@ -55,7 +55,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [isHover, setIsHover] = useState<boolean>(false)
     const { PostCard, PostAuthor, PostContent, PostReactionButtonContainer, PostCardContainer, PostReactionButton,
         PostAuthorIcon, PostAuthorDisplayName, PostAuthorHandle, PostCreatedAt, dropdown,skeletonIcon, skeletonName, skeletonHandle, skeletonText1line, skeletonText2line } = viewPostCard();
-
     const [isLiked, setIsLiked] = useState<boolean>(postJson?.viewer?.like)
     const [isReposted, setIsReposted] = useState<boolean>(postJson?.viewer?.repost)
     const [postInfo, setPostInfo] = useState<any>(null)
@@ -158,29 +157,29 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                           </div>
                       )}
                       <div className={PostAuthor()}>
-                          <div className={PostAuthorIcon()}>
+                          <Link className={PostAuthorIcon()} href={`/profile/${postJson?.author.did}`}>
                               {isSkeleton ? (
                                   <Skeleton className={skeletonIcon({color:color})}/>
                               ) : (
                                   <img src={postJson?.author?.avatar}/>
 
                                   )}
-                          </div>
-                          <div className={PostAuthorDisplayName()} style={{fontSize:'13px'}}>
+                          </Link>
+                          <Link className={PostAuthorDisplayName()} style={{fontSize:'13px'}} href={`/profile/${postJson?.author.did}`}>
                                 {isSkeleton ? (
                                     <Skeleton className={skeletonName({color:color})}/>
                                     ) : (
-                                    <div>{postJson?.author?.displayName}</div>
+                                    <span>{postJson?.author?.displayName}</span>
                                 )}
-                          </div>
+                          </Link>
                           <div className={'text-[#BABABA]'}>&nbsp;-&nbsp;</div>
-                          <div className={PostAuthorHandle()}>
+                          <Link className={PostAuthorHandle()} href={`/profile/${postJson?.author.did}`}>
                               {isSkeleton ? (
                                       <Skeleton className={skeletonHandle({color: color})}/>
                               ) : (
-                                  <div>{postJson?.author?.handle}</div>
+                                  <span>{postJson?.author?.handle}</span>
                               )}
-                          </div>
+                          </Link>
                           <div className={PostCreatedAt()} style={{fontSize:'12px'}}>
                               {isHover && !isSkeleton ? (
                                   <Dropdown className={dropdown({color:color})}>

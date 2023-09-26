@@ -1,18 +1,24 @@
 import { useAgent } from '../../atoms/agent'
 import { BskyAgent } from '@atproto/api'
-import { useRouter } from 'next/navigation'
+import {useRouter, useSearchParams} from 'next/navigation'
 import { useCallback, useEffect } from 'react'
+import { usePathname } from 'next/navigation';
+
 
 export const useRequiredSession = () => {
     const router = useRouter()
     const [agent, setAgent] = useAgent()
+    const searchParams = useSearchParams()
+    const toRedirect = searchParams.get('toRedirect')
+    const pathname = usePathname()
 
     const restoreSession = useCallback(async () => {
         const sessionJson = localStorage.getItem('session')
 
         if (!sessionJson) {
+            if(pathname === '/login') return
             if (router) {
-                router.push('/login')
+                router.push(`/login${pathname? `?toRedirect=${pathname.replace('/', '')}${searchParams ? `&${searchParams}` : ``}` : ``}`)
             } else {
                 location.href = '/login'
             }
@@ -27,10 +33,10 @@ export const useRequiredSession = () => {
 
             setAgent(agent)
         } catch (error) {
-            //alert(error)
             console.error(error)
+            if(pathname === '/login') return
             if (router) {
-                router.push('/login')
+                router.push(`/login${pathname? `?toRedirect=${pathname.replace('/', '')}${searchParams ? `&${searchParams}` : ``}` : ``}`)
             } else {
                 location.href = '/login'
             }

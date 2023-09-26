@@ -3,25 +3,44 @@ import {ViewScreen} from "@/app/components/ViewScreen";
 import {ViewPostCard} from "@/app/components/ViewPostCard";
 import React, {useEffect} from "react";
 import {useState} from "react";
-import useDarkMode from "use-dark-mode";
 import {isMobile} from "react-device-detect";
 import {useAgent} from "@/app/atoms/agent";
-import { useSearchParams } from 'next/navigation'
+import {usePathname, useSearchParams} from 'next/navigation'
+import {Image} from "@nextui-org/react";
+import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import type { ProfileView } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
+
 
 
 export default function Root() {
     const [agent, setAgent] = useAgent()
     const [loading, setLoading] = useState(false)
-    const [searchResult, setSearchResult] = useState([])
+    const [searchPostsResult, setSearchPostsResult] = useState<PostView[]>([])
+    const [searchUsersResult, setSearchUsersResult] = useState<ProfileView[]>([])
+    console.log('hgoehogehgoe')
     const searchParams = useSearchParams()
-    const search = searchParams.get('word')
-    console.log(search)
+    const searchWord = searchParams.get('word')
+    const target = searchParams.get('target')
     const [searchText, setSearchText] = useState(searchParams.get('word'))
-    const darkMode = useDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const color = darkMode.value ? 'dark' : 'light'
+    const [searchTarget, setSearchTarget] = useState(searchParams.get('target'))
+    const [darkMode, setDarkMode] = useState(false);
+    const color = darkMode ? 'dark' : 'light'
+
+    const modeMe = (e:any) => {
+        setDarkMode(!!e.matches);
+    };
+
+    useEffect(() => {
+        const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
+
+        setDarkMode(matchMedia.matches);
+        matchMedia.addEventListener("change", modeMe);
+
+        return () => matchMedia.removeEventListener("change", modeMe);
+    }, []);
 
 
-    const fetchResult = async (query: string) => {
+    const fetchSearchResult = async (query: string) => {
         try {
             console.log(agent)
             if (!agent) return;
@@ -48,45 +67,105 @@ export default function Root() {
                 const { posts } = data;
                 results.push(...posts);
             }
-            console.log(results)
+            //console.log(results)
 
-            setSearchResult(results);
+            setSearchPostsResult(results);
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
             setLoading(false);
         }
-    };
+    }
+
+    const fetchSearchUsers = async (term: string) => {
+        try{
+            setLoading(true)
+            if(!agent) return
+            const {data} = await agent.searchActors({term: term})
+            console.log(data)
+            setSearchUsersResult(data.actors)
+            setLoading(false)
+        }catch (e) {
+
+        }
+    }
 
     useEffect(() => {
-        setSearchText(search)
-    },[search])
+        setSearchText(searchWord)
+    },[searchWord])
+    useEffect(() => {
+        setSearchTarget(target)
+    },[target])
 
     useEffect(() => {
         console.log('Effect')
-        console.log(searchText)
+        //console.log(searchText)
         if(searchText === '' || !searchText) return
-        fetchResult(searchText);
-    }, [agent, searchText]);
+        switch (searchTarget) {
+            case 'posts':
+                fetchSearchResult(searchText);
+                break;
+            case 'users':
+                fetchSearchUsers(searchText);
+                break;
+        }
+    }, [agent, searchText, searchTarget]);
 
     return(
         <>
-            {loading ? (
-                Array.from({ length: 15 }, (_, index) => (
-                    <ViewPostCard
-                        key={`skeleton-${index}`}
-                        color={color}
-                        numbersOfImage={0}
-                        postJson={null}
-                        isMobile={isMobile}
-                        isSkeleton={true}
-                    />
-                ))
-            ) : (
-                searchResult.map((post, index) => (
-                    // eslint-disable-next-line react/jsx-key
-                    <ViewPostCard key={index} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
-                ))
+            {target === 'posts' && (
+                loading ? (
+                        Array.from({ length: 15 }, (_, index) => (
+                            <ViewPostCard
+                                key={`skeleton-${index}`}
+                                color={color}
+                                numbersOfImage={0}
+                                postJson={null}
+                                isMobile={isMobile}
+                                isSkeleton={true}
+                            />
+                        ))
+                    ) : (
+                        searchPostsResult.map((post: PostView, index) => (
+                            // eslint-disable-next-line react/jsx-key
+                            <ViewPostCard key={post.uri} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
+                        ))
+                    )
+            )}
+            {target === 'users' && (
+                loading ? (
+                    Array.from({ length: 15 }, (_, index) => (
+                        <ViewPostCard
+                            key={`skeleton-${index}`}
+                            color={color}
+                            numbersOfImage={0}
+                            postJson={null}
+                            isMobile={isMobile}
+                            isSkeleton={true}
+                        />
+                    ))
+                ) : (
+                    searchUsersResult.map((actor:ProfileView, index) => (
+                        // eslint-disable-next-line react/jsx-key
+                        //<ViewPostCard key={index} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
+                        <>
+                            <div key={actor.did}
+                                 className={'w-full max-w-[600px] h-[100px] flex items-center bg-[#2C2C2C] text-[#D7D7D7] border-[#181818] border-b-[1px] overflow-x-hidden'}>
+                                <div className={'h-[50px] w-[50px] rounded-[10px] ml-[10px] mr-[10px]'}>
+                                    <Image className={'h-full w-full'} src={actor?.avatar} alt={'avatar image'}/>
+                                </div>
+                                <div className={'h-[50px]'}>
+                                    <div className={'flex w-full'}>
+                                        <div className={''}>{actor.displayName}</div>
+                                        <div className={'text-[#BABABA]'}>&nbsp;-&nbsp;</div>
+                                        <div className={''}>{actor.handle}</div>
+                                    </div>
+                                    <div className={'w-[calc(500px)] whitespace-nowrap text-ellipsis overflow-hidden'}>{actor.description}</div>
+                                </div>
+                            </div>
+                        </>
+                    ))
+                )
             )}
         </>
     )

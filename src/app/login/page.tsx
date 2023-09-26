@@ -1,27 +1,13 @@
 'use client'
-import {useState, useRef, useEffect} from "react";
-import { createLoginPage } from "./styles";
-import { AppBskyFeedPost, BskyAgent, RichText, AtpAgentLoginOpts, AtpSessionData } from "@atproto/api";
-
-import { BrowserView, MobileView, isMobile } from "react-device-detect"
+import {useEffect, useState} from "react";
+import {createLoginPage} from "./styles";
+import {BskyAgent} from "@atproto/api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { faImage } from '@fortawesome/free-regular-svg-icons'
-import { faLink, faLock, faUser, faList } from '@fortawesome/free-solid-svg-icons'
+import {faLink, faList, faLock, faUser} from '@fortawesome/free-solid-svg-icons'
 //import { CircularProgressbar } from 'react-circular-progressbar';
 //import 'react-circular-progressbar/dist/styles.css';
-
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownSection,
-  DropdownItem,
-  Button,
-  Image,
-  Spinner,
-  Input,
-} from "@nextui-org/react";
-import {store} from "next/dist/build/output/store";
+import {Button, Spinner,} from "@nextui-org/react";
+import {useSearchParams} from "next/navigation";
 
 export default function CreateLoginPage() {
   const [loading, setLoading] = useState(false)
@@ -29,6 +15,8 @@ export default function CreateLoginPage() {
   const [user, setUser] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [isLoginFailed, setIsLoginFailed] = useState<boolean>(false)
+  const searchParams = useSearchParams()
+  const toRedirect = searchParams.get('toRedirect')
   const { background,
     LoginForm, LoginFormConnectServer,
     LoginFormHandle, LoginFormPassword,
@@ -82,7 +70,15 @@ export default function CreateLoginPage() {
         localStorage.setItem('Accounts', JSON.stringify(accountsData));
       }
 
-      location.href = '/'
+      if(toRedirect){
+        const url = `/${toRedirect}${searchParams ? `&${searchParams}` : ``}`
+        const paramName = 'toRedirect';
+        location.href = url.replace(
+            new RegExp(`[?&]${paramName}=[^&]*(&|$)`, 'g'), // パラメータを正確に一致させる正規表現
+            '?')
+      }else{
+        location.href = '/'
+      }
 
     } catch(e) {
         console.log(e)
@@ -101,7 +97,16 @@ export default function CreateLoginPage() {
           const {session} = JSON.parse(storedData)
           await agent.resumeSession(session)
 
-          location.href = '/home'
+          if(toRedirect){
+
+            const url = `/${toRedirect}${searchParams ? `&${searchParams}` : ``}`
+            const paramName = 'toRedirect';
+            location.href = url.replace(
+                new RegExp(`[?&]${paramName}=[^&]*(&|$)`, 'g'), // パラメータを正確に一致させる正規表現
+                '?')
+          }else{
+            location.href = '/'
+          }
         }
       }catch (e) {
         console.log(e)

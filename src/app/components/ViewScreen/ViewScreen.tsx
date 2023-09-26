@@ -8,7 +8,7 @@ import {ViewSideBar} from "../ViewSideBar";
 import {Navbar} from "@nextui-org/react";
 import {SearchTabtPage} from "../SearchTabPage";
 //import {Swiper} from "swiper/react"
-import useDarkMode from "use-dark-mode";
+//import useDarkMode from "use-dark-mode";
 
 interface Props {
     className?: string;
@@ -31,8 +31,8 @@ export const ViewScreen: React.FC<Props> = (props: Props) => {
     const [value, setValue] = useState(false)
     const [selectedTab, setSelectedTab] = useState(tab);
     const [searchText, setSearchText] = useState("");
-    const darkMode = useDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
-    const color = darkMode.value ? 'dark' : 'light'
+    const darkMode = true
+    const color = darkMode ? 'dark' : 'light'
 
 
 

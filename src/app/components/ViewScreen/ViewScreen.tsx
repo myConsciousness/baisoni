@@ -98,7 +98,7 @@ export const ViewScreen: React.FC<Props> = (props: Props) => {
                             ) : (
                                 searchResult.map((post, index) => (
                                     // eslint-disable-next-line react/jsx-key
-                                    <ViewPostCard key={index} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
+                                    <ViewPostCard key={`search-${index}-${post.uri}`} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
                                 ))
                             )
                         )}

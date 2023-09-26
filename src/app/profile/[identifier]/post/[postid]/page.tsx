@@ -20,9 +20,9 @@ import {
 } from '@fortawesome/free-regular-svg-icons'
 import {
     faArrowUpFromBracket,
-    faBookmark as faSolidBookmark, faCode,
+    faBookmark as faSolidBookmark, faCheckCircle, faCircleQuestion, faCircleXmark, faCode,
     faCopy,
-    faEllipsis, faFlag, faLanguage,
+    faEllipsis, faFlag, faHashtag, faLanguage,
     faQuoteLeft,
     faRetweet,
     faSquare as faSolidSquare, faTrash, faU, faUser
@@ -37,7 +37,7 @@ import {
     Image,
     Spinner,
     Input,
-    Popover, PopoverTrigger, PopoverContent,useDisclosure
+    Popover, PopoverTrigger, PopoverContent, useDisclosure, Link, Chip, Tooltip
 } from "@nextui-org/react";
 
 import {
@@ -157,6 +157,97 @@ export default function Root() {
     },[agent, atUri])
 
 
+    const renderTextWithLinks = () => {
+        const encoder = new TextEncoder();
+        let decoder = new TextDecoder();
+        if(!post.post.record?.facets){
+            let memo: any[] = []
+            post.post.record.text.split('\n').map((line:any, i:number) => {
+                memo.push(<p key={i}>{line}<br/></p>)
+            })
+            return memo
+        }
+        const { text, facets } = post.post.record;
+        const text_bytes = encoder.encode(text);
+        let result: any[] = [];
+        let lastOffset = 0;
+
+        facets.forEach((facet:any, index:number) => {
+            const { byteStart, byteEnd } = facet.index;
+            const facetText = decoder.decode(text_bytes.slice(byteStart, byteEnd));
+
+            // 直前のテキストを追加
+            if (byteStart > lastOffset) {
+                const nonLinkText = decoder.decode(text_bytes.slice(lastOffset, byteStart));
+                nonLinkText.split('\n').map((line:any, i:number) => {
+                    result.push(<span key={`text-${i}-${byteStart}`}>{line}</span>)
+
+                })
+            }
+
+            switch (facet.features[0].$type) {
+                case "app.bsky.richtext.facet#mention":
+                    result.push(
+                        <Link key={`link-${index}-${byteStart}`} href={`/profile/${facet.features[0].did}`}>
+                            {facetText}
+                        </Link>
+                    )
+                    break
+
+                case "app.bsky.richtext.facet#link":
+                    result.push(
+                        <span>
+                            <Chip
+                                className={color}
+                                startContent={<Tooltip showArrow={true} color={'foreground'}
+                                                       content={facetText === facet.features[0].uri ? "リンク偽装の心配はありません。" : facet.features[0].uri.includes(facetText.replace('...', '')) ?  'URL短縮の可能性があります。' : 'リンク偽装の可能性があります。'}
+                                >
+                                    <FontAwesomeIcon icon={facetText === facet.features[0].uri ? faCheckCircle : facet.features[0].uri.includes(facetText.replace('...', '')) ? faCircleQuestion : faCircleXmark} />
+                                </Tooltip>}
+                                variant="faded"
+                                color={facetText === facet.features[0].uri ? "success" : facet.features[0].uri.includes(facetText.replace('...', '')) ? 'default' : "danger"}
+                            >
+                            <a key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
+                                {facetText}
+                            </a>
+                            </Chip>
+                        </span>
+                    )
+                    break
+
+                case "app.bsky.richtext.facet#tag":
+                    result.push(
+                        <span>
+                            <Chip
+                                className={color}
+                                startContent={<FontAwesomeIcon icon={faHashtag} />}
+                                variant="faded"
+                                color="primary"
+                            >
+                            <a key={`a-${index}-${byteStart}`} href={`/search?searchWord=${(facet.features[0].tag.replace('#', '%23'))}&target=posts`}>
+                                {facetText.replace('#', '')}
+                            </a>
+                        </Chip>
+                        </span>
+                    )
+                    break
+            }
+
+            lastOffset = byteEnd;
+        });
+
+        // 最後のテキストを追加
+        if (lastOffset < text_bytes.length) {
+            const nonLinkText = decoder.decode(text_bytes.slice(lastOffset));
+            nonLinkText.split('\n').map((line:any, i:number) => {
+                result.push(<span key={`div-${i}-${lastOffset}`}>{line}</span>)
+            })
+        }
+
+        return result
+    }
+
+
     return post && (
         <main className={Container({color:color})}>
             <div className={AuthorPost()}>
@@ -170,15 +261,7 @@ export default function Root() {
                     </div>
                 </div>
                 <div className={PostContent()}>
-                    <SwipeableList>
-                        <SwipeableListItem
-                            maxSwipe={80} // ここに適切な maxSwipe の値を設定する
-                            //leadingActions={leadingActions()}
-                            //trailingActions={trailingActions()}
-                        >
-                            {post.post.record?.text}
-                        </SwipeableListItem>
-                    </SwipeableList>
+                    {renderTextWithLinks()}
                     {translateError && (
                         <div className={'text-red-500'}>
                             Translation error

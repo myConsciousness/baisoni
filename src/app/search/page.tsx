@@ -10,6 +10,8 @@ import {Image, Spinner} from "@nextui-org/react";
 import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import type { ProfileView } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import InfiniteScroll  from "react-infinite-scroller"
+import {Link} from "@nextui-org/react"
+
 
 
 
@@ -201,7 +203,7 @@ export default function Root() {
                         // eslint-disable-next-line react/jsx-key
                         //<ViewPostCard key={index} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
                         <>
-                            <div key={actor.did}
+                            <Link key={actor.did} href={`/profile/${actor.did}`}
                                  className={'w-full max-w-[600px] h-[100px] flex items-center bg-[#2C2C2C] text-[#D7D7D7] border-[#181818] border-b-[1px] overflow-x-hidden'}>
                                 <div className={'h-[50px] w-[50px] rounded-[10px] ml-[10px] mr-[10px]'}>
                                     <Image className={'h-full w-full'} src={actor?.avatar} alt={'avatar image'}/>
@@ -214,7 +216,7 @@ export default function Root() {
                                     </div>
                                     <div className={'w-[calc(500px)] whitespace-nowrap text-ellipsis overflow-hidden'}>{actor.description}</div>
                                 </div>
-                            </div>
+                            </Link>
                         </>
                     ))
                 )

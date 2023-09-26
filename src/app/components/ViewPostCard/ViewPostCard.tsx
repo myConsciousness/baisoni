@@ -1,11 +1,11 @@
-import React, {useState, useRef, useCallback, useEffect} from "react";
+import React, {useState, useRef, useCallback, useEffect, ReactNode} from "react";
 import { viewPostCard } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import {faRetweet, faEllipsis, faFlag, faLink, faCode, faFont, faTrash} from '@fortawesome/free-solid-svg-icons'
 import { faStar as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
-import { faStar as faHeartSolid } from '@fortawesome/free-solid-svg-icons'
+import { faStar as faHeartSolid, faHashtag, faCheckCircle, faCircleXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
 
 import 'react-circular-progressbar/dist/styles.css';
 import {
@@ -20,8 +20,12 @@ import {
     Input,
     Link,
     Skeleton,
+    Chip,
+    Tooltip,
     Popover, PopoverTrigger, PopoverContent,
 } from "@nextui-org/react";
+import {RichText, UnicodeString} from '@atproto/api'
+
 
 
 import {
@@ -55,7 +59,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [loading, setLoading] = useState(false)
     const [isHover, setIsHover] = useState<boolean>(false)
     const { PostCard, PostAuthor, PostContent, PostReactionButtonContainer, PostCardContainer, PostReactionButton,
-        PostAuthorIcon, PostAuthorDisplayName, PostAuthorHandle, PostCreatedAt, dropdown,skeletonIcon, skeletonName, skeletonHandle, skeletonText1line, skeletonText2line } = viewPostCard();
+        PostAuthorIcon, PostAuthorDisplayName, PostAuthorHandle, PostCreatedAt, dropdown,skeletonIcon, skeletonName, skeletonHandle, skeletonText1line, skeletonText2line,chip } = viewPostCard();
     const [isLiked, setIsLiked] = useState<boolean>(postJson?.viewer?.like)
     const [isReposted, setIsReposted] = useState<boolean>(postJson?.viewer?.repost)
     const [postInfo, setPostInfo] = useState<any>(null)
@@ -147,6 +151,98 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const handleTextMouseUp = () => {
         setIsTextSelectionInProgress(false);
     };
+
+    const renderTextWithLinks = () => {
+        const encoder = new TextEncoder();
+        let decoder = new TextDecoder();
+        if(!postJson.record?.facets){
+            let post: any[] = []
+            postJson.record.text.split('\n').map((line:any, i:number) => {
+                post.push(<p key={i}>{line}</p>)
+            })
+            return post
+        }
+        const { text, facets } = postJson.record;
+        const text_bytes = encoder.encode(text);
+        let result: any[] = [];
+        let lastOffset = 0;
+
+        facets.forEach((facet:any, index:number) => {
+            const { byteStart, byteEnd } = facet.index;
+            const facetText = decoder.decode(text_bytes.slice(byteStart, byteEnd));
+
+            // 直前のテキストを追加
+            if (byteStart > lastOffset) {
+                const nonLinkText = decoder.decode(text_bytes.slice(lastOffset, byteStart));
+                nonLinkText.split('\n').map((line:any, i:number) => {
+                    result.push(<span key={`text-${i}-${byteStart}`}>{line}<br/></span>)
+
+                })
+            }
+
+            switch (facet.features[0].$type) {
+                case "app.bsky.richtext.facet#mention":
+                    result.push(
+                        <Link key={`link-${index}-${byteStart}`} href={`/profile/${facet.features[0].did}`}>
+                            {facetText}
+                        </Link>
+                    )
+                    break
+
+                case "app.bsky.richtext.facet#link":
+                    result.push(
+                        <span>
+                            <Chip
+                                className={chip({color:color})}
+                                startContent={<Tooltip showArrow={true} color={'foreground'}
+                                                       content={facetText === facet.features[0].uri ? "リンク偽装の心配はありません。" : facet.features[0].uri.includes(facetText.replace('...', '')) ?  'URL短縮の可能性があります。' : 'リンク偽装の可能性があります。'}
+                                >
+                                    <FontAwesomeIcon icon={facetText === facet.features[0].uri ? faCheckCircle : facet.features[0].uri.includes(facetText.replace('...', '')) ? faCircleQuestion : faCircleXmark} />
+                                </Tooltip>}
+                                variant="faded"
+                                color={facetText === facet.features[0].uri ? "success" : facet.features[0].uri.includes(facetText.replace('...', '')) ? 'default' : "danger"}
+                            >
+                            <a key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
+                                {facetText}
+                            </a>
+                            </Chip>
+                        </span>
+                    )
+                    break
+
+                case "app.bsky.richtext.facet#tag":
+                    result.push(
+                        <span>
+                            <Chip
+                                className={chip({color:color})}
+                                startContent={<FontAwesomeIcon icon={faHashtag} />}
+                                variant="faded"
+                                color="primary"
+                            >
+                            <a key={`a-${index}-${byteStart}`} href={`/search?searchWord=${(facet.features[0].tag.replace('#', '%23'))}&target=posts`}>
+                                {facetText.replace('#', '')}
+                            </a>
+                        </Chip>
+                        </span>
+                    )
+                    break
+            }
+
+            lastOffset = byteEnd;
+        });
+
+        // 最後のテキストを追加
+        if (lastOffset < text_bytes.length) {
+            const nonLinkText = decoder.decode(text_bytes.slice(lastOffset));
+            console.log(nonLinkText)
+            nonLinkText.split('\n').map((line:any, i:number) => {
+                result.push(<span key={`div-${i}-${lastOffset}`}>{line}</span>)
+            })
+        }
+
+        return result
+    };
+
   return (
       <main className={PostCard({color:color})}
             //onMouseDown={handleTextSelect}
@@ -172,9 +268,11 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                        }}
                   >
                       {json?.reason && (
-                          <div className={'text-[13px] ml-[40px] text-[#909090] text-bold'}>
+                          <Link className={'text-[13px] ml-[40px] text-[#909090] text-bold'}
+                                href={`/profile/${json.reason.by.did}`}
+                          >
                               Reposted by {json.reason.by.displayName}
-                          </div>
+                          </Link>
                       )}
                       <div className={PostAuthor()}>
                           <Link className={PostAuthorIcon()} href={`/profile/${postJson?.author.did}`}>
@@ -222,7 +320,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           </DropdownItem>
                                           <DropdownItem key='2' startContent={<FontAwesomeIcon icon={faCode}/>}
                                                         onClick={() => {
-                                                            navigator.clipboard.writeText(postJson)
+                                                            navigator.clipboard.writeText(JSON.stringify(postJson))
                                                         }}
                                           >
                                               Copy Post JSON
@@ -267,12 +365,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <Skeleton className={skeletonText2line({color: color})}/>
                                   </div>
                           ) : (
-                              <div onClick={(e) => {e.stopPropagation()}}>{postJson?.record?.text.split('\n').map((line:string, index: number) => (
-                                  <span key={index}>
-                                      {line}
-                                      <br />
-                                  </span>
-                              ))}</div>
+                              <div onClick={(e) => {e.stopPropagation()}}>
+                                  {(renderTextWithLinks())}
+                              </div>
                           )}
                           {postJson?.embed?.images?.length > 0 && (
                               <div className={'mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden'}>

@@ -1,5 +1,5 @@
 'use client';
-
+import {RichText, UnicodeString} from '@atproto/api'
 import {TabBar} from "@/app/components/TabBar";
 import {ViewPostCard} from "@/app/components/ViewPostCard";
 import React, {useEffect, useState} from "react";
@@ -23,8 +23,11 @@ import {
     Image,
     Spinner,
     Input,
+    Link,
     Popover, PopoverTrigger, PopoverContent,useDisclosure
 } from "@nextui-org/react";
+import reactStringReplace from 'react-string-replace'
+
 
 
 export default function Root() {
@@ -46,6 +49,7 @@ export default function Root() {
     const [isFollowing, setIsFollowing] = useState(false)
     const [onHoverButton, setOnHoverButton] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
+    const [hasMoreLimit, setHasMoreLimit] = useState(false)
     const color = darkMode ? 'dark' : 'light'
 
     const { background, ProfileContainer, ProfileInfoContainer, HeaderImageContainer, ProfileHeaderImage,
@@ -109,6 +113,7 @@ export default function Root() {
         try{
             setLoading(true)
             const {data} = await agent.getAuthorFeed({actor: username})
+            console.log(data)
             if (data) {
                 if(data.cursor){
                     setCursor(data.cursor)
@@ -144,12 +149,11 @@ export default function Root() {
     const loadMore = async (page:any) => {
         if(!agent) return
         if(!cursor) return
-        if(loading) return
-        if(loading2) return
         try{
             setLoading2(true)
             const {data} = await agent.getAuthorFeed({cursor: !hasCursor ? cursor : hasCursor, actor: username});
             const {feed} = data
+            if(feed.length === 0) setHasMoreLimit(true)
             if(data.cursor){
                 setHasCursor(data.cursor)
             }
@@ -270,12 +274,46 @@ export default function Root() {
                                         setOnHoverButton(true)
                                     }}
                             >
-                                {profile.did === agent?.session?.did ? ('Edit Profile') : isFollowing ? !onHoverButton ? ('Following') : ('Un Follow') : ('Follow')}
+                                {profile.did === agent?.session?.did ? ('Edit Profile') : profile?.viewer?.following ? !onHoverButton ? ('Following') : ('Un Follow') : ('Follow')}
                             </Button>
                         </div>
                         <div className={ProfileDisplayName()}>{profile.displayName}</div>
                         <div className={ProfileHandle({isMobile:isMobile})}>@{profile.handle}</div>
-                        <div className={ProfileBio({isMobile:isMobile})}>{profile?.description}</div>
+                        <div className={ProfileBio({isMobile:isMobile})}>
+                            {
+                                profile?.description.split('\n').map((line:any, i:number) => (
+                                    <p key={i}>
+                                        {reactStringReplace(line, /(@[a-zA-Z0-9-.]+|https?:\/\/[a-zA-Z0-9-./?=_%&:#@]+)/g, (match, j) => {
+                                            if (match.startsWith('@')) {
+                                                let domain = match.substring(1) // remove "@" symbol from match
+                                                if (domain.endsWith('.')){
+                                                    domain = domain.slice(0, -1)
+                                                }
+                                                return (
+                                                    <Link key={j} href={`/profile/${domain}`}>
+                                                        {match}
+                                                    </Link>
+                                                )
+                                            } else if (match.startsWith('http')) {
+                                                let url = match
+                                                if(url.endsWith('.')){
+                                                    url = url.slice(0, -1)
+                                                }
+                                                console.log(match)
+                                                return (
+                                                    <a key={j} href={url} target="_blank" rel="noopener noreferrer">
+                                                        {match.replace(/^(https?:\/\/)/, '')}
+                                                    </a>
+                                                )
+                                            } else {
+                                                return match
+                                            }
+                                        })}
+                                    </p>
+                                ))
+                            }
+
+                        </div>
                     </div>
                 </div>
                 <>
@@ -294,14 +332,15 @@ export default function Root() {
                         ) : (
                             <InfiniteScroll
                                 loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
-                                hasMore={!loading2}         //読み込みを行うかどうかの判定
+                                hasMore={!loading && !loading2 && !hasMoreLimit}         //読み込みを行うかどうかの判定
                                 loader={<Spinner/>}
                                 threshold={300}
                                 useWindow={false}
                             >
                                 {timeline.map((post, index) => (
-                                    // eslint-disable-next-line react/jsx-key
-                                    <ViewPostCard color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
+                                    <>
+                                        <ViewPostCard key={`post-${index}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
+                                    </>
                                 ))}
                             </InfiniteScroll>
                         )}

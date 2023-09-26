@@ -85,7 +85,7 @@ export const TabBar: React.FC<Props> = (props: Props) => {
                }}
           >
               <FontAwesomeIcon icon={faHome} className={Icon({color:color, selected:selectedTab})}
-                style={{color:selectedTab === 'home' ? 'red' : undefined}}
+                               style={{color:selectedTab === 'home' ? '#62A8DC' : undefined}}
               />
           </div>
           <div className={Container({selected:selectedTab==='search'})}
@@ -95,7 +95,9 @@ export const TabBar: React.FC<Props> = (props: Props) => {
                    props.setValue('search')
                }}
           >
-                <FontAwesomeIcon icon={faSearch} className={Icon({color:color, selected:selectedTab})}/>
+                <FontAwesomeIcon icon={faSearch} className={Icon({color:color, selected:selectedTab})}
+                                 style={{color:selectedTab === 'search' ? '#62A8DC' : undefined}}
+                />
           </div>
           <div className={Container({selected:selectedTab==='inbox'})}
                onClick={() => {
@@ -108,7 +110,9 @@ export const TabBar: React.FC<Props> = (props: Props) => {
           >
               <Badge content={''} color={'primary'}
                   isInvisible={unreadNotification == 0}>
-                  <FontAwesomeIcon icon={faInbox} className={Icon({color:color, selected:selectedTab})}/>
+                  <FontAwesomeIcon icon={faInbox} className={Icon({color:color, selected:selectedTab})}
+                                   style={{color:selectedTab === 'inbox' ? '#62A8DC' : undefined}}
+                  />
               </Badge>
           </div>
           <div className={Container({selected:selectedTab==='post'})}

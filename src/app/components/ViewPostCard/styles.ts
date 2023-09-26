@@ -21,6 +21,7 @@ export const viewPostCard = tv({
         skeletonTime: '',
         skeletonText1line: 'h-3 w-3/5 rounded-lg ',
         skeletonText2line: 'h-3 w-4/5 rounded-lg ',
+        chip: '',
 
     },
     variants: {
@@ -40,6 +41,7 @@ export const viewPostCard = tv({
                 skeletonHandle: 'dark text-white',
                 skeletonText1line: 'dark text-white',
                 skeletonText2line: 'dark text-white',
+                chip: 'dark ',
             },
         },
         isMobile: {

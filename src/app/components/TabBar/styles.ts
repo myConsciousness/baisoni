@@ -20,10 +20,10 @@ export const tabBar = tv({
         },
         selected: {
             true: {
-                Icon: 'font-black',
+                Icon: 'text-[#1DA1F2]',
             },
             false: {
-                Icon: 'font-medium',
+                Icon: '',
             }
         },
         isMobile: {

@@ -30,7 +30,7 @@ interface Props {
     isMobile?: boolean
     open?: boolean
     tab: 'home' | 'search' | 'inbox' | 'post'
-    page: 'single' | 'profile' | 'home' | 'post' | 'search'
+    page: 'profile' | 'home' | 'post' | 'search'
     isNextPage? : boolean
     setValue?: any
     selectedTab: string

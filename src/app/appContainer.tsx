@@ -54,9 +54,10 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                     })}
                 </div>
                 {pathName !== '/post' && pathName !== '/login' && (
-                    <TabBar color={color} selected={'search'} setValue={setSelectedTab}/>
+                    <TabBar color={color} selected={selectedTab} setValue={setSelectedTab}/>
                 )}
             </div>
         </main>
     )
 }
+

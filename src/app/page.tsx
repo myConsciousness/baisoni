@@ -59,12 +59,15 @@ export default function Root(props:any) {
         const seenUris = new Set<string>();
         const filteredData = timeline.filter(item => {
             const uri = item.post.uri;
+            console.log(item)
             if(item.reply){
                 if(item.reason) return true
                 //@ts-ignore
                 if((item.post.author.did === item.reply.parent.author.did) && (item.reply.parent.author.did === item.reply.root.author.did)) return true
                 return false
             }
+            //これはおそらくparentやrootがミュートユーザーの時、recordにreplyが入って、authorが自分ではない場合は非表示
+            if(item.post.record?.reply && item.post.author.did !== agent?.session?.did) return false
             // まだ uri がセットに登録されていない場合、trueを返し、セットに登録する
             if (!seenUris.has(uri)) {
                 seenUris.add(uri);

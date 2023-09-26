@@ -3,7 +3,7 @@ import { tv } from "@nextui-org/react";
 export const viewProfilePage = tv({
     slots: {
         background: 'max-w-[600px] min-w-[350px] w-full',
-        ProfileContainer: 'w-full h-full bg-white border-[#E3E3E3] border-bottom-[1px]',
+        ProfileContainer: 'w-full max-h-[800px] bg-white border-[#E3E3E3] border-bottom-[1px]',
         HeaderImageContainer: 'w-full h-[150px] relative',
         ProfileHeaderImage: 'h-full w-full object-cover',
         ProfileInfoContainer: 'w-full h-full relative pl-[13px] pr-[8px] pb-[16px]',

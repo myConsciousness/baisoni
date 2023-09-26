@@ -209,7 +209,7 @@ export default function Root() {
 
     return profile && (
         <>
-            <main className={background({color:color, isMobile:isMobile})}>
+            <>
                 <div className={ProfileContainer()}>
                     <div className={HeaderImageContainer()}>
                         <img className={ProfileHeaderImage()} src={profile?.banner}/>
@@ -279,10 +279,34 @@ export default function Root() {
                     </div>
                 </div>
                 <>
-                    <>
-                    </>
+                    {
+                        (loading || !agent) ? (
+                            Array.from({ length: 15 }, (_, index) => (
+                                <ViewPostCard
+                                    key={`skeleton-${index}`}
+                                    color={color}
+                                    numbersOfImage={0}
+                                    postJson={null}
+                                    isMobile={isMobile}
+                                    isSkeleton={true}
+                                />
+                            ))
+                        ) : (
+                            <InfiniteScroll
+                                loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
+                                hasMore={!loading2}         //読み込みを行うかどうかの判定
+                                loader={<Spinner/>}
+                                threshold={300}
+                                useWindow={false}
+                            >
+                                {timeline.map((post, index) => (
+                                    // eslint-disable-next-line react/jsx-key
+                                    <ViewPostCard color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
+                                ))}
+                            </InfiniteScroll>
+                        )}
                 </>
-            </main>
+            </>
         </>
     )
 }

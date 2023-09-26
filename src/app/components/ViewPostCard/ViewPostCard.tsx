@@ -3,7 +3,7 @@ import { viewPostCard } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faComment } from '@fortawesome/free-regular-svg-icons'
-import { faRetweet, faEllipsis, faFlag, faLink, faCode, faFont } from '@fortawesome/free-solid-svg-icons'
+import {faRetweet, faEllipsis, faFlag, faLink, faCode, faFont, faTrash} from '@fortawesome/free-solid-svg-icons'
 import { faStar as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { faStar as faHeartSolid } from '@fortawesome/free-solid-svg-icons'
 
@@ -33,6 +33,7 @@ import {
 } from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
 import {useAgent} from "@/app/atoms/agent";
+import {useRouter} from "next/navigation";
 
 interface Props {
     className?: string
@@ -48,7 +49,7 @@ interface Props {
 }
 export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [ agent ] = useAgent()
-
+    const router = useRouter()
     const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;
     const [loading, setLoading] = useState(false)
@@ -101,6 +102,10 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         console.log(true)
     };
 
+    const handleReply = async () => {
+
+    }
+
     const handleRepost = async () => {
         if(loading) return
         setLoading(true)
@@ -130,10 +135,25 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         }
         setLoading(false)
     }
+
+    const [isTextSelectionInProgress, setIsTextSelectionInProgress] = useState(false);
+
+    // Handle mouse down event on the text content
+    const handleTextMouseDown = () => {
+        setIsTextSelectionInProgress(true);
+    };
+
+    // Handle mouse up event on the text content
+    const handleTextMouseUp = () => {
+        setIsTextSelectionInProgress(false);
+    };
   return (
       <main className={PostCard({color:color})}
             //onMouseDown={handleTextSelect}
             //onMouseUp={handleTextDeselect}
+          onClick={() => {
+              router.push(`/profile/${postJson?.author.did}/post/${postJson?.uri.match(/\/(\w+)$/)?.[1] || ""}`)
+          }}
 
       >
           <SwipeableList>
@@ -191,8 +211,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           aria-label="Multiple selection actions"
                                           selectionMode="multiple"
                                       >
-                                          <DropdownItem key='1' startContent={<FontAwesomeIcon icon={faFlag}/>}>Report Post</DropdownItem>
-                                          <DropdownItem key='2' startContent={<FontAwesomeIcon icon={faLink}/>}
+                                          <DropdownItem key='1' startContent={<FontAwesomeIcon icon={faLink}/>}
                                                         onClick={() => {
                                                             console.log(`https://bsky.app/profile/${postJson.author.did}/post/${postJson.uri.match(/\/(\w+)$/)?.[1] || ""}`)
                                                             navigator.clipboard.writeText(`https://bsky.app/profile/${postJson.author.did}/post/${postJson.uri.match(/\/(\w+)$/)?.[1] || ""}`)
@@ -201,13 +220,35 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           >
                                               Copy Post URL
                                           </DropdownItem>
-                                          <DropdownItem key='3' startContent={<FontAwesomeIcon icon={faCode}/>}
+                                          <DropdownItem key='2' startContent={<FontAwesomeIcon icon={faCode}/>}
                                                         onClick={() => {
                                                             navigator.clipboard.writeText(postJson)
                                                         }}
                                           >
                                               Copy Post JSON
                                           </DropdownItem>
+                                          <DropdownSection title="Danger zone">
+                                              {agent?.session?.did !== postJson.author.did ? (
+                                                  <DropdownItem
+                                                      key="delete"
+                                                      className="text-danger"
+                                                      color="danger"
+                                                      startContent={<FontAwesomeIcon icon={faFlag} />}
+                                                  >
+                                                      Report
+                                                  </DropdownItem>
+                                              ) : (
+                                                  <DropdownItem
+                                                      key="delete"
+                                                      className="text-danger"
+                                                      color="danger"
+                                                      startContent={<FontAwesomeIcon icon={faTrash} />}
+                                                  >
+                                                      Delete
+                                                  </DropdownItem>
+                                              )
+                                              }
+                                          </DropdownSection>
                                       </DropdownMenu>
                                   </Dropdown>
                               ) : (
@@ -226,7 +267,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <Skeleton className={skeletonText2line({color: color})}/>
                                   </div>
                           ) : (
-                              <div className={''}>{postJson?.record?.text.split('\n').map((line:string, index: number) => (
+                              <div onClick={(e) => {e.stopPropagation()}}>{postJson?.record?.text.split('\n').map((line:string, index: number) => (
                                   <span key={index}>
                                       {line}
                                       <br />
@@ -257,12 +298,22 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                               {!isMobile && (
                                   <>
                                       <FontAwesomeIcon icon={faComment} className={PostReactionButton()}
-                                                       style={{display: isHover && !isSkeleton ? undefined : 'none'}}/>
+                                                       style={{display: isHover && !isSkeleton ? undefined : 'none'}}
+                                                       onClick={(e) => {
+                                                           e.stopPropagation()
+                                                           handleReply()
+                                                       }}
+                                      />
                                       <FontAwesomeIcon icon={faRetweet} className={PostReactionButton()}
-                                                       onClick={() => {handleRepost()}}
+                                                       onClick={(e) => {
+                                                           e.stopPropagation()
+                                                           handleRepost()
+                                                       }}
                                                        style={{color:isReposted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isReposted ? undefined : 'none'}}/>
                                       <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
-                                                       onClick={() => {handleLike()}}
+                                                       onClick={(e) => {
+                                                           e.stopPropagation()
+                                                           handleLike()}}
                                                        style={{color:isLiked ? '#fd7e00' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}/>
                                   </>
                               )}

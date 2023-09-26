@@ -25,7 +25,7 @@ export const TabBar: React.FC<Props> = (props: Props) => {
     const route = useRouter()
     const {className, color, isMobile, uploadImageAvailable, open, selected} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;
-    const [selectedTab, setSelectedTab] = useState<'home' | 'search' | 'inbox' | 'post'>('home');
+    const [selectedTab, setSelectedTab] = useState<'home' | 'search' | 'inbox' | 'post'>(selected);
     const [unreadNotification, setUnreadNotification] = useState<number>(0)
     const { TabBar, Container, Icon,
     } = tabBar();
@@ -73,27 +73,31 @@ export const TabBar: React.FC<Props> = (props: Props) => {
         };
     },[agent])
 
+    console.log(selectedTab)
+
   return (
       <main className={TabBar({color:color, isMobile:isMobile})}>
-          <div className={Container({selected:selected==='home'})}
+          <div className={Container({selected:selectedTab==='home'})}
                onClick={() => {
                     route.push('/')
                     setSelectedTab('home')
                     props.setValue('home')
                }}
           >
-              <FontAwesomeIcon icon={faHome} className={Icon({color:color, selected:selected})}/>
+              <FontAwesomeIcon icon={faHome} className={Icon({color:color, selected:selectedTab})}
+                style={{color:selectedTab === 'home' ? 'red' : undefined}}
+              />
           </div>
-          <div className={Container({selected:selected==='search'})}
+          <div className={Container({selected:selectedTab==='search'})}
                onClick={() => {
                    route.push('/search')
                    setSelectedTab('search')
                    props.setValue('search')
                }}
           >
-                <FontAwesomeIcon icon={faSearch} className={Icon({color:color, selected:selected})}/>
+                <FontAwesomeIcon icon={faSearch} className={Icon({color:color, selected:selectedTab})}/>
           </div>
-          <div className={Container({selected:selected==='inbox'})}
+          <div className={Container({selected:selectedTab==='inbox'})}
                onClick={() => {
                    route.push('/inbox')
                    setSelectedTab('inbox')
@@ -104,17 +108,17 @@ export const TabBar: React.FC<Props> = (props: Props) => {
           >
               <Badge content={''} color={'primary'}
                   isInvisible={unreadNotification == 0}>
-                  <FontAwesomeIcon icon={faInbox} className={Icon({color:color, selected:selected})}/>
+                  <FontAwesomeIcon icon={faInbox} className={Icon({color:color, selected:selectedTab})}/>
               </Badge>
           </div>
-          <div className={Container({selected:selected==='post'})}
+          <div className={Container({selected:selectedTab==='post'})}
                onClick={() => {
                    route.push('/post')
                    setSelectedTab('post')
                    props.setValue('post')
                }}
           >
-                <FontAwesomeIcon icon={faPenToSquare} className={Icon({color:color, selected:selected})}/>
+                <FontAwesomeIcon icon={faPenToSquare} className={Icon({color:color, selected:selectedTab})}/>
           </div>
       </main>
   );

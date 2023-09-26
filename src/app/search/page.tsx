@@ -6,24 +6,27 @@ import {useState} from "react";
 import {isMobile} from "react-device-detect";
 import {useAgent} from "@/app/atoms/agent";
 import {usePathname, useSearchParams} from 'next/navigation'
-import {Image} from "@nextui-org/react";
+import {Image, Spinner} from "@nextui-org/react";
 import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import type { ProfileView } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
+import InfiniteScroll  from "react-infinite-scroller"
+
 
 
 
 export default function Root() {
     const [agent, setAgent] = useAgent()
     const [loading, setLoading] = useState(false)
+    const [loading2, setLoading2] = useState(false)
     const [searchPostsResult, setSearchPostsResult] = useState<PostView[]>([])
     const [searchUsersResult, setSearchUsersResult] = useState<ProfileView[]>([])
-    console.log('hgoehogehgoe')
     const searchParams = useSearchParams()
     const searchWord = searchParams.get('word')
     const target = searchParams.get('target')
     const [searchText, setSearchText] = useState(searchParams.get('word'))
     const [searchTarget, setSearchTarget] = useState(searchParams.get('target'))
     const [darkMode, setDarkMode] = useState(false);
+    const [numOfResult, setNumOfResult] = useState(0)
     const color = darkMode ? 'dark' : 'light'
 
     const modeMe = (e:any) => {
@@ -48,7 +51,7 @@ export default function Root() {
             if (query === '') return;
             const res = await fetch(`https://search.bsky.social/search/posts?q=${query}&offset=0`);
             const json = await res.json();
-
+            setNumOfResult(json.length)
             const outputArray = json.map((item: any) => `at://${item.user.did as string}/${item.tid as string}`);
 
             if (outputArray.length === 0) return;
@@ -82,11 +85,51 @@ export default function Root() {
             setLoading(true)
             if(!agent) return
             const {data} = await agent.searchActors({term: term})
-            console.log(data)
             setSearchUsersResult(data.actors)
             setLoading(false)
         }catch (e) {
 
+        }
+    }
+
+    const loadMore = async (page:any) => {
+        if(!agent) return
+        if(numOfResult === 0) return
+        if(loading) return
+        if(loading2) return
+        try{
+            setLoading2(true)
+            const res = await fetch(`https://search.bsky.social/search/posts?q=${searchText}&offset=${numOfResult}`);
+            const json = await res.json();
+            const outputArray = json.map((item: any) => `at://${item.user.did as string}/${item.tid as string}`);
+
+            if (outputArray.length === 0) return;
+
+            const maxBatchSize = 25; // 1つのリクエストに許容される最大数
+            const batches = [];
+            for (let i = 0; i < outputArray.length; i += maxBatchSize) {
+                const batch = outputArray.slice(i, i + maxBatchSize);
+                batches.push(batch);
+            }
+
+            const results = [];
+            for (const batch of batches) {
+                const { data } = await agent?.getPosts({ uris: batch });
+                const { posts } = data;
+                results.push(...posts);
+            }
+            //重複する投稿を削除
+            const diffTimeline = results.filter(newItem => {
+                return !searchPostsResult.some(oldItem => oldItem.uri === newItem.uri);
+            });
+
+            setSearchPostsResult([...searchPostsResult,...diffTimeline])
+            setNumOfResult(json.length === 30 ? numOfResult + json.length : 0)
+
+            setLoading2(false)
+        }catch(e){
+            setLoading2(false)
+            console.log(e)
         }
     }
 
@@ -126,10 +169,19 @@ export default function Root() {
                             />
                         ))
                     ) : (
-                        searchPostsResult.map((post: PostView, index) => (
-                            // eslint-disable-next-line react/jsx-key
-                            <ViewPostCard key={post.uri} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
-                        ))
+                        <InfiniteScroll
+                           loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
+                           hasMore={!loading2 && numOfResult !==0}         //読み込みを行うかどうかの判定
+                           loader={<Spinner/>}
+                           threshold={300}
+                           useWindow={false}
+                        >
+                             {searchPostsResult.map((post: PostView, index) => (
+                                // eslint-disable-next-line react/jsx-key
+                                <ViewPostCard key={post.uri} color={color} numbersOfImage={0} postJson={post}
+                                           isMobile={isMobile}/>
+                             ))}
+                        </InfiniteScroll>
                     )
             )}
             {target === 'users' && (

@@ -187,7 +187,7 @@ export default function Root(props:any) {
                     hasMore={!loading2}         //読み込みを行うかどうかの判定
                     loader={<Spinner/>}
                     threshold={1000}
-                    useWindow={false}
+                    useWindow={true}
                 >
                     {timeline.map((post, index) => (
                         // eslint-disable-next-line react/jsx-key

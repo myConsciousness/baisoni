@@ -1,4 +1,4 @@
-import { useAgent } from '../../atoms/agent'
+import { useAgent } from '@/app/_atoms/agent'
 import { BskyAgent } from '@atproto/api'
 import {useRouter, useSearchParams} from 'next/navigation'
 import { useCallback, useEffect } from 'react'

@@ -5,7 +5,7 @@ import {layout} from "@/app/styles";
 import {TabBar} from "@/app/components/TabBar";
 import {isMobile} from "react-device-detect";
 import {usePathname, useRouter, useSearchParams} from 'next/navigation';
-import {useRequiredSession} from "@/app/lib/hooks/useRequiredSession";
+import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
 
 
 export function AppConatiner({ children }: { children: React.ReactNode }) {

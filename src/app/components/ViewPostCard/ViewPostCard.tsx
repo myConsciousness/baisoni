@@ -37,7 +37,7 @@ import {
     TrailingActions,
 } from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
-import {useAgent} from "@/app/atoms/agent";
+import {useAgent} from "@/app/_atoms/agent";
 import {useRouter} from "next/navigation";
 
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react";

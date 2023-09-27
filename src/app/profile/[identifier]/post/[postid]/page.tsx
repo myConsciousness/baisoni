@@ -4,7 +4,7 @@ import {TabBar} from "@/app/components/TabBar";
 import {ViewPostCard} from "@/app/components/ViewPostCard";
 import React, {useEffect, useState} from "react";
 import {isMobile} from "react-device-detect";
-import {useAgent} from "@/app/atoms/agent";
+import {useAgent} from "@/app/_atoms/agent";
 import InfiniteScroll  from "react-infinite-scroller"
 import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import type { FeedViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs";

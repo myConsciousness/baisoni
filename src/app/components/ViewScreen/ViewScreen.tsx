@@ -19,7 +19,7 @@ interface Props {
     open?: boolean;
     tab: "home" | "search" | "inbox" | "post";
 }
-import { useAgent } from '../../atoms/agent'
+import { useAgent } from '@/app/_atoms/agent'
 
 
 export const ViewScreen: React.FC<Props> = (props: Props) => {

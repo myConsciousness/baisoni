@@ -4,7 +4,7 @@ import {TabBar} from "@/app/components/TabBar";
 import {ViewPostCard} from "@/app/components/ViewPostCard";
 import React, {useEffect, useState} from "react";
 import {isMobile} from "react-device-detect";
-import {useAgent} from "@/app/atoms/agent";
+import {useAgent} from "@/app/_atoms/agent";
 import InfiniteScroll  from "react-infinite-scroller"
 import {Spinner} from "@nextui-org/react"
 import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
@@ -202,7 +202,7 @@ export default function Root(props:any) {
                         >
                             {timeline.map((post, index) => (
                                 // eslint-disable-next-line react/jsx-key
-                                <ViewPostCard color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
+                                <ViewPostCard key={`post-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
                             ))}
                         </InfiniteScroll>
                     )}

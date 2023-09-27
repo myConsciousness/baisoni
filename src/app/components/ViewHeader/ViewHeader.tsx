@@ -20,8 +20,8 @@ import {
 
 import {Tabs, Tab, Chip} from "@nextui-org/react";
 import {useRouter, useSearchParams} from "next/navigation";
-import {useAgent} from "@/app/atoms/agent";
-import {useRequiredSession} from "@/app/lib/hooks/useRequiredSession";
+import {useAgent} from "@/app/_atoms/agent";
+import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
 
 
 interface Props {
@@ -173,13 +173,15 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         }}
                         style={{marginLeft:'40px'}}
                     >
-                        <Tab key="following"
-                             title={
-                                 <div className="flex items-center pl-[15px] pr-[15px]">
-                                     <span>Following</span>
-                                 </div>
-                             }
-                        />
+                        {Object.keys(userPrefences).length > 0 && (
+                            <Tab key="following"
+                                 title={
+                                     <div className="flex items-center pl-[15px] pr-[15px]">
+                                         <span>Following</span>
+                                     </div>
+                                 }
+                            />
+                        )}
                         {pinnedFeeds.map((feed:any, index:number) => (
                             <Tab key={feed.uri}
                                  title={

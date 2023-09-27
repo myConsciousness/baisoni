@@ -4,7 +4,7 @@ import {ViewPostCard} from "@/app/components/ViewPostCard";
 import React, {useEffect} from "react";
 import {useState} from "react";
 import {isMobile} from "react-device-detect";
-import {useAgent} from "@/app/atoms/agent";
+import {useAgent} from "@/app/_atoms/agent";
 import {usePathname, useSearchParams} from 'next/navigation'
 import {Image, Spinner} from "@nextui-org/react";
 import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";

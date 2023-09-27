@@ -10,8 +10,8 @@ export default function RootLayout({children,}: { children: React.ReactNode }) {
 
 
   return (
-    <html lang="en">
-      <body className={inter.className} style={{overscrollBehaviorY:'none'}} suppressHydrationWarning>
+    <html lang="en" className={'overflow-hidden'}>
+      <body className={inter.className} style={{overscrollBehaviorY:'none', WebkitOverflowScrolling: 'touch',}} suppressHydrationWarning>
         <Providers>
           <AppConatiner>
             {children}

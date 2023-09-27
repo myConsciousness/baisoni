@@ -28,8 +28,8 @@ import {
 
 import {Tabs, Tab, Chip} from "@nextui-org/react";
 import {useRouter, useSearchParams} from "next/navigation";
-import {useAgent} from "@/app/atoms/agent";
-import {useRequiredSession} from "@/app/lib/hooks/useRequiredSession";
+import {useAgent} from "@/app/_atoms/agent";
+import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
 import {LeadingActions, SwipeableList, SwipeableListItem, SwipeAction, TrailingActions} from "react-swipeable-list";
 import {postOnlyPage} from "@/app/components/PostOnlyPage/styles";
 import Textarea from "react-textarea-autosize";

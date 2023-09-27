@@ -26,9 +26,9 @@ import {
 import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react";
 
 import Textarea from 'react-textarea-autosize'; // 追加
-import {useRequiredSession} from "@/app/lib/hooks/useRequiredSession";
+import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
 import {useRouter, useSearchParams} from "next/navigation";
-import {useAgent} from "@/app/atoms/agent";
+import {useAgent} from "@/app/_atoms/agent";
 
 
 export default function Root() {
@@ -146,6 +146,8 @@ export default function Root() {
             })
             console.log(res)
             console.log('hoge')
+            router.push('/')
+            setLoading(false)
         }catch (e) {
             console.log(e)
         }finally {

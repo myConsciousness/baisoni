@@ -281,7 +281,7 @@ export default function Root() {
                         <div className={ProfileHandle({isMobile:isMobile})}>@{profile.handle}</div>
                         <div className={ProfileBio({isMobile:isMobile})}>
                             {
-                                profile?.description.split('\n').map((line:any, i:number) => (
+                                profile?.description?.split('\n').map((line:any, i:number) => (
                                     <p key={i}>
                                         {reactStringReplace(line, /(@[a-zA-Z0-9-.]+|https?:\/\/[a-zA-Z0-9-./?=_%&:#@]+)/g, (match, j) => {
                                             if (match.startsWith('@')) {
@@ -299,7 +299,6 @@ export default function Root() {
                                                 if(url.endsWith('.')){
                                                     url = url.slice(0, -1)
                                                 }
-                                                console.log(match)
                                                 return (
                                                     <a key={j} href={url} target="_blank" rel="noopener noreferrer">
                                                         {match.replace(/^(https?:\/\/)/, '')}
@@ -312,7 +311,6 @@ export default function Root() {
                                     </p>
                                 ))
                             }
-
                         </div>
                     </div>
                 </div>

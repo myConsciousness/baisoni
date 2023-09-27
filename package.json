@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@atproto/api": "^0.6.16",
+    "@emoji-mart/data": "^1.1.2",
+    "@emoji-mart/react": "^1.1.1",
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
     "@fortawesome/free-regular-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
@@ -31,6 +33,7 @@
     "react-circular-progressbar": "^2.1.0",
     "react-device-detect": "^2.2.3",
     "react-dom": "18.2.0",
+    "react-dropzone": "^14.2.3",
     "react-infinite-scroller": "^1.2.6",
     "react-string-replace": "^1.1.1",
     "react-swipeable-list": "^1.9.1",

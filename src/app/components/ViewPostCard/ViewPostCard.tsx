@@ -5,7 +5,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import {faRetweet, faEllipsis, faFlag, faLink, faCode, faFont, faTrash} from '@fortawesome/free-solid-svg-icons'
 import { faStar as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
-import { faStar as faHeartSolid, faHashtag, faCheckCircle, faCircleXmark, faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
+import { faStar as faHeartSolid, faHashtag, faCheckCircle, faCircleXmark, faCircleQuestion, faReply } from '@fortawesome/free-solid-svg-icons'
+import {PostModal} from "../PostModal";
 
 import 'react-circular-progressbar/dist/styles.css';
 import {
@@ -39,6 +40,9 @@ import 'react-swipeable-list/dist/styles.css';
 import {useAgent} from "@/app/atoms/agent";
 import {useRouter} from "next/navigation";
 
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react";
+
+
 interface Props {
     className?: string
     color: 'light' | 'dark'
@@ -62,6 +66,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         PostAuthorIcon, PostAuthorDisplayName, PostAuthorHandle, PostCreatedAt, dropdown,skeletonIcon, skeletonName, skeletonHandle, skeletonText1line, skeletonText2line,chip } = viewPostCard();
     const [isLiked, setIsLiked] = useState<boolean>(postJson?.viewer?.like)
     const [isReposted, setIsReposted] = useState<boolean>(postJson?.viewer?.repost)
+    const [isPostModalOpen, setIsPostModalOpen] = useState<boolean>(false)
     const [postInfo, setPostInfo] = useState<any>(null)
 
 
@@ -107,7 +112,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     };
 
     const handleReply = async () => {
-
+        //setIsPostModalOpen(true)
+        console.log('open')
+        onOpen()
     }
 
     const handleRepost = async () => {
@@ -219,7 +226,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                 variant="faded"
                                 color="primary"
                             >
-                            <a key={`a-${index}-${byteStart}`} href={`/search?searchWord=${(facet.features[0].tag.replace('#', '%23'))}&target=posts`}>
+                            <a key={`a-${index}-${byteStart}`} href={`/search?word=${(facet.features[0].tag.replace('#', '%23'))}&target=posts`}>
                                 {facetText.replace('#', '')}
                             </a>
                         </Chip>
@@ -236,188 +243,218 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             const nonLinkText = decoder.decode(text_bytes.slice(lastOffset));
             console.log(nonLinkText)
             nonLinkText.split('\n').map((line:any, i:number) => {
-                result.push(<span key={`div-${i}-${lastOffset}`}>{line}</span>)
+                result.push(<span key={`div-${i}-${lastOffset}`}>{line}<br/></span>)
             })
         }
 
         return result
     };
 
-  return (
-      <main className={PostCard({color:color})}
-            //onMouseDown={handleTextSelect}
-            //onMouseUp={handleTextDeselect}
-          onClick={() => {
-              router.push(`/profile/${postJson?.author.did}/post/${postJson?.uri.match(/\/(\w+)$/)?.[1] || ""}`)
-          }}
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-      >
-          <SwipeableList>
-              <SwipeableListItem
-                  //leadingActions={isMobile && leadingActions()}
-                  //trailingActions={isMobile && trailingActions()}
-                  maxSwipe={70}
+    return (
+      <>
+          <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement={isMobile ? 'top' : 'center'} className={'z-[100] max-w-[600px]'}>
+              <ModalContent
               >
+                  {(onClose) => (
+                      <PostModal color={color} type={'Reply'}/>
+                  )}
+              </ModalContent>
+          </Modal>
+          <main className={PostCard({color:color})}
+              //onMouseDown={handleTextSelect}
+              //onMouseUp={handleTextDeselect}
+                onClick={() => {
+                    router.push(`/profile/${postJson?.author.did}/post/${postJson?.uri.match(/\/(\w+)$/)?.[1] || ""}`)
+                }}
 
-                  <div className={PostCardContainer()}
-                       onMouseEnter={() => {
-                           setIsHover(true)
-                       }}
-                       onMouseLeave={() => {
-                           setIsHover(false)
-                       }}
+          >
+              <SwipeableList>
+                  <SwipeableListItem
+                      //leadingActions={isMobile && leadingActions()}
+                      //trailingActions={isMobile && trailingActions()}
+                      maxSwipe={70}
                   >
-                      {json?.reason && (
-                          <Link className={'text-[13px] ml-[40px] text-[#909090] text-bold'}
-                                href={`/profile/${json.reason.by.did}`}
-                          >
-                              Reposted by {json.reason.by.displayName}
-                          </Link>
-                      )}
-                      <div className={PostAuthor()}>
-                          <Link className={PostAuthorIcon()} href={`/profile/${postJson?.author.did}`}>
-                              {isSkeleton ? (
-                                  <Skeleton className={skeletonIcon({color:color})}/>
-                              ) : (
-                                  <img src={postJson?.author?.avatar}/>
+
+                      <div className={PostCardContainer()}
+                           onMouseEnter={() => {
+                               setIsHover(true)
+                           }}
+                           onMouseLeave={() => {
+                               setIsHover(false)
+                           }}
+                      >
+                          {json?.reason && (
+                              <Link className={'text-[13px] ml-[40px] text-[#909090] text-bold'}
+                                    href={`/profile/${json.reason.by.did}`}
+                              >
+                                  Reposted by {json.reason.by.displayName}
+                              </Link>
+                          )}
+                          <div className={PostAuthor()}>
+                              <Link className={PostAuthorIcon()} href={`/profile/${postJson?.author.did}`}>
+                                  {isSkeleton ? (
+                                      <Skeleton className={skeletonIcon({color:color})}/>
+                                  ) : (
+                                      <img src={postJson?.author?.avatar}/>
 
                                   )}
-                          </Link>
-                          <Link className={PostAuthorDisplayName({color: color})} style={{fontSize:'13px'}} href={`/profile/${postJson?.author.did}`}>
-                                {isSkeleton ? (
-                                    <Skeleton className={skeletonName({color:color})}/>
-                                    ) : (
-                                    <span>{postJson?.author?.displayName}</span>
-                                )}
-                          </Link>
-                          <div className={'text-[#BABABA]'}>&nbsp;-&nbsp;</div>
-                          <Link className={PostAuthorHandle({color: color})} href={`/profile/${postJson?.author.did}`}>
-                              {isSkeleton ? (
+                              </Link>
+                              <Link className={PostAuthorDisplayName({color: color})} style={{fontSize:'13px'}} href={`/profile/${postJson?.author.did}`}>
+                                  {isSkeleton ? (
+                                      <Skeleton className={skeletonName({color:color})}/>
+                                  ) : (
+                                      <span>{postJson?.author?.displayName}</span>
+                                  )}
+                              </Link>
+                              <div className={'text-[#BABABA]'}>&nbsp;-&nbsp;</div>
+                              <Link className={PostAuthorHandle({color: color})} href={`/profile/${postJson?.author.did}`}>
+                                  {isSkeleton ? (
                                       <Skeleton className={skeletonHandle({color: color})}/>
-                              ) : (
-                                  <span>{postJson?.author?.handle}</span>
-                              )}
-                          </Link>
-                          <div className={PostCreatedAt()} style={{fontSize:'12px'}}>
-                              {isHover && !isSkeleton ? (
-                                  <Dropdown className={dropdown({color:color})}>
-                                      <DropdownTrigger>
-                                          <FontAwesomeIcon icon={faEllipsis} className={'h-[20px] mb-[4px] cursor-pointer text-[#909090]'}/>
-                                      </DropdownTrigger>
-                                      <DropdownMenu
-                                          disallowEmptySelection
-                                          aria-label="Multiple selection actions"
-                                          selectionMode="multiple"
-                                      >
-                                          <DropdownItem key='1' startContent={<FontAwesomeIcon icon={faLink}/>}
-                                                        onClick={() => {
-                                                            console.log(`https://bsky.app/profile/${postJson.author.did}/post/${postJson.uri.match(/\/(\w+)$/)?.[1] || ""}`)
-                                                            navigator.clipboard.writeText(`https://bsky.app/profile/${postJson.author.did}/post/${postJson.uri.match(/\/(\w+)$/)?.[1] || ""}`)
-                                                        }}
+                                  ) : (
+                                      <span>{postJson?.author?.handle}</span>
+                                  )}
+                              </Link>
+                              <div className={PostCreatedAt()} style={{fontSize:'12px'}}>
+                                  {!isMobile && isHover && !isSkeleton ? (
+                                      <Dropdown className={dropdown({color:color})}>
+                                          <DropdownTrigger>
+                                              <FontAwesomeIcon icon={faEllipsis} className={'h-[20px] mb-[4px] cursor-pointer text-[#909090]'}/>
+                                          </DropdownTrigger>
+                                          <DropdownMenu
+                                              disallowEmptySelection
+                                              aria-label="Multiple selection actions"
+                                              selectionMode="multiple"
+                                          >
+                                              <DropdownItem key='1' startContent={<FontAwesomeIcon icon={faLink}/>}
+                                                            onClick={() => {
+                                                                console.log(`https://bsky.app/profile/${postJson.author.did}/post/${postJson.uri.match(/\/(\w+)$/)?.[1] || ""}`)
+                                                                navigator.clipboard.writeText(`https://bsky.app/profile/${postJson.author.did}/post/${postJson.uri.match(/\/(\w+)$/)?.[1] || ""}`)
+                                                            }}
 
-                                          >
-                                              Copy Post URL
-                                          </DropdownItem>
-                                          <DropdownItem key='2' startContent={<FontAwesomeIcon icon={faCode}/>}
-                                                        onClick={() => {
-                                                            navigator.clipboard.writeText(JSON.stringify(postJson))
-                                                        }}
-                                          >
-                                              Copy Post JSON
-                                          </DropdownItem>
-                                          <DropdownSection title="Danger zone">
-                                              {agent?.session?.did !== postJson.author.did ? (
-                                                  <DropdownItem
-                                                      key="delete"
-                                                      className="text-danger"
-                                                      color="danger"
-                                                      startContent={<FontAwesomeIcon icon={faFlag} />}
-                                                  >
-                                                      Report
-                                                  </DropdownItem>
-                                              ) : (
-                                                  <DropdownItem
-                                                      key="delete"
-                                                      className="text-danger"
-                                                      color="danger"
-                                                      startContent={<FontAwesomeIcon icon={faTrash} />}
-                                                  >
-                                                      Delete
-                                                  </DropdownItem>
-                                              )
-                                              }
-                                          </DropdownSection>
-                                      </DropdownMenu>
-                                  </Dropdown>
-                              ) : (
-                                    isSkeleton ? (
-                                        <Skeleton/>
-                                    ) :(
-                                        <a href={'https://bsky.social/'}>1d</a>
-                                    )
-                              )}
+                                              >
+                                                  Copy Post URL
+                                              </DropdownItem>
+                                              <DropdownItem key='2' startContent={<FontAwesomeIcon icon={faCode}/>}
+                                                            onClick={() => {
+                                                                navigator.clipboard.writeText(JSON.stringify(postJson))
+                                                            }}
+                                              >
+                                                  Copy Post JSON
+                                              </DropdownItem>
+                                              <DropdownSection title="Danger zone">
+                                                  {agent?.session?.did !== postJson.author.did ? (
+                                                      <DropdownItem
+                                                          key="delete"
+                                                          className="text-danger"
+                                                          color="danger"
+                                                          startContent={<FontAwesomeIcon icon={faFlag} />}
+                                                      >
+                                                          Report
+                                                      </DropdownItem>
+                                                  ) : (
+                                                      <DropdownItem
+                                                          key="delete"
+                                                          className="text-danger"
+                                                          color="danger"
+                                                          startContent={<FontAwesomeIcon icon={faTrash} />}
+                                                      >
+                                                          Delete
+                                                      </DropdownItem>
+                                                  )
+                                                  }
+                                              </DropdownSection>
+                                          </DropdownMenu>
+                                      </Dropdown>
+                                  ) : (
+                                      isSkeleton ? (
+                                          <Skeleton/>
+                                      ) :(
+                                          <a href={'https://bsky.social/'}>1d</a>
+                                      )
+                                  )}
+                              </div>
                           </div>
-                      </div>
-                      <div className={PostContent({isMobile:isMobile})}>
-                          {isSkeleton ? (
+                          <div className={PostContent({isMobile:isMobile})}>
+                              {isSkeleton ? (
                                   <div className="w-full flex flex-col gap-2">
                                       <Skeleton className={skeletonText1line({color: color})}/>
                                       <Skeleton className={skeletonText2line({color: color})}/>
                                   </div>
-                          ) : (
-                              <div onClick={(e) => {e.stopPropagation()}}>
-                                  {(renderTextWithLinks())}
-                              </div>
-                          )}
-                          {postJson?.embed?.images?.length > 0 && (
-                              <div className={'mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden'}>
-                                  {postJson?.embed?.images?.length === 1 && (
-                                      <img className={'w-full h-full'} src={postJson.embed.images[0].thumb}></img>
-                                  )}
-                              </div>
-                          )}
-                      </div>
-                      <div className={PostReactionButtonContainer()} style={{}}>
-                          <div className={`mr-[12px]`}>
-                              {isMobile && (
+                              ) : (
                                   <>
-                                      <FontAwesomeIcon icon={faComment} className={PostReactionButton()}/>
-                                      <FontAwesomeIcon icon={faRetweet} className={PostReactionButton()}
-                                                       onClick={() => {handleRepost()}}
-                                                       style={{color:isReposted ? '#17BF63' : '#909090',}}/>
-                                      <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
-                                                       onClick={() => {handleLike()}}
-                                                       style={{color:isLiked ? '#fd7e00' : '#909090',}}/>
+                                      {json?.reply && (
+                                          <div>
+                                              <FontAwesomeIcon icon={faReply}></FontAwesomeIcon>
+                                              Reply to {json.reply.parent.author?.displayName}
+                                          </div>
+                                      )}
+                                      <div onClick={(e) => {e.stopPropagation()}}>
+                                          {(renderTextWithLinks())}
+                                      </div>
                                   </>
                               )}
-                              {!isMobile && (
-                                  <>
-                                      <FontAwesomeIcon icon={faComment} className={PostReactionButton()}
-                                                       style={{display: isHover && !isSkeleton ? undefined : 'none'}}
-                                                       onClick={(e) => {
-                                                           e.stopPropagation()
-                                                           handleReply()
-                                                       }}
-                                      />
-                                      <FontAwesomeIcon icon={faRetweet} className={PostReactionButton()}
-                                                       onClick={(e) => {
-                                                           e.stopPropagation()
-                                                           handleRepost()
-                                                       }}
-                                                       style={{color:isReposted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isReposted ? undefined : 'none'}}/>
-                                      <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
-                                                       onClick={(e) => {
-                                                           e.stopPropagation()
-                                                           handleLike()}}
-                                                       style={{color:isLiked ? '#fd7e00' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}/>
-                                  </>
+                              {postJson?.embed?.images?.length > 0 && (
+                                  <div className={'mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden'}>
+                                      {postJson?.embed?.images?.length === 1 && (
+                                          <img className={'w-full h-full'} src={postJson.embed.images[0].thumb}></img>
+                                      )}
+                                  </div>
                               )}
                           </div>
+                          <div className={PostReactionButtonContainer()} style={{}}>
+                              <div className={`mr-[12px]`}>
+                                  {isMobile && (
+                                      <>
+                                          <FontAwesomeIcon icon={faComment} className={PostReactionButton()}
+                                                           onClick={(e) => {
+                                                               e.stopPropagation()
+                                                               handleReply()
+                                                           }}
+                                          />
+                                          <FontAwesomeIcon icon={faRetweet} className={PostReactionButton()}
+                                                           onClick={(e) => {
+                                                               e.stopPropagation()
+                                                               handleRepost()
+                                                           }}
+                                                           style={{color:isReposted ? '#17BF63' : '#909090',}}/>
+                                          <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
+                                                           onClick={(e) => {
+                                                               e.stopPropagation()
+                                                               handleLike()}}
+                                                           style={{color:isLiked ? '#fd7e00' : '#909090',}}/>
+                                      </>
+                                  )}
+                                  {!isMobile && (
+                                      <>
+                                          <FontAwesomeIcon icon={faComment} className={PostReactionButton()}
+                                                           style={{display: isHover && !isSkeleton ? undefined : 'none'}}
+                                                           onClick={(e) => {
+                                                               e.stopPropagation()
+                                                               handleReply()
+                                                           }}
+                                          />
+                                          <FontAwesomeIcon icon={faRetweet} className={PostReactionButton()}
+                                                           onClick={(e) => {
+                                                               e.stopPropagation()
+                                                               handleRepost()
+                                                           }}
+                                                           style={{color:isReposted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isReposted ? undefined : 'none'}}/>
+                                          <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
+                                                           onClick={(e) => {
+                                                               e.stopPropagation()
+                                                               handleLike()}}
+                                                           style={{color:isLiked ? '#fd7e00' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}/>
+                                      </>
+                                  )}
+                              </div>
+                          </div>
                       </div>
-                  </div>
-              </SwipeableListItem>
-          </SwipeableList>
-      </main>
+                  </SwipeableListItem>
+              </SwipeableList>
+          </main>
+      </>
   );
 }
 

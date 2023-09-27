@@ -180,7 +180,7 @@ export default function Root() {
             if (byteStart > lastOffset) {
                 const nonLinkText = decoder.decode(text_bytes.slice(lastOffset, byteStart));
                 nonLinkText.split('\n').map((line:any, i:number) => {
-                    result.push(<span key={`text-${i}-${byteStart}`}>{line}</span>)
+                    result.push(<span key={`text-${i}-${byteStart}`}>{line}<br/></span>)
 
                 })
             }
@@ -240,7 +240,7 @@ export default function Root() {
         if (lastOffset < text_bytes.length) {
             const nonLinkText = decoder.decode(text_bytes.slice(lastOffset));
             nonLinkText.split('\n').map((line:any, i:number) => {
-                result.push(<span key={`div-${i}-${lastOffset}`}>{line}</span>)
+                result.push(<span key={`div-${i}-${lastOffset}`}>{line}<br/></span>)
             })
         }
 

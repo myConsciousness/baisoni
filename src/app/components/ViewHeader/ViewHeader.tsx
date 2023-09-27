@@ -120,8 +120,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                                 if (e.key !== "Enter" || isComposing) return; //1
                                 props.setSearchText(searchText)
                                 document.getElementById("searchBar")?.blur()
-                                console.log(searchText)
-                                router.push(`/search?word=${searchText}&target=${target}`)
+                                router.push(`/search?word=${encodeURIComponent(searchText)}&target=${target}`)
                             }}
                             onCompositionStart={() => setComposing(true)}
                             onCompositionEnd={() => setComposing(false)}
@@ -238,7 +237,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                                 tabContent: "group-data-[selected=true]:text-white"
                             }}
                             onSelectionChange={(e) => {
-                                router.push(`/search?word=${searchText}&target=${e}`)
+                                router.push(`/search?word=${encodeURIComponent(searchText)}&target=${e}`)
                             }}
                             selectedKey={searchParams.get('target') || 'posts'}
                         >

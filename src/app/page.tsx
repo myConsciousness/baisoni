@@ -9,6 +9,8 @@ import InfiniteScroll  from "react-infinite-scroller"
 import {Spinner} from "@nextui-org/react"
 import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import type { FeedViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faArrowsRotate} from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -170,10 +172,10 @@ export default function Root(props:any) {
     return(
         <>
             {availavleNewTimeline && (
-                <div className={' absolute top-[120px] left-[200px] right-[200px] z-[9999999999] items-center justify-center flex'}>
-                    <div className={'text-black h-[30px] w-[80px] bg-blue-50 rounded-full cursor-pointer'}
+                <div className={' absolute flex justify-center z-[10] left-16 right-16 top-[120px]'}>
+                    <div className={'text-black  bg-blue-50 rounded-full cursor-pointer pl-[10px] pr-[10px] pt-[5px] pb-[5px]'}
                          onClick={handleRefresh}
-                    >New Posts</div>
+                    ><FontAwesomeIcon icon={faArrowsRotate}/> New Posts</div>
                 </div>
             )}
             <>

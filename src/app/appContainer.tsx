@@ -5,15 +5,19 @@ import {layout} from "@/app/styles";
 import {TabBar} from "@/app/components/TabBar";
 import {isMobile} from "react-device-detect";
 import {usePathname, useRouter, useSearchParams} from 'next/navigation';
+import {useRequiredSession} from "@/app/lib/hooks/useRequiredSession";
 
 
 export function AppConatiner({ children }: { children: React.ReactNode }) {
+    //ここでsession作っておかないとpost画面を直で行った時にpostできないため
+    const {agent} = useRequiredSession()
     const router = useRouter()
     let pathName = usePathname()
     const searchParams = useSearchParams()
     const target = searchParams.get('target')
     const [value, setValue] = useState(false)
     const tab = pathName === '/' ? 'home' : (pathName === '/search' || pathName === '/inbox' || pathName === '/post') ? pathName.replace("/",'') : 'home';
+    //@ts-ignore
     const [selectedTab, setSelectedTab] = useState<"home" | "search" | "inbox" | "post">(tab);
     const [searchText, setSearchText] = useState("");
     const specificPaths = ['/post', '/login']

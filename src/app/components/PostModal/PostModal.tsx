@@ -1,15 +1,18 @@
-'use client';
 import React, {useState, useRef, useCallback, useEffect} from "react";
-import { createPostPage } from "./styles";
+import { postModal } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { faImage, faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { faCirclePlus, faXmark, faPen, faFaceLaughBeam, faLink } from '@fortawesome/free-solid-svg-icons'
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { useDropzone, FileWithPath } from 'react-dropzone'
+import {
+    faBookmark as faRegularBookmark,
+    faComment,
+    faImage,
+    faSquare as faRegularSquare, faTrashCan
+} from '@fortawesome/free-regular-svg-icons'
+import {
+    faXmark,
+    faPen, faCirclePlus, faFaceLaughBeam
+} from '@fortawesome/free-solid-svg-icons'
 import 'react-circular-progressbar/dist/styles.css';
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
 import {
     Dropdown,
     DropdownTrigger,
@@ -19,19 +22,30 @@ import {
     Button,
     Image,
     Spinner,
-    Input,
-    Popover, PopoverTrigger, PopoverContent,
+    ScrollShadow,
+    Popover, PopoverTrigger, PopoverContent, useDisclosure,
 } from "@nextui-org/react";
 
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react";
-
-import Textarea from 'react-textarea-autosize'; // 追加
-import {useRequiredSession} from "@/app/lib/hooks/useRequiredSession";
+import {Tabs, Tab, Chip} from "@nextui-org/react";
 import {useRouter, useSearchParams} from "next/navigation";
 import {useAgent} from "@/app/atoms/agent";
+import {useRequiredSession} from "@/app/lib/hooks/useRequiredSession";
+import {LeadingActions, SwipeableList, SwipeableListItem, SwipeAction, TrailingActions} from "react-swipeable-list";
+import {postOnlyPage} from "@/app/components/PostOnlyPage/styles";
+import Textarea from "react-textarea-autosize";
+import Picker from "@emoji-mart/react";
+import data from "@emoji-mart/data";
+import {buildStyles, CircularProgressbar} from "react-circular-progressbar";
+import {useDropzone} from "react-dropzone";
 
 
-export default function Root() {
+interface Props {
+    children?: React.ReactNode;
+    color: 'light' | 'dark';
+    type?: 'Post' | 'Reply' | `Quote`
+}
+export const PostModal: React.FC<Props> = (props: Props) => {
+    const {color, type} = props
     const [agent, setAgent] = useAgent()
     //const {agent} = useRequiredSession()
     const router = useRouter()
@@ -68,10 +82,9 @@ export default function Root() {
         footerTooltipStyle,dropdown,popover,
 
         ImageDeleteButton, ImageAddALTButton, ImageEditButton,
-    } = createPostPage();
+    } = postModal();
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [darkMode, setDarkMode] = useState(false);
-    const color = darkMode ? 'dark' : 'light'
     const modeMe = (e:any) => {
         setDarkMode(!!e.matches);
     }
@@ -141,7 +154,7 @@ export default function Root() {
         setLoading(true)
         try{
             const res = await agent.post({text: contentText,
-                                                                     langs: Array.from(PostContentLanguage)
+                langs: Array.from(PostContentLanguage)
 
             })
             console.log(res)
@@ -245,9 +258,10 @@ export default function Root() {
         }
     }
 
+
     return (
-        <main className={background({color:color, isMobile:isMobile})}>
-            <div className={backgroundColor()}></div>
+
+        <>
             {isOpen && (
                 window.prompt("Please enter link", "Harry Potter")
             )}
@@ -263,7 +277,7 @@ export default function Root() {
                     >
                         cancel
                     </Button>
-                    <div className={headerTitle()}>Post</div>
+                    <div className={headerTitle()}>{type}</div>
                     <Button className={headerPostButton()}
                             radius={'full'}
                             color={'primary'}
@@ -549,6 +563,8 @@ export default function Root() {
                     </div>
                 </div>
             </div>
-        </main>
-    );
+        </>
+    )
 }
+
+export default PostModal;

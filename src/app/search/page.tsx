@@ -23,10 +23,10 @@ export default function Root() {
     const [searchPostsResult, setSearchPostsResult] = useState<PostView[]>([])
     const [searchUsersResult, setSearchUsersResult] = useState<ProfileView[]>([])
     const searchParams = useSearchParams()
-    const searchWord = searchParams.get('word')
-    const target = searchParams.get('target')
-    const [searchText, setSearchText] = useState(searchParams.get('word'))
-    const [searchTarget, setSearchTarget] = useState(searchParams.get('target'))
+    const searchWord = searchParams.get('word') || ''
+    const target = searchParams.get('target') || 'posts'
+    const [searchText, setSearchText] = useState(searchWord)
+    const [searchTarget, setSearchTarget] = useState(target)
     const [darkMode, setDarkMode] = useState(false);
     const [numOfResult, setNumOfResult] = useState(0)
     const color = darkMode ? 'dark' : 'light'
@@ -47,11 +47,10 @@ export default function Root() {
 
     const fetchSearchResult = async (query: string) => {
         try {
-            console.log(agent)
             if (!agent) return;
             setLoading(true);
             if (query === '') return;
-            const res = await fetch(`https://search.bsky.social/search/posts?q=${query}&offset=0`);
+            const res = await fetch(`https://search.bsky.social/search/posts?q=${encodeURIComponent(query)}&offset=0`);
             const json = await res.json();
             setNumOfResult(json.length)
             const outputArray = json.map((item: any) => `at://${item.user.did as string}/${item.tid as string}`);
@@ -101,7 +100,8 @@ export default function Root() {
         if(loading2) return
         try{
             setLoading2(true)
-            const res = await fetch(`https://search.bsky.social/search/posts?q=${searchText}&offset=${numOfResult}`);
+            const res = await fetch(`https://search.bsky.social/search/posts?q=${encodeURIComponent(searchText)}&offset=${numOfResult}`);
+            console.log(res)
             const json = await res.json();
             const outputArray = json.map((item: any) => `at://${item.user.did as string}/${item.tid as string}`);
 
@@ -174,7 +174,6 @@ export default function Root() {
                         <InfiniteScroll
                            loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
                            hasMore={!loading2 && numOfResult !==0}         //読み込みを行うかどうかの判定
-                           loader={<Spinner/>}
                            threshold={300}
                            useWindow={false}
                         >
@@ -183,6 +182,10 @@ export default function Root() {
                                 <ViewPostCard key={post.uri} color={color} numbersOfImage={0} postJson={post}
                                            isMobile={isMobile}/>
                              ))}
+                            {loading2 && (
+                                <Spinner className={'flex justify-center '}/>
+
+                            )}
                         </InfiniteScroll>
                     )
             )}

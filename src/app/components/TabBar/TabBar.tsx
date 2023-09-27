@@ -57,7 +57,7 @@ export const TabBar: React.FC<Props> = (props: Props) => {
         if(!agent)return
         try{
             const res = await agent.updateSeenNotifications()
-            console.log(res)
+            //console.log(res)
         }catch (e) {
             console.log(e)
         }
@@ -72,8 +72,6 @@ export const TabBar: React.FC<Props> = (props: Props) => {
             clearInterval(interval); // インターバルをクリーンアップ
         };
     },[agent])
-
-    console.log(selectedTab)
 
   return (
       <main className={TabBar({color:color, isMobile:isMobile})}>

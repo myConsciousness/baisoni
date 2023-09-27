@@ -146,8 +146,8 @@ export default function Root() {
             })
             console.log(res)
             console.log('hoge')
-            router.push('/')
             setLoading(false)
+            router.push('/')
         }catch (e) {
             console.log(e)
         }finally {

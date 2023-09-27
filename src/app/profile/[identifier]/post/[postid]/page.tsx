@@ -1,9 +1,5 @@
 'use client';
-
-import {TabBar} from "@/app/components/TabBar";
-import {ViewPostCard} from "@/app/components/ViewPostCard";
 import React, {useEffect, useState} from "react";
-import {isMobile} from "react-device-detect";
 import {useAgent} from "@/app/_atoms/agent";
 import InfiniteScroll  from "react-infinite-scroller"
 import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
@@ -25,7 +21,7 @@ import {
     faEllipsis, faFlag, faHashtag, faLanguage,
     faQuoteLeft,
     faRetweet,
-    faSquare as faSolidSquare, faTrash, faU, faUser
+    faSquare as faSolidSquare, faTrash, faU, faUser, faLink
 } from '@fortawesome/free-solid-svg-icons'
 import {
     Dropdown,
@@ -179,10 +175,10 @@ export default function Root() {
             // 直前のテキストを追加
             if (byteStart > lastOffset) {
                 const nonLinkText = decoder.decode(text_bytes.slice(lastOffset, byteStart));
-                nonLinkText.split('\n').map((line:any, i:number) => {
-                    result.push(<span key={`text-${i}-${byteStart}`}>{line}<br/></span>)
-
-                })
+                const textChunks = nonLinkText.split('\n').map((line, index, array) => (
+                    <span key={`text-${byteStart}-${index}`}>{line}{index !== array.length - 1 && <br/>}</span>
+                ));
+                result.push(textChunks);
             }
 
             switch (facet.features[0].$type) {
@@ -208,7 +204,10 @@ export default function Root() {
                                 color={facetText === facet.features[0].uri ? "success" : facet.features[0].uri.includes(facetText.replace('...', '')) ? 'default' : "danger"}
                             >
                             <a key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
-                                {facetText}
+                                <>
+                                    <FontAwesomeIcon icon={faLink}/>{facetText}
+
+                                </>
                             </a>
                             </Chip>
                         </span>
@@ -224,9 +223,9 @@ export default function Root() {
                                 variant="faded"
                                 color="primary"
                             >
-                            <a key={`a-${index}-${byteStart}`} href={`/search?searchWord=${(facet.features[0].tag.replace('#', '%23'))}&target=posts`}>
+                            <Link key={`a-${index}-${byteStart}`} href={`/search?searchWord=${(facet.features[0].tag.replace('#', '%23'))}&target=posts`}>
                                 {facetText.replace('#', '')}
-                            </a>
+                            </Link>
                         </Chip>
                         </span>
                     )
@@ -239,9 +238,13 @@ export default function Root() {
         // 最後のテキストを追加
         if (lastOffset < text_bytes.length) {
             const nonLinkText = decoder.decode(text_bytes.slice(lastOffset));
-            nonLinkText.split('\n').map((line:any, i:number) => {
-                result.push(<span key={`div-${i}-${lastOffset}`}>{line}<br/></span>)
-            })
+            const textWithLineBreaks = nonLinkText.split('\n').map((line, index) => (
+                <span key={`div-${lastOffset}-${index}`}>
+                    {line}
+                    {index !== nonLinkText.length - 1 && <br />}
+                </span>
+            ))
+            result.push(textWithLineBreaks);
         }
 
         return result

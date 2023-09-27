@@ -4,13 +4,22 @@ import { Noto_Sans_JP } from 'next/font/google'
 import { Providers } from './providers';
 import {AppConatiner} from "./appContainer";
 
-const inter = Noto_Sans_JP({ subsets: ['latin'] })
+const noto = Noto_Sans_JP({
+    weight: ['400', '700'],
+    subsets: ['latin'],
+    variable: '--font-noto-sans-jp',
+});
+export const metadata = {
+    title: 'タイトル',
+    description: '説明...',
+}
+
 export default function RootLayout({children,}: { children: React.ReactNode }) {
 
 
   return (
     <html lang="en" className={'overflow-hidden'}>
-      <body className={`${inter.className} font-body`} style={{overscrollBehaviorY:'none', WebkitOverflowScrolling: 'touch',}} suppressHydrationWarning>
+      <body className={`font-body ${noto.className}`} style={{overscrollBehaviorY:'none', WebkitOverflowScrolling: 'touch',}} suppressHydrationWarning>
         <Providers>
           <AppConatiner>
             {children}

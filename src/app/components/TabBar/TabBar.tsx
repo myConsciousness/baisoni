@@ -38,7 +38,7 @@ export const TabBar: React.FC<Props> = (props: Props) => {
             const {data} = await agent.countUnreadNotifications()
             const notifications = await agent.listNotifications()
             const {count} = data
-            const reason = ['follow', 'mention', 'reply', 'post']
+            const reason = ['mention', 'reply']
             let notify_num = 0
             for (let i = 0; i < data.count; i++) {
                 const notificationReason = notifications.data.notifications[i].reason;

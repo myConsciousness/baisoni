@@ -273,7 +273,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
               <ModalContent
               >
                   {(onClose) => (
-                      <PostModal color={color} type={'Reply'}/>
+                      <PostModal color={color} type={'Reply'} postData={postJson}/>
                   )}
               </ModalContent>
           </Modal>

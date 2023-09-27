@@ -64,9 +64,7 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                 </div>
             ) : (
                 <div className={'h-full max-w-[600px] min-w-[350px] w-full'}>
-                    {React.cloneElement(children as any, {
-                        name: 'hoge',
-                    })}
+                    {children}
                 </div>
             )}
         </main>

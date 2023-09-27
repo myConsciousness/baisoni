@@ -1,3 +1,4 @@
+import { Record } from '@atproto/api/src/client/types/app/bsky/feed/post'
 import React, {useState, useRef, useCallback, useEffect} from "react";
 import { postModal } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
@@ -43,9 +44,10 @@ interface Props {
     children?: React.ReactNode;
     color: 'light' | 'dark';
     type?: 'Post' | 'Reply' | `Quote`
+    postData?: any
 }
 export const PostModal: React.FC<Props> = (props: Props) => {
-    const {color, type} = props
+    const {color, type, postData} = props
     const [agent, setAgent] = useAgent()
     //const {agent} = useRequiredSession()
     const router = useRouter()
@@ -147,16 +149,38 @@ export const PostModal: React.FC<Props> = (props: Props) => {
         e.dataTransfer.dropEffect = 'copy';
     };
 
+    console.log(postData)
     const handlePostClick = async () => {
         console.log(agent)
         if(!agent) return
         if(contentText === '') return
         setLoading(true)
         try{
-            const res = await agent.post({text: contentText,
-                langs: Array.from(PostContentLanguage)
-
-            })
+            //@ts-ignore 問題ないので無視して
+            let postContent : Record = {}
+            if(type === 'Reply'){
+                postContent = {
+                    text: contentText,
+                    langs: Array.from(PostContentLanguage),
+                    reply: {
+                        root:{
+                            uri: postData.uri,
+                            cid: postData.cid
+                        },
+                        parent:{
+                            uri: postData.uri,
+                            cid: postData.cid
+                        }
+                    },
+                    createdAt: new Date().toISOString(),
+                }
+                if(contentImage.length <= 4 && contentImage.length >= 1){
+                    postContent.embed = {
+                        $type : ''
+                    }
+                }
+            }
+            const res = await agent.post(postContent)
             console.log(res)
             console.log('hoge')
         }catch (e) {

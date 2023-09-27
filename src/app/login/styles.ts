@@ -14,11 +14,11 @@ export const createLoginPage = tv({
     variants: {
         color:{
             light: {
-                background: 'bg-cover bg-[url("https://raw.githubusercontent.com/kawaikute-gomen/ucho-ten-images-repo/main/images/backgroundImages/light/sky_00421.jpg")]',
+                background: '',
                 container: '',
             },
             dark: {
-                //background: 'bg-cover bg-[url("https://raw.githubusercontent.com/kawaikute-gomen/ucho-ten-images-repo/main/images/backgroundImages/dark/starry-sky-gf5ade6b4f_1920.jpg")]',
+                //background: 'bg-cover bg-[url(/images/backgroundImage/dark/starry-sky-gf5ade6b4f_1920.jpg)]',
                 background: 'bg-black',
                 container: '',
             },

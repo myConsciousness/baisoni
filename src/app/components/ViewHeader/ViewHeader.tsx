@@ -140,7 +140,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                 ) : (
                     <img
                         className={'h-[100%] w-[145px]'}
-                        src={'https://raw.githubusercontent.com/hota1024/ucho-ten/190ebcbd9619eb94c85d81d64285b16f36508a47/public/images/Logo/ucho-ten.svg'}/>
+                        src={'/images/logo/ucho-ten.svg'}/>
                 )}
                 {selectedTab === 'single' && (
                     <Button

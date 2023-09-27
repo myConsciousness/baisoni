@@ -23,10 +23,10 @@ export const viewProfilePage = tv({
     variants: {
         color:{
             light: {
-                background: 'bg-cover bg-[url("https://raw.githubusercontent.com/kawaikute-gomen/ucho-ten-images-repo/main/images/backgroundImages/light/sky_00421.jpg")]',
+                background: '',
             },
             dark: {
-                background: 'bg-cover bg-[url("https://raw.githubusercontent.com/kawaikute-gomen/ucho-ten-images-repo/main/images/backgroundImages/dark/starry-sky-gf5ade6b4f_1920.jpg")]',
+                background: '',
                 dropdown: 'dark text-white',
                 ProfileInfoContainer: 'text-white bg-black',
                 FollowButton: 'text-white dark'

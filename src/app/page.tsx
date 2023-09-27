@@ -181,7 +181,7 @@ export default function Root(props:any) {
             )}
             <>
                 {
-                    (loading || !agent) ? (
+                    (loading) ? (
                         Array.from({ length: 15 }, (_, index) => (
                             <ViewPostCard
                                 key={`skeleton-${index}`}
@@ -202,7 +202,7 @@ export default function Root(props:any) {
                         >
                             {timeline.map((post, index) => (
                                 // eslint-disable-next-line react/jsx-key
-                                <ViewPostCard key={`post-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
+                                <ViewPostCard key={`${post?.reason ? `reason` : `post`}-${post.post.uri}-${index}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
                             ))}
                         </InfiniteScroll>
                     )}

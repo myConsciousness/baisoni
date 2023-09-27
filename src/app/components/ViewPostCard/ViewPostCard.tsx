@@ -1,13 +1,11 @@
-import React, {useState, useRef, useCallback, useEffect, ReactNode} from "react";
+import React, {useState} from "react";
 import { viewPostCard } from "./styles";
-import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import {faRetweet, faEllipsis, faFlag, faLink, faCode, faFont, faTrash} from '@fortawesome/free-solid-svg-icons'
 import { faStar as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { faStar as faHeartSolid, faHashtag, faCheckCircle, faCircleXmark, faCircleQuestion, faReply } from '@fortawesome/free-solid-svg-icons'
 import {PostModal} from "../PostModal";
-
 import 'react-circular-progressbar/dist/styles.css';
 import {
     Dropdown,
@@ -15,20 +13,11 @@ import {
     DropdownMenu,
     DropdownSection,
     DropdownItem,
-    Button,
-    Image,
-    Spinner,
-    Input,
     Link,
     Skeleton,
     Chip,
     Tooltip,
-    Popover, PopoverTrigger, PopoverContent,
 } from "@nextui-org/react";
-import {RichText, UnicodeString} from '@atproto/api'
-
-
-
 import {
     LeadingActions,
     SwipeableList,
@@ -39,8 +28,7 @@ import {
 import 'react-swipeable-list/dist/styles.css';
 import {useAgent} from "@/app/_atoms/agent";
 import {useRouter} from "next/navigation";
-
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react";
+import {Modal, ModalContent, useDisclosure} from "@nextui-org/react";
 
 
 interface Props {
@@ -67,8 +55,10 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [isLiked, setIsLiked] = useState<boolean>(postJson?.viewer?.like)
     const [isReposted, setIsReposted] = useState<boolean>(postJson?.viewer?.repost)
     const [isPostModalOpen, setIsPostModalOpen] = useState<boolean>(false)
+    const [isSwipeEnabled, setIsSwipeEnabled] = useState(true);
     const [postInfo, setPostInfo] = useState<any>(null)
-    if(!agent) return
+    const [isTextSelectionInProgress, setIsTextSelectionInProgress] = useState(false);
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
 
     const leadingActions = () => (
@@ -98,9 +88,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             </SwipeAction>
         </TrailingActions>
     )
-
-    //console.log(postJson)
-    const [isSwipeEnabled, setIsSwipeEnabled] = useState(true);
 
     const handleTextSelect = () => {
         setIsSwipeEnabled(false);
@@ -148,8 +135,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         setLoading(false)
     }
 
-    const [isTextSelectionInProgress, setIsTextSelectionInProgress] = useState(false);
-
     // Handle mouse down event on the text content
     const handleTextMouseDown = () => {
         setIsTextSelectionInProgress(true);
@@ -174,7 +159,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         const text_bytes = encoder.encode(text);
         let result: any[] = [];
         let lastOffset = 0;
-        let elements= []
         facets.forEach((facet:any, index:number) => {
             const { byteStart, byteEnd } = facet.index;
 
@@ -206,7 +190,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                             <Chip
                                 className={chip({color:color})}
                                 startContent={<Tooltip showArrow={true} color={'foreground'}
-                                                       content={facetText === facet.features[0].uri ? "リンク偽装の心配はありません。" : facet.features[0].uri.includes(facetText.replace('...', '')) ?  'URL短縮の可能性があります。' : 'リンク偽装の可能性があります。'}
+                                    content={facetText === facet.features[0].uri ? "リンク偽装の心配はありません。" : facet.features[0].uri.includes(facetText.replace('...', '')) ?  'URL短縮の可能性があります。' : 'リンク偽装の可能性があります。'}
                                 >
                                     <FontAwesomeIcon icon={facetText === facet.features[0].uri ? faCheckCircle : facet.features[0].uri.includes(facetText.replace('...', '')) ? faCircleQuestion : faCircleXmark} />
                                 </Tooltip>}
@@ -230,19 +214,17 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                 variant="faded"
                                 color="primary"
                             >
-                            <a key={`a-${index}-${byteStart}`} href={`/search?word=%23${(facet.features[0].tag.replace('#', ''))}&target=posts`}>
-                                {facetText.replace('#', '')}
-                            </a>
-                        </Chip>
+                                <a key={`a-${index}-${byteStart}`} href={`/search?word=%23${(facet.features[0].tag.replace('#', ''))}&target=posts`}>
+                                   {facetText.replace('#', '')}
+                                </a>
+                            </Chip>
                         </span>
                     )
                     break
             }
-
             lastOffset = byteEnd;
-        });
+        })
 
-        // 最後のテキストを追加
         if (lastOffset < text_bytes.length) {
             const nonLinkText = decoder.decode(text_bytes.slice(lastOffset));
             const textWithLineBreaks = nonLinkText.split('\n').map((line, index) => (
@@ -250,23 +232,15 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                     {line}
                     {index !== nonLinkText.length - 1 && <br />}
                 </span>
-            ));
+            ))
             result.push(textWithLineBreaks);
         }
-
-
         return result
-    };
-
-    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    }
 
     function formatDate(inputDate: string): string {
         const date = new Date(inputDate);
-
-        if (isNaN(date.getTime())) {
-            return "Invalid date"; // 無効な日付が与えられた場合
-        }
-
+        if (isNaN(date.getTime())) return "Invalid date" // 無効な日付が与えられた場合
         const now = new Date();
         const year = date.getFullYear();
         const month = date.getMonth() + 1; // 月は0から始まるため+1する
@@ -358,7 +332,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   )}
                               </Link>
                               <div className={PostCreatedAt()} style={{fontSize:'12px'}}>
-                                  {isHover && !isSkeleton ? (
+                                  {!isMobile && isHover && !isSkeleton ? (
                                       <Dropdown className={dropdown({color:color})}>
                                           <DropdownTrigger>
                                               <FontAwesomeIcon icon={faEllipsis} className={'h-[20px] mb-[4px] cursor-pointer text-[#909090]'}/>

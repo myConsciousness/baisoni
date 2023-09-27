@@ -173,19 +173,22 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         const text_bytes = encoder.encode(text);
         let result: any[] = [];
         let lastOffset = 0;
-
+        let elements= []
         facets.forEach((facet:any, index:number) => {
             const { byteStart, byteEnd } = facet.index;
+
             const facetText = decoder.decode(text_bytes.slice(byteStart, byteEnd));
 
             // 直前のテキストを追加
             if (byteStart > lastOffset) {
                 const nonLinkText = decoder.decode(text_bytes.slice(lastOffset, byteStart));
-                nonLinkText.split('\n').map((line:any, i:number) => {
-                    result.push(<span key={`text-${i}-${byteStart}`}>{line}<br/></span>)
-
-                })
+                const textChunks = nonLinkText.split('\n').map((line, index, array) => (
+                    <span key={`text-${byteStart}-${index}`}>{line}{index !== array.length - 1 && <br/>}</span>
+                ));
+                result.push(textChunks);
             }
+
+
 
             switch (facet.features[0].$type) {
                 case "app.bsky.richtext.facet#mention":
@@ -226,7 +229,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                 variant="faded"
                                 color="primary"
                             >
-                            <a key={`a-${index}-${byteStart}`} href={`/search?word=${(facet.features[0].tag.replace('#', '%23'))}&target=posts`}>
+                            <a key={`a-${index}-${byteStart}`} href={`/search?word=%23${(facet.features[0].tag.replace('#', ''))}&target=posts`}>
                                 {facetText.replace('#', '')}
                             </a>
                         </Chip>
@@ -241,11 +244,15 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         // 最後のテキストを追加
         if (lastOffset < text_bytes.length) {
             const nonLinkText = decoder.decode(text_bytes.slice(lastOffset));
-            console.log(nonLinkText)
-            nonLinkText.split('\n').map((line:any, i:number) => {
-                result.push(<span key={`div-${i}-${lastOffset}`}>{line}<br/></span>)
-            })
+            const textWithLineBreaks = nonLinkText.split('\n').map((line, index) => (
+                <span key={`div-${lastOffset}-${index}`}>
+                    {line}
+                    {index !== nonLinkText.length - 1 && <br />}
+                </span>
+            ));
+            result.push(textWithLineBreaks);
         }
+
 
         return result
     };

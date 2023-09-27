@@ -179,7 +179,7 @@ export default function Root() {
                         >
                              {searchPostsResult.map((post: PostView, index) => (
                                 // eslint-disable-next-line react/jsx-key
-                                <ViewPostCard key={post.uri} color={color} numbersOfImage={0} postJson={post}
+                                <ViewPostCard key={`search-post-${post.uri}`} color={color} numbersOfImage={0} postJson={post}
                                            isMobile={isMobile}/>
                              ))}
                             {loading2 && (
@@ -206,7 +206,7 @@ export default function Root() {
                         // eslint-disable-next-line react/jsx-key
                         //<ViewPostCard key={index} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
                         <>
-                            <Link key={actor.did} href={`/profile/${actor.did}`}
+                            <Link key={`search-actor-${actor.did}`} href={`/profile/${actor.did}`}
                                  className={'w-full max-w-[600px] h-[100px] flex items-center bg-[#2C2C2C] text-[#D7D7D7] border-[#181818] border-b-[1px] overflow-x-hidden'}>
                                 <div className={'h-[50px] w-[50px] rounded-[10px] ml-[10px] mr-[10px]'}>
                                     <Image className={'h-full w-full'} src={actor?.avatar} alt={'avatar image'}/>

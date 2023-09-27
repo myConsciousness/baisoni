@@ -259,6 +259,39 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
 
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
+    function formatDate(inputDate: string): string {
+        const date = new Date(inputDate);
+
+        if (isNaN(date.getTime())) {
+            return "Invalid date"; // 無効な日付が与えられた場合
+        }
+
+        const now = new Date();
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // 月は0から始まるため+1する
+        const day = date.getDate();
+
+        if (
+            year === now.getFullYear() &&
+            month === now.getMonth() + 1 &&
+            day === now.getDate()
+        ) {
+            // 今日の場合
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+        } else if (year === now.getFullYear()) {
+            // 今年の場合
+            return `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}`;
+        } else {
+            // 今年以外の場合
+            const shortYear = year % 100;
+            return `${String(shortYear).padStart(2, "0")}/${String(month).padStart(2, "0")}/${String(
+                day
+            ).padStart(2, "0")}`;
+        }
+    }
+
     return (
       <>
           <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement={isMobile ? 'top' : 'center'} className={'z-[100] max-w-[600px]'}>
@@ -324,7 +357,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   )}
                               </Link>
                               <div className={PostCreatedAt()} style={{fontSize:'12px'}}>
-                                  {!isMobile && isHover && !isSkeleton ? (
+                                  {isHover && !isSkeleton ? (
                                       <Dropdown className={dropdown({color:color})}>
                                           <DropdownTrigger>
                                               <FontAwesomeIcon icon={faEllipsis} className={'h-[20px] mb-[4px] cursor-pointer text-[#909090]'}/>
@@ -375,11 +408,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           </DropdownMenu>
                                       </Dropdown>
                                   ) : (
-                                      isSkeleton ? (
-                                          <Skeleton/>
-                                      ) :(
-                                          <a href={'https://bsky.social/'}>1d</a>
-                                      )
+                                      <>
+                                          {!isSkeleton && (<div>{formatDate(postJson?.indexedAt)}</div>)}
+                                      </>
                                   )}
                               </div>
                           </div>

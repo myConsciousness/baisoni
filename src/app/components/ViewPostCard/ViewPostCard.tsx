@@ -68,6 +68,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [isReposted, setIsReposted] = useState<boolean>(postJson?.viewer?.repost)
     const [isPostModalOpen, setIsPostModalOpen] = useState<boolean>(false)
     const [postInfo, setPostInfo] = useState<any>(null)
+    if(!agent) return
 
 
     const leadingActions = () => (

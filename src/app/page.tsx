@@ -69,6 +69,7 @@ export default function Root(props:any) {
                 return false
             }
             //これはおそらくparentやrootがミュートユーザーの時、recordにreplyが入って、authorが自分ではない場合は非表示
+            //@ts-ignore
             if(item.post.record?.reply && item.post.author.did !== agent?.session?.did) return false
             // まだ uri がセットに登録されていない場合、trueを返し、セットに登録する
             if (!seenUris.has(uri)) {

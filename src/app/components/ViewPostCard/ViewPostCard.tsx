@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useCallback, useState, useMemo} from "react";
 import { viewPostCard } from "./styles";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faComment } from '@fortawesome/free-regular-svg-icons'
@@ -60,45 +60,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [isTextSelectionInProgress, setIsTextSelectionInProgress] = useState(false);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-
-    const leadingActions = () => (
-        <LeadingActions>
-            <SwipeAction onClick={() => console.info('swipe action triggered')}
-            >
-                <span
-                    className={'h-full bg-[#17BF63] text-white flex justify-center items-center cursor-pointer'}
-
-                >
-                    {isReposted ? 'un report' : 'repost'}
-                </span>
-            </SwipeAction>
-        </LeadingActions>
-    )
-
-    const trailingActions = () => (
-        <TrailingActions>
-            <SwipeAction
-                onClick={() => console.info('swipe action triggered')}
-            >
-                <span
-                    className={'h-full w-full bg-[#E0245E] text-white flex justify-center items-center '}
-                >
-                    {isLiked ? 'unlike' : 'like'}
-                </span>
-            </SwipeAction>
-        </TrailingActions>
-    )
-
-    const handleTextSelect = () => {
-        setIsSwipeEnabled(false);
-        console.log(false)
-    };
-
-    const handleTextDeselect = () => {
-        setIsSwipeEnabled(true);
-        console.log(true)
-    };
-
     const handleReply = async () => {
         //setIsPostModalOpen(true)
         console.log('open')
@@ -135,17 +96,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         setLoading(false)
     }
 
-    // Handle mouse down event on the text content
-    const handleTextMouseDown = () => {
-        setIsTextSelectionInProgress(true);
-    };
-
-    // Handle mouse up event on the text content
-    const handleTextMouseUp = () => {
-        setIsTextSelectionInProgress(false);
-    };
-
-    const renderTextWithLinks = () => {
+    const renderTextWithLinks = useMemo(() => {
+        if(!postJson?.record) return
         const encoder = new TextEncoder();
         let decoder = new TextDecoder();
         if(!postJson.record?.facets){
@@ -240,7 +192,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             result.push(textWithLineBreaks);
         }
         return result
-    }
+    },[])
 
     function formatDate(inputDate: string): string {
         const date = new Date(inputDate);
@@ -408,7 +360,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           </div>
                                       )}
                                       <div onClick={(e) => {e.stopPropagation()}}>
-                                          {(renderTextWithLinks())}
+                                          {renderTextWithLinks}
                                       </div>
                                   </>
                               )}

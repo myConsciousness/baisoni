@@ -197,9 +197,13 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                 variant="faded"
                                 color={facetText === facet.features[0].uri ? "success" : facet.features[0].uri.includes(facetText.replace('...', '')) ? 'default' : "danger"}
                             >
-                            <a key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
-                                {facetText}
-                            </a>
+                                {(facet.features[0].uri).startsWith('https://bsky.app') ? (
+                                    <Link key={`a-${index}-${byteStart}`} href={facet.features[0].uri.replace('https://bsky.app',`${location.protocol}//${window.location.host}`)}>{facetText}</Link>
+                                ) : (
+                                    <a key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
+                                        {facetText}
+                                    </a>
+                                )}
                             </Chip>
                         </span>
                     )

@@ -1,4 +1,5 @@
-import { Record } from '@atproto/api/src/client/types/app/bsky/feed/post'
+import { BskyAgent } from '@atproto/api'
+export type PostRecordPost = Parameters<BskyAgent['post']>[0]
 import React, {useState, useRef, useCallback, useEffect} from "react";
 import { postModal } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
@@ -157,7 +158,7 @@ export const PostModal: React.FC<Props> = (props: Props) => {
         setLoading(true)
         try{
             //@ts-ignore 問題ないので無視して
-            let postContent : Record = {}
+            let postContent: PostRecordPost = {}
             if(type === 'Reply'){
                 postContent = {
                     text: contentText,

@@ -11,6 +11,7 @@ import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs
 import type { FeedViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faArrowsRotate} from "@fortawesome/free-solid-svg-icons";
+import {useSearchParams} from "next/navigation";
 
 
 
@@ -26,6 +27,8 @@ export default function Root(props:any) {
     const [hasCursor, setHasCursor] = useState<string | null>(null)
     const [darkMode, setDarkMode] = useState(false);
     const color = darkMode ? 'dark' : 'light'
+    const searchParams = useSearchParams()
+    const selectedFeed = searchParams.get('feed') || 'following'
 
     const modeMe = (e:any) => {
         setDarkMode(!!e.matches);
@@ -86,7 +89,12 @@ export default function Root(props:any) {
         if(!agent) return
         try{
             setLoading(true)
-            const {data} = await agent.getTimeline({limit:30})
+            let data
+            if(selectedFeed === 'following'){
+                ({data} = await agent.getTimeline({limit:30}))
+            }else{
+                ({data} = await agent.app.bsky.feed.getFeed({feed: selectedFeed, limit: 30}))
+            }
             if (data) {
                 if(data.cursor){
                     setCursor(data.cursor)
@@ -110,7 +118,12 @@ export default function Root(props:any) {
         if(!cursor) return
         try{
             setLoading2(true)
-            const {data} = await agent.getTimeline({cursor: !hasCursor ? cursor : hasCursor});
+            let data
+            if(selectedFeed === 'following'){
+                ({data} = await agent.getTimeline({cursor: !hasCursor ? cursor : hasCursor, limit:30}))
+            }else{
+                ({data} = await agent.app.bsky.feed.getFeed({feed: selectedFeed, cursor: !hasCursor ? cursor : hasCursor, limit: 30}))
+            }
             const {feed} = data
             if(data.cursor){
                 setHasCursor(data.cursor)
@@ -135,7 +148,12 @@ export default function Root(props:any) {
     const checkNewTimeline = async () => {
         if(!agent) return
         try{
-            const {data} = await agent?.getTimeline({limit:30})
+            let data
+            if(selectedFeed === 'following'){
+                ({data} = await agent.getTimeline({limit:30}))
+            }else{
+                ({data} = await agent.app.bsky.feed.getFeed({feed: selectedFeed, limit: 30}))
+            }
             if (data) {
                 const {feed} = data
                 const filteredData = FormattingTimeline(feed)
@@ -158,7 +176,7 @@ export default function Root(props:any) {
     useEffect(() => {
         if(!agent) return
         fetchTimeline()
-    },[agent])
+    },[agent, selectedFeed])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -168,7 +186,7 @@ export default function Root(props:any) {
         return () => {
             clearInterval(interval); // インターバルをクリーンアップ
         };
-    },[agent, cursor])
+    },[agent, cursor, selectedFeed])
 
     return(
         <>
@@ -202,7 +220,7 @@ export default function Root(props:any) {
                         >
                             {timeline.map((post, index) => (
                                 // eslint-disable-next-line react/jsx-key
-                                <ViewPostCard key={`${post?.reason ? `reason` : `post`}-${post.post.uri}-${index}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
+                                <ViewPostCard key={`${post?.reason ? `reason` : `post`}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
                             ))}
                         </InfiniteScroll>
                     )}

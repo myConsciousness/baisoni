@@ -29,7 +29,7 @@ export default function RootLayout({children,}: { children: React.ReactNode }) {
         <meta property="og:locale" content="ja_JP"  />
         <meta name="description" content="Ucho-tenは「他者から解放され、自己の独立」を目指すBlueskyクライアントです。いつでも新鮮な気持ちでSNSを使うことができます。"/>
         <meta property="og:description" content='Ucho-tenは「他者から解放され、自己の独立」を目指すBlueskyクライアントです。いつでも新鮮な気持ちでSNSを使うことができます。'/>
-        <meta property="og:image" content="/images/Logo/ucho-ten-ogp.png"/>
+        <meta property="og:image" content="/images/ogp/ucho-ten-ogp.png"/>
         <meta name="twitter:card" content="summarylargeimage"/>
         <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />
         <meta name="robots" content="noarchive,max-image-preview"/>

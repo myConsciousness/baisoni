@@ -157,7 +157,6 @@ export const PostModal: React.FC<Props> = (props: Props) => {
         if(contentText === '') return
         setLoading(true)
         try{
-            //@ts-ignore 問題ないので無視して
             let postContent: PostRecordPost = {}
             if(type === 'Reply'){
                 postContent = {

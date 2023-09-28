@@ -46,6 +46,7 @@ interface Props {
     color: 'light' | 'dark';
     type?: 'Post' | 'Reply' | `Quote`
     postData?: any
+    onClose?: any
 }
 export const PostModal: React.FC<Props> = (props: Props) => {
     const {color, type, postData} = props
@@ -182,6 +183,7 @@ export const PostModal: React.FC<Props> = (props: Props) => {
             }
             const res = await agent.post(postContent)
             console.log(res)
+            props.onClose(true)
             console.log('hoge')
         }catch (e) {
             console.log(e)
@@ -296,7 +298,7 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                         className={headerCancelButton()}
                         isDisabled={loading}
                         onClick={() => {
-                            router.push('/')
+                            props.onClose(true)
                         }}
                     >
                         cancel
@@ -305,7 +307,9 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                     <Button className={headerPostButton()}
                             radius={'full'}
                             color={'primary'}
-                            onPress={handlePostClick}
+                            onPress={() => {
+                                handlePostClick()
+                            }}
                             isDisabled={loading || contentText.length === 0 || contentText.length > 300 || isImageMaxLimited}
                             isLoading={loading}
                     >

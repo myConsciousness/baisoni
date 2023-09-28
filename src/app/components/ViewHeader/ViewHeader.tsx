@@ -87,6 +87,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
         setSearchText(search)
     },[])
 
+
     return (
         <main className={Header()}>
             <div className={top()}>
@@ -165,6 +166,11 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         aria-label="Options"
                         color="primary"
                         variant="underlined"
+                        items={pinnedFeeds}
+                        onSelectionChange={(e) => {
+                            console.log(e)
+                            router.push(`/home?feed=${e}`)
+                        }}
                         classNames={{
                             tabList: "w-full relative rounded-none p-0 border-b border-divider",
                             cursor: "w-full bg-[#6A52FF]",
@@ -189,6 +195,9 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                                             <span>{feed.displayName}</span>
                                         </div>
                                  }
+                                 onClick={() => {
+                                     console.log(feed.uri)
+                                 }}
                             />
                         ))}
                     </Tabs>

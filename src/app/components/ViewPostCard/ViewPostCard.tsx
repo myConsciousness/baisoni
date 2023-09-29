@@ -363,7 +363,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                               )}
                               <div className={'overflow-x-scroll'}>
                                   {postJson?.embed && (
-                                      postJson?.embed?.$type === 'app.bsky.embed.images#view' && (
+                                      postJson?.embed?.$type === 'app.bsky.embed.images#view' ? (
                                           <ScrollShadow orientation="horizontal">
                                               <div className={`flex overflow-x-auto overflow-y-hidden w-[${postJson.embed.images.length !== 1 ? `100svw` : `100%`}]`}>
                                                   {postJson.embed.images.map((image: any, index: number) => (
@@ -375,6 +375,40 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                   ))}
                                               </div>
                                           </ScrollShadow>
+                                      ) : (
+                                          postJson.embed.$type === 'app.bsky.embed.external#view' && (
+                                              <a
+                                                  href={postJson.embed.external?.uri}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                              >
+                                                  <div className="h-[100px] w-full rounded-lg overflow-hidden border border-gray-600 flex items-center text-gray-800 hover:bg-gray-200">
+                                                      <div className="h-100 w-24 border-r border-gray-600">
+                                                          <img
+                                                              src={postJson.embed.external?.thumb}
+                                                              className="object-cover w-full h-full"
+                                                              alt={postJson.embed.external?.alt}
+                                                          />
+                                                      </div>
+                                                      <div className="flex items-center ml-2 h-full w-[calc(100%-6rem)]">
+                                                          <div className="w-52 min-w-0">
+                                                              <div className="text-sm font-bold text-black whitespace-nowrap overflow-hidden overflow-ellipsis">
+                                                                  {postJson.embed.external?.title}
+                                                              </div>
+                                                              <div className="text-xs text-gray-700 mt-1 overflow-hidden" style={{WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>
+                                                                  {postJson.embed.external?.description}
+                                                              </div>
+                                                              <div className="text-xs text-gray-700 mt-1">
+                                                                  <a href={postJson.embed.external?.uri} className="text-gray-700 underline">
+                                                                      {postJson.embed.external?.uri.match(/^https?:\/{2,}(.*?)(?:\/|\?|#|$)/)[1]}
+                                                                  </a>
+                                                              </div>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </a>
+
+                                          )
                                       )
                                   )}
                               </div>

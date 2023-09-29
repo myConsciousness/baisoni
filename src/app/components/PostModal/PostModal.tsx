@@ -4,16 +4,8 @@ import React, {useState, useRef, useCallback, useEffect} from "react";
 import { postModal } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-    faBookmark as faRegularBookmark,
-    faComment,
-    faImage,
-    faSquare as faRegularSquare, faTrashCan
-} from '@fortawesome/free-regular-svg-icons'
-import {
-    faXmark,
-    faPen, faCirclePlus, faFaceLaughBeam
-} from '@fortawesome/free-solid-svg-icons'
+import { faImage, faTrashCan } from '@fortawesome/free-regular-svg-icons'
+import { faXmark, faPen, faCirclePlus, faFaceLaughBeam } from '@fortawesome/free-solid-svg-icons'
 import 'react-circular-progressbar/dist/styles.css';
 import {
     Dropdown,
@@ -24,22 +16,14 @@ import {
     Button,
     Image,
     Spinner,
-    ScrollShadow,
-    Popover, PopoverTrigger, PopoverContent, useDisclosure,
-} from "@nextui-org/react";
-
-import {Tabs, Tab, Chip} from "@nextui-org/react";
+    Popover, PopoverTrigger, PopoverContent, useDisclosure,} from "@nextui-org/react";
 import {useRouter, useSearchParams} from "next/navigation";
 import {useAgent} from "@/app/_atoms/agent";
-import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
-import {LeadingActions, SwipeableList, SwipeableListItem, SwipeAction, TrailingActions} from "react-swipeable-list";
-import {postOnlyPage} from "@/app/components/PostOnlyPage/styles";
 import Textarea from "react-textarea-autosize";
 import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import {buildStyles, CircularProgressbar} from "react-circular-progressbar";
 import {useDropzone} from "react-dropzone";
-
 
 interface Props {
     children?: React.ReactNode;
@@ -51,11 +35,10 @@ interface Props {
 export const PostModal: React.FC<Props> = (props: Props) => {
     const {color, type, postData} = props
     const [agent, setAgent] = useAgent()
-    //const {agent} = useRequiredSession()
     const router = useRouter()
     const searchParams = useSearchParams()
     const postParam = searchParams.get('text')
-    const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;
+    const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063]*$/;
     const [PostContentLanguage, setPostContentLanguage] = useState(new Set<string>([]))
     const inputId = Math.random().toString(32).substring(2)
     const [contentText, setContentText] = useState(postParam ? postParam : '')
@@ -74,17 +57,14 @@ export const PostModal: React.FC<Props> = (props: Props) => {
         contentImage.length >= 5 || contentImage.length === 4 // 4枚まで
     const isImageMinLimited = contentImage.length === 0 // 4枚まで
     const [compressProcessing, setCompressProcessing] = useState(false)
-    const { background, backgroundColor,
-        PostModal,
-        header, headerTitle, headerPostButton, headerCancelButton,
+    const { PostModal, header, headerTitle, headerPostButton, headerCancelButton,
         content, contentLeft, contentLeftAuthorIcon, contentLeftAuthorIconImage,
-        contentRight, contentRightTextArea, contentRightImagesContainer, contentRightUrlsContainer,
+        contentRight, contentRightTextArea, contentRightImagesContainer,
         contentRightUrlCard, contentRightUrlCardDeleteButton,
         URLCard, URLCardThumbnail, URLCardDetail, URLCardDetailContent, URLCardTitle, URLCardDescription, URLCardLink,
         footer, footerTooltip,
-        footerCharacterCount, footerCharacterCountText, footerCharacterCountCircle,
+        footerCharacterCount, footerCharacterCountText,
         footerTooltipStyle,dropdown,popover,
-
         ImageDeleteButton, ImageAddALTButton, ImageEditButton,
     } = postModal();
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
@@ -108,14 +88,11 @@ export const PostModal: React.FC<Props> = (props: Props) => {
         }
     }
 
-
     const onDrop = useCallback(async (files: File[]) => {
         if(contentImage.length + files.length > 4){
             return
         }
         const maxFileSize = 975 * 1024; // 975KB
-
-
         const compressedImages = await Promise.all(
             Array.from(files).map(async (file) => {
                 if (file.size > maxFileSize) {
@@ -151,7 +128,6 @@ export const PostModal: React.FC<Props> = (props: Props) => {
         e.dataTransfer.dropEffect = 'copy';
     };
 
-    console.log(postData)
     const handlePostClick = async () => {
         console.log(agent)
         if(!agent) return
@@ -222,7 +198,6 @@ export const PostModal: React.FC<Props> = (props: Props) => {
         setContentImages((b) => [...b, ...compressedImages]);
     };
 
-    const AppearanceColor = color
     const onEmojiClick = (event: any) => {
         if (textareaRef.current) {
             const target = textareaRef.current
@@ -286,7 +261,6 @@ export const PostModal: React.FC<Props> = (props: Props) => {
 
 
     return (
-
         <>
             {isOpen && (
                 window.prompt("Please enter link", "Harry Potter")
@@ -325,7 +299,7 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                                          alt={"author icon"}
                                          onDragStart={handleDragStart}
                                          src={"https://av-cdn.bsky.app/img/avatar/plain/did:plc:txandrhc7afdozk6a2itgltm/bafkreihwad5kaujw2f6kbfg37zmkhclgd3ap7grixl6pusfb5b34s6jite@jpeg"}
-                                    ></img>
+                                    />
                                 </DropdownTrigger>
                                 <DropdownMenu>
                                     <DropdownSection title='accounts'>
@@ -477,7 +451,7 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                         )}
                     </div>
                 </div>
-                <div className={footer({color:AppearanceColor})}>
+                <div className={footer({color:color})}>
                     <div className={footerTooltip()}>
                         <div className={footerTooltipStyle()}>
                             <label htmlFor={inputId}>

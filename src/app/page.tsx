@@ -64,7 +64,8 @@ export default function Root(props:any) {
         const seenUris = new Set<string>();
         const filteredData = timeline.filter(item => {
             const uri = item.post.uri;
-            console.log(item)
+            //console.log(item)
+            if(item.post.embed) console.log(item.post.embed)
             if(item.reply){
                 if(item.reason) return true
                 //@ts-ignore
@@ -219,8 +220,9 @@ export default function Root(props:any) {
                             useWindow={false}
                         >
                             {timeline.map((post, index) => (
-                                // eslint-disable-next-line react/jsx-key
-                                <ViewPostCard key={`${post?.reason ? `reason` : `post`}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
+                                <>
+                                    <ViewPostCard key={`${post?.reason ? `reason-${(post.reason as any).by.did}` : `post`}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
+                                </>
                             ))}
                         </InfiniteScroll>
                     )}

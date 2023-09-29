@@ -61,13 +61,13 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [isTextSelectionInProgress, setIsTextSelectionInProgress] = useState(false);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-    const handleReply = async () => {
+    const handleReply = useCallback(async () => {
         //setIsPostModalOpen(true)
         console.log('open')
         onOpen()
-    }
+    },[])
 
-    const handleRepost = async () => {
+    const handleRepost = useCallback(async () => {
         if(loading) return
         setLoading(true)
         if(isReposted){
@@ -80,9 +80,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             console.log(res)
         }
         setLoading(false)
-    }
+    },[])
 
-    const handleLike = async () => {
+    const handleLike = useCallback(async () => {
         if(loading) return
         setLoading(true)
         if(isLiked){
@@ -95,7 +95,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             console.log(res)
         }
         setLoading(false)
-    }
+    }, [])
 
     const renderTextWithLinks = useMemo(() => {
         if(!postJson?.record) return
@@ -254,15 +254,15 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                            }}
                       >
                           {json?.reason && (
-                              <a className={'text-[13px] ml-[40px] text-[#909090] text-bold'}
+                              <span className={'text-[13px] ml-[40px] text-[#909090] text-bold hover:cursor-pointer'}
                                  onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
 
                               >
                                   Reposted by {json.reason.by.displayName}
-                              </a>
+                              </span>
                           )}
-                          <div className={PostAuthor()}>
-                              <a className={PostAuthorIcon()}
+                          <div className={`${PostAuthor()}`}>
+                              <span className={PostAuthorIcon()}
                                 onClick={() => (
                                     router.push(`/profile/${postJson?.author.did}`)
                                 )}
@@ -273,8 +273,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <img src={postJson?.author?.avatar}/>
 
                                   )}
-                              </a>
-                              <a className={PostAuthorDisplayName({color: color})} style={{fontSize:'13px'}}
+                              </span>
+                              <span className={PostAuthorDisplayName({color: color})} style={{fontSize:'13px'}}
                                 onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
                               >
                                   {isSkeleton ? (
@@ -282,9 +282,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   ) : (
                                       <span>{postJson?.author?.displayName}</span>
                                   )}
-                              </a>
+                              </span>
                               <div className={'text-[#BABABA]'}>&nbsp;-&nbsp;</div>
-                              <a className={PostAuthorHandle({color: color})}
+                              <span className={PostAuthorHandle({color: color})}
                                     onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
                               >
                                   {isSkeleton ? (
@@ -292,7 +292,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   ) : (
                                       <span>{postJson?.author?.handle}</span>
                                   )}
-                              </a>
+                              </span>
                               <div className={PostCreatedAt()} style={{fontSize:'12px'}}>
                                   {!isMobile && isHover && !isSkeleton ? (
                                       <Dropdown className={dropdown({color:color})}>

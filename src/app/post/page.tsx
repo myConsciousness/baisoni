@@ -137,10 +137,10 @@ export default function Root() {
     const handlePostClick = async () => {
         console.log(agent)
         if(!agent) return
-        if(contentText === '') return
+        if(contentText.trim() === '') return
         setLoading(true)
         try{
-            const res = await agent.post({text: contentText,
+            const res = await agent.post({text: contentText.trim(),
                                                                      langs: Array.from(PostContentLanguage)
 
             })
@@ -270,7 +270,7 @@ export default function Root() {
                             radius={'full'}
                             color={'primary'}
                             onPress={handlePostClick}
-                            isDisabled={loading || contentText.length === 0 || contentText.length > 300 || isImageMaxLimited}
+                            isDisabled={loading || contentText.trim().length === 0 || contentText.trim().length > 300 || isImageMaxLimited}
                             isLoading={loading}
                     >
                         {loading ? '' : 'send'}
@@ -540,10 +540,10 @@ export default function Root() {
                             </div>
                         </BrowserView>
                         <div className={footerCharacterCount()}>
-                            <div className={footerCharacterCountText()} style={{color:contentText.length >= 300 ? "red": 'white'}}>{300 - contentText.length}</div>
+                            <div className={footerCharacterCountText()} style={{color:contentText.length >= 300 ? "red": 'white'}}>{300 - contentText.trim().length}</div>
                             <div style={{width:'20px', height:'20px', marginLeft:'5px'}}>
                                 <CircularProgressbar
-                                    value={contentText.length} maxValue={300}
+                                    value={contentText.trim().length} maxValue={300}
                                     styles={buildStyles({pathColor:contentText.length >= 300 ? "red" : "deepskyblue",})}
                                 />
                             </div>

@@ -169,7 +169,8 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         items={pinnedFeeds}
                         onSelectionChange={(e) => {
                             console.log(e)
-                            router.push(`/?feed=${e}`)
+                            //profileやpost固有の画面に移動するとtopページに飛ばされるバグはここにあった
+                            //router.push(`/?feed=${e}`)
                         }}
                         classNames={{
                             tabList: "w-full relative rounded-none p-0 border-b border-divider",

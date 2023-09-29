@@ -254,36 +254,45 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                            }}
                       >
                           {json?.reason && (
-                              <Link className={'text-[13px] ml-[40px] text-[#909090] text-bold'}
-                                    href={`/profile/${json.reason.by.did}`}
+                              <a className={'text-[13px] ml-[40px] text-[#909090] text-bold'}
+                                 onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
+
                               >
                                   Reposted by {json.reason.by.displayName}
-                              </Link>
+                              </a>
                           )}
                           <div className={PostAuthor()}>
-                              <Link className={PostAuthorIcon()} href={`/profile/${postJson?.author.did}`}>
+                              <a className={PostAuthorIcon()}
+                                onClick={() => (
+                                    router.push(`/profile/${postJson?.author.did}`)
+                                )}
+                              >
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonIcon({color:color})}/>
                                   ) : (
                                       <img src={postJson?.author?.avatar}/>
 
                                   )}
-                              </Link>
-                              <Link className={PostAuthorDisplayName({color: color})} style={{fontSize:'13px'}} href={`/profile/${postJson?.author.did}`}>
+                              </a>
+                              <a className={PostAuthorDisplayName({color: color})} style={{fontSize:'13px'}}
+                                onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
+                              >
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonName({color:color})}/>
                                   ) : (
                                       <span>{postJson?.author?.displayName}</span>
                                   )}
-                              </Link>
+                              </a>
                               <div className={'text-[#BABABA]'}>&nbsp;-&nbsp;</div>
-                              <Link className={PostAuthorHandle({color: color})} href={`/profile/${postJson?.author.did}`}>
+                              <a className={PostAuthorHandle({color: color})}
+                                    onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
+                              >
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonHandle({color: color})}/>
                                   ) : (
                                       <span>{postJson?.author?.handle}</span>
                                   )}
-                              </Link>
+                              </a>
                               <div className={PostCreatedAt()} style={{fontSize:'12px'}}>
                                   {!isMobile && isHover && !isSkeleton ? (
                                       <Dropdown className={dropdown({color:color})}>

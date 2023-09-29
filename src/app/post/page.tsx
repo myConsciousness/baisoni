@@ -544,7 +544,7 @@ export default function Root() {
                             <div style={{width:'20px', height:'20px', marginLeft:'5px'}}>
                                 <CircularProgressbar
                                     value={contentText.trim().length} maxValue={300}
-                                    styles={buildStyles({pathColor:contentText.length >= 300 ? "red" : "deepskyblue",})}
+                                    styles={buildStyles({pathColor:contentText.trim().length >= 300 ? "red" : "deepskyblue",})}
                                 />
                             </div>
                         </div>

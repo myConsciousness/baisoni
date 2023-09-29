@@ -241,12 +241,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                 }}
 
           >
-              <SwipeableList>
-                  <SwipeableListItem
-                      //leadingActions={isMobile && leadingActions()}
-                      //trailingActions={isMobile && trailingActions()}
-                      maxSwipe={70}
-                  >
+              <>
+                  <>
 
                       <div className={PostCardContainer()}
                            onMouseEnter={() => {
@@ -364,13 +360,21 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       </div>
                                   </>
                               )}
-                              {postJson?.embed?.images?.length > 0 && (
-                                  <div className={'mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden'}>
-                                      {postJson?.embed?.images?.length === 1 && (
-                                          <img className={'w-full h-full'} src={postJson.embed.images[0].thumb}></img>
-                                      )}
-                                  </div>
-                              )}
+                              <div className={'overflow-x-scroll'}>
+                                  {postJson?.embed && (
+                                      postJson?.embed?.$type === 'app.bsky.embed.images#view' && (
+                                          <div className={`flex overflow-x-auto w-[${postJson.embed.images.length !== 1 ? `100svw` : `100%`}]`}>
+                                              {postJson.embed.images.map((image: any, index: number) => (
+                                                  <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden ${postJson.embed.images.length !== 1 && `max-w-[100%] h-[300px] mr-[10px] bg-cover`}`}
+                                                       key={`image-${index}`}
+                                                  >
+                                                      <img className="w-full h-full" src={image.thumb} alt={image?.alt} />
+                                                  </div>
+                                              ))}
+                                          </div>
+                                      )
+                                  )}
+                              </div>
                           </div>
                           <div className={PostReactionButtonContainer()} style={{}}>
                               <div className={`mr-[12px]`}>
@@ -420,8 +424,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                               </div>
                           </div>
                       </div>
-                  </SwipeableListItem>
-              </SwipeableList>
+                  </>
+              </>
           </main>
       </>
   );

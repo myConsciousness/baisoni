@@ -4,6 +4,7 @@ import { Noto_Sans_JP } from 'next/font/google'
 import { Providers } from './providers';
 import {AppConatiner} from "./appContainer";
 
+
 const noto = Noto_Sans_JP({
     weight: ['400', '700'],
     subsets: ['latin'],
@@ -12,13 +13,14 @@ const noto = Noto_Sans_JP({
 export const metadata = {
     title: 'タイトル',
     description: '説明...',
+    viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 }
 
 export default function RootLayout({children,}: { children: React.ReactNode }) {
 
 
   return (
-    <html lang="en" className={'overflow-hidden'}>
+    <html lang="en" className={'overflow-hidden'} suppressHydrationWarning={true}>
       <head>
         <title>Ucho-ten</title>
         <meta charSet="utf-8"/>
@@ -34,7 +36,7 @@ export default function RootLayout({children,}: { children: React.ReactNode }) {
         <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />
         <meta name="robots" content="noarchive,max-image-preview"/>
       </head>
-      <body className={`font-body ${noto.className}`} style={{overscrollBehaviorY:'none', WebkitOverflowScrolling: 'touch',}} suppressHydrationWarning>
+      <body className={`font-body ${noto.className}`} style={{overscrollBehaviorY:'none', WebkitOverflowScrolling: 'touch',}}>
         <Providers>
           <AppConatiner>
             {children}

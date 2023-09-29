@@ -155,13 +155,13 @@ export const PostModal: React.FC<Props> = (props: Props) => {
     const handlePostClick = async () => {
         console.log(agent)
         if(!agent) return
-        if(contentText === '') return
+        if(contentText.trim() === '') return
         setLoading(true)
         try{
             let postContent: PostRecordPost = {}
             if(type === 'Reply'){
                 postContent = {
-                    text: contentText,
+                    text: contentText.trim(),
                     langs: Array.from(PostContentLanguage),
                     reply: {
                         root:{
@@ -310,7 +310,7 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                             onPress={() => {
                                 handlePostClick()
                             }}
-                            isDisabled={loading || contentText.length === 0 || contentText.length > 300 || isImageMaxLimited}
+                            isDisabled={loading || contentText.trim().length === 0 || contentText.trim().length > 300 || isImageMaxLimited}
                             isLoading={loading}
                     >
                         {loading ? '' : 'send'}
@@ -580,11 +580,11 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                             </div>
                         </BrowserView>
                         <div className={footerCharacterCount()}>
-                            <div className={footerCharacterCountText()} style={{color:contentText.length >= 300 ? "red": 'white'}}>{300 - contentText.length}</div>
+                            <div className={footerCharacterCountText()} style={{color:contentText.trim().length >= 300 ? "red": 'white'}}>{300 - contentText.length}</div>
                             <div style={{width:'20px', height:'20px', marginLeft:'5px'}}>
                                 <CircularProgressbar
-                                    value={contentText.length} maxValue={300}
-                                    styles={buildStyles({pathColor:contentText.length >= 300 ? "red" : "deepskyblue",})}
+                                    value={contentText.trim().length} maxValue={300}
+                                    styles={buildStyles({pathColor:contentText.trim().length >= 300 ? "red" : "deepskyblue",})}
                                 />
                             </div>
                         </div>

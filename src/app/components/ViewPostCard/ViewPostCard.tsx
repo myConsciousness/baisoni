@@ -17,6 +17,7 @@ import {
     Skeleton,
     Chip,
     Tooltip,
+    ScrollShadow,
 } from "@nextui-org/react";
 import {
     LeadingActions,
@@ -363,15 +364,17 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                               <div className={'overflow-x-scroll'}>
                                   {postJson?.embed && (
                                       postJson?.embed?.$type === 'app.bsky.embed.images#view' && (
-                                          <div className={`flex overflow-x-auto w-[${postJson.embed.images.length !== 1 ? `100svw` : `100%`}]`}>
-                                              {postJson.embed.images.map((image: any, index: number) => (
-                                                  <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden ${postJson.embed.images.length !== 1 && `max-w-[100%] h-[300px] mr-[10px] bg-cover`}`}
-                                                       key={`image-${index}`}
-                                                  >
-                                                      <img className="w-full h-full" src={image.thumb} alt={image?.alt} />
-                                                  </div>
-                                              ))}
-                                          </div>
+                                          <ScrollShadow orientation="horizontal">
+                                              <div className={`flex overflow-x-auto overflow-y-hidden w-[${postJson.embed.images.length !== 1 ? `100svw` : `100%`}]`}>
+                                                  {postJson.embed.images.map((image: any, index: number) => (
+                                                      <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden ${postJson.embed.images.length !== 1 && `max-w-[600px] h-[300px] mr-[10px] bg-cover`}`}
+                                                           key={`image-${index}`}
+                                                      >
+                                                          <img className="w-full h-full" src={image.thumb} alt={image?.alt} />
+                                                      </div>
+                                                  ))}
+                                              </div>
+                                          </ScrollShadow>
                                       )
                                   )}
                               </div>

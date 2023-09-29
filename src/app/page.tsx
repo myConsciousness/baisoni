@@ -2,7 +2,7 @@
 
 import {TabBar} from "@/app/components/TabBar";
 import {ViewPostCard} from "@/app/components/ViewPostCard";
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {isMobile} from "react-device-detect";
 import {useAgent} from "@/app/_atoms/agent";
 import InfiniteScroll  from "react-infinite-scroller"
@@ -44,7 +44,6 @@ export default function Root(props:any) {
     }, []);
 
 
-
     const handleRefresh = () => {
         console.log('refresh');
 
@@ -57,6 +56,7 @@ export default function Root(props:any) {
         console.log(diffTimeline);
         // timelineに差分を追加
         setTimeline([...diffTimeline, ...timeline]);
+        setCursor(newCursor)
         setAvailableNewTimeline(false);
     }
 
@@ -114,9 +114,10 @@ export default function Root(props:any) {
         }
     }
 
-    const loadMore = async (page:any) => {
+    const loadMore = useCallback(async (page:any) => {
         if(!agent) return
         if(!cursor) return
+        console.log('loadMore')
         try{
             setLoading2(true)
             let data
@@ -144,7 +145,7 @@ export default function Root(props:any) {
             setLoading2(false)
             console.log(e)
         }
-    }
+    },[cursor, agent, timeline, hasCursor, selectedFeed])
 
     const checkNewTimeline = async () => {
         if(!agent) return
@@ -155,11 +156,12 @@ export default function Root(props:any) {
             }else{
                 ({data} = await agent.app.bsky.feed.getFeed({feed: selectedFeed, limit: 30}))
             }
+            console.log(data.cursor)
             if (data) {
                 const {feed} = data
                 const filteredData = FormattingTimeline(feed)
 
-                if(data.cursor && data.cursor !== cursor){
+                if(data.cursor && data.cursor !== cursor && data.cursor !== newCursor){
                     setNewCursor(data.cursor)
                     const diffTimeline = filteredData.filter(newItem => {
                         return !timeline.some(oldItem => oldItem.post.uri === newItem.post.uri);

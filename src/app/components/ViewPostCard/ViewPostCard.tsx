@@ -2,7 +2,7 @@ import React, {useCallback, useState, useMemo} from "react";
 import { viewPostCard } from "./styles";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faComment } from '@fortawesome/free-regular-svg-icons'
-import {faRetweet, faEllipsis, faFlag, faLink, faCode, faFont, faTrash} from '@fortawesome/free-solid-svg-icons'
+import {faRetweet, faEllipsis, faFlag, faLink, faCode, faTrash} from '@fortawesome/free-solid-svg-icons'
 import { faStar as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { faStar as faHeartSolid, faHashtag, faCheckCircle, faCircleXmark, faCircleQuestion, faReply } from '@fortawesome/free-solid-svg-icons'
 import {PostModal} from "../PostModal";
@@ -18,14 +18,8 @@ import {
     Chip,
     Tooltip,
     ScrollShadow,
+    Image,
 } from "@nextui-org/react";
-import {
-    LeadingActions,
-    SwipeableList,
-    SwipeableListItem,
-    SwipeAction,
-    TrailingActions,
-} from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
 import {useAgent} from "@/app/_atoms/agent";
 import {useRouter} from "next/navigation";
@@ -48,7 +42,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [ agent ] = useAgent()
     const router = useRouter()
     const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json} = props;
-    const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;
+    const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063]*$/;
     const [loading, setLoading] = useState(false)
     const [isHover, setIsHover] = useState<boolean>(false)
     const { PostCard, PostAuthor, PostContent, PostReactionButtonContainer, PostCardContainer, PostReactionButton,
@@ -61,13 +55,13 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [isTextSelectionInProgress, setIsTextSelectionInProgress] = useState(false);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
-    const handleReply = useCallback(async () => {
+    const handleReply = async () => {
         //setIsPostModalOpen(true)
         console.log('open')
         onOpen()
-    },[])
+    }
 
-    const handleRepost = useCallback(async () => {
+    const handleRepost = async () => {
         if(loading) return
         setLoading(true)
         if(isReposted){
@@ -80,9 +74,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             console.log(res)
         }
         setLoading(false)
-    },[])
+    }
 
-    const handleLike = useCallback(async () => {
+    const handleLike = async () => {
         if(loading) return
         setLoading(true)
         if(isLiked){
@@ -95,7 +89,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             console.log(res)
         }
         setLoading(false)
-    }, [])
+    }
 
     const renderTextWithLinks = useMemo(() => {
         if(!postJson?.record) return
@@ -270,7 +264,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonIcon({color:color})}/>
                                   ) : (
-                                      <img src={postJson?.author?.avatar}/>
+                                      <Image src={postJson?.author?.avatar} radius={'none'} className={'z-0'} alt={postJson.author.did}/>
 
                                   )}
                               </span>
@@ -379,7 +373,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                       <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden ${postJson.embed.images.length !== 1 && `max-w-[600px] h-[300px] mr-[10px] bg-cover`}`}
                                                            key={`image-${index}`}
                                                       >
-                                                          <img className="w-full h-full" src={image.thumb} alt={image?.alt} />
+                                                          <img className="w-full h-full z-0" src={image.thumb} alt={image?.alt} />
                                                       </div>
                                                   ))}
                                               </div>
@@ -395,7 +389,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                       <div className="h-[100px] w-[100px] border-r border-gray-600">
                                                           <img
                                                               src={postJson.embed.external?.thumb}
-                                                              className="object-cover w-full h-full"
+                                                              className="object-cover w-full h-full z-0"
                                                               alt={postJson.embed.external?.alt}
                                                           />
                                                       </div>

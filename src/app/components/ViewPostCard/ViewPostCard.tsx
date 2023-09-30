@@ -24,6 +24,7 @@ import 'react-swipeable-list/dist/styles.css';
 import {useAgent} from "@/app/_atoms/agent";
 import {useRouter} from "next/navigation";
 import {Modal, ModalContent, useDisclosure} from "@nextui-org/react";
+import { formattedSimpleDate } from "@/app/_lib/strings/datetime";
 
 
 interface Props {
@@ -192,34 +193,34 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         return result
     },[])
 
-    function formatDate(inputDate: string): string {
-        const date = new Date(inputDate);
-        if (isNaN(date.getTime())) return "Invalid date" // 無効な日付が与えられた場合
-        const now = new Date();
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1; // 月は0から始まるため+1する
-        const day = date.getDate();
+    // function formatDate(inputDate: string): string {
+    //     const date = new Date(inputDate);
+    //     if (isNaN(date.getTime())) return "Invalid date" // 無効な日付が与えられた場合
+    //     const now = new Date();
+    //     const year = date.getFullYear();
+    //     const month = date.getMonth() + 1; // 月は0から始まるため+1する
+    //     const day = date.getDate();
 
-        if (
-            year === now.getFullYear() &&
-            month === now.getMonth() + 1 &&
-            day === now.getDate()
-        ) {
-            // 今日の場合
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-        } else if (year === now.getFullYear()) {
-            // 今年の場合
-            return `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}`;
-        } else {
-            // 今年以外の場合
-            const shortYear = year % 100;
-            return `${String(shortYear).padStart(2, "0")}/${String(month).padStart(2, "0")}/${String(
-                day
-            ).padStart(2, "0")}`;
-        }
-    }
+    //     if (
+    //         year === now.getFullYear() &&
+    //         month === now.getMonth() + 1 &&
+    //         day === now.getDate()
+    //     ) {
+    //         // 今日の場合
+    //         const hours = date.getHours();
+    //         const minutes = date.getMinutes();
+    //         return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    //     } else if (year === now.getFullYear()) {
+    //         // 今年の場合
+    //         return `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}`;
+    //     } else {
+    //         // 今年以外の場合
+    //         const shortYear = year % 100;
+    //         return `${String(shortYear).padStart(2, "0")}/${String(month).padStart(2, "0")}/${String(
+    //             day
+    //         ).padStart(2, "0")}`;
+    //     }
+    // }
     const handleMouseUp = (e:any) => {
         // マウスダウンしていない状態でクリックされた場合は何もしない
         if (startX === null || startY === null) return
@@ -370,7 +371,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       </Dropdown>
                                   ) : (
                                       <>
-                                          {!isSkeleton && (<div>{formatDate(postJson?.indexedAt)}</div>)}
+                                          {!isSkeleton && (<div>{formattedSimpleDate(postJson?.indexedAt)}</div>)}
                                       </>
                                   )}
                               </div>

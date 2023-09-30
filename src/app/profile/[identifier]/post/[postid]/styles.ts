@@ -3,7 +3,7 @@ import { tv } from "@nextui-org/react";
 export const postOnlyPage = tv({
     slots: {
         Container: 'h-full min-w-[350px] max-w-[600px]',
-        AuthorPost: 'w-full border-b-[1px] border-[#AAAAAA]',
+        AuthorPost: 'w-full border-b-[1px]',
         Author: 'flex items-center pt-[10px] pl-[14px] pr-[24px] pb-[9px]',
         AuthorIcon: 'bg-[#D9D9D9] h-[50px] w-[50px] rounded-[10px] mr-[12px] overflow-hidden',
         AuthorDisplayName: 'text-[16px] font-bold',
@@ -22,12 +22,14 @@ export const postOnlyPage = tv({
                 Container: 'bg-white text-black',
                 PostContent: 'text-black',
                 PostCreatedAt: 'text-black',
+                AuthorPost: 'border-[#AAAAAA]'
             },
             dark: {
                 Container: 'bg-[#2C2C2C] text-[#D7D7D7] border-[#181818]',
                 PostContent: 'text-white',
                 PostCreatedAt: 'text-white',
                 dropdown: 'dark text-white',
+                AuthorPost: 'border-[#181818]'
             },
         },
         isMobile: {

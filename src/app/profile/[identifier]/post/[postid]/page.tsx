@@ -1,7 +1,6 @@
 'use client';
 import React, {useEffect, useState} from "react";
 import {useAgent} from "@/app/_atoms/agent";
-import InfiniteScroll  from "react-infinite-scroller"
 import type { PostView } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import type { FeedViewPost } from "@atproto/api/dist/client/types/app/bsky/feed/defs";
 import {usePathname} from "next/navigation";
@@ -11,7 +10,7 @@ import {
     faBookmark as faRegularBookmark,
     faComment,
     faImage,
-    faSquare as faRegularSquare,
+    faStar as faRegularStar,
     faTrashCan
 } from '@fortawesome/free-regular-svg-icons'
 import {
@@ -21,7 +20,7 @@ import {
     faEllipsis, faFlag, faHashtag, faLanguage,
     faQuoteLeft,
     faRetweet,
-    faSquare as faSolidSquare, faTrash, faU, faUser, faLink
+    faStar as faSolidStar, faTrash, faU, faUser, faLink
 } from '@fortawesome/free-solid-svg-icons'
 import {
     Dropdown,
@@ -29,21 +28,12 @@ import {
     DropdownMenu,
     DropdownSection,
     DropdownItem,
-    Button,
-    Image,
-    Spinner,
-    Input,
-    Popover, PopoverTrigger, PopoverContent, useDisclosure, Link, Chip, Tooltip
+    Link, Chip, Tooltip, ModalContent, Modal, useDisclosure
 } from "@nextui-org/react";
-
-import {
-    LeadingActions,
-    SwipeableList,
-    SwipeableListItem,
-    SwipeAction,
-    TrailingActions,
-} from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
+import {ViewPostCard} from "@/app/components/ViewPostCard";
+import {isMobile} from "react-device-detect";
+import {PostModal} from "@/app/components/PostModal";
 
 
 export default function Root() {
@@ -52,7 +42,6 @@ export default function Root() {
     const [loading2, setLoading2] = useState(false)
     const pathname = usePathname()
     const username = pathname.replace('/profile/','')
-    console.log(username)
     const atUri1 = pathname.replace('/profile/','at://')
     const atUri = atUri1.replace('/post/','/app.bsky.feed.post/')
     const [timeline, setTimeline] = useState<FeedViewPost[]>([])
@@ -68,9 +57,11 @@ export default function Root() {
     const [viewTranslatedText, setViewTranslatedText] = useState<boolean>(true)
     const [translateError, setTranslateError] = useState<boolean>(false)
     const [isLiked, setIsLiked] = useState<boolean>(false)
+    const [isReposted, setIsReposted] = useState<boolean>(false)
     const [isBookmarked, setIsBookmarked] = useState<boolean>(false)
     const [isPostMine, setIsPostMine] = useState<boolean>(false)
     const color = darkMode ? 'dark' : 'light'
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     const { Container,AuthorPost,Author, AuthorIcon, AuthorDisplayName,AuthorHandle,PostContent,PostCreatedAt,ReactionButtonContainer,ReactionButton,dropdown
     } = postOnlyPage();
@@ -108,13 +99,14 @@ export default function Root() {
         return filteredData as FeedViewPost[];
     }
 
-
     const fetchPost = async () => {
         if(!agent) return
         try{
             const {data} = await agent.getPostThread({uri: atUri})
             console.log(data)
             setPost(data.thread)
+            setIsLiked(!!(data.thread.post as any).viewer?.like)
+            setIsReposted(!!(data.thread.post as any).viewer?.repost)
         }catch (e) {
 
         }
@@ -250,141 +242,224 @@ export default function Root() {
         return result
     }
 
+    function renderNestedViewPostCards(post:any, color: 'dark'|'light', isMobile:boolean) {
+        if (post && post.parent) {
+            const nestedViewPostCards = renderNestedViewPostCards(post.parent, color, isMobile); // 再帰呼び出し
+
+            return (
+                <>
+                    {nestedViewPostCards}
+                    <ViewPostCard color={color} postJson={post.parent.post} isMobile={isMobile} />
+                </>
+            );
+        }
+        return null; // ネストが終了したらnullを返す
+    }
+
+    const handleReply = async () => {
+        console.log('open')
+        onOpen()
+    }
+    const handleRepost = async () => {
+        if(loading) return
+        setLoading(true)
+        if(isReposted){
+            setIsReposted(!isReposted)
+            const res = await agent?.deleteRepost(post.post.viewer?.repost)
+        }else{
+            setIsReposted(!isReposted)
+            const res = await agent?.repost(post.post.uri, post.post.cid)
+        }
+        setLoading(false)
+    }
+
+    const handleLike = async () => {
+        if(loading) return
+        setLoading(true)
+        if(isLiked){
+            setIsLiked(!isLiked)
+            const res = await agent?.deleteLike(post.post.viewer?.like)
+        }else{
+            setIsLiked(!isLiked)
+            const res = await agent?.like(post.post.uri, post.post.cid)
+        }
+        setLoading(false)
+    }
 
     return post && (
-        <main className={Container({color:color})}>
-            <div className={AuthorPost()}>
-                <div className={Author()}>
-                    <div className={AuthorIcon()}>
-                        <img src={post.post.author?.avatar}></img>
-                    </div>
-                    <div>
-                        <div className={AuthorDisplayName()}>{post.post.author?.displayName}</div>
-                        <div className={AuthorHandle()}>{post.post.author?.handle}</div>
-                    </div>
-                </div>
-                <div className={PostContent()}>
-                    {renderTextWithLinks()}
-                    {translateError && (
-                        <div className={'text-red-500'}>
-                            Translation error
+        <>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement={isMobile ? 'top' : 'center'} className={'z-[100] max-w-[600px]'}>
+                <ModalContent
+                >
+                    {(onClose) => (
+                        <PostModal color={color} type={'Reply'} postData={post.post} onClose={onClose}/>
+                    )}
+                </ModalContent>
+            </Modal>
+            <main className={Container({color:color})}>
+                {post?.parent && (
+                    <>
+                        {renderNestedViewPostCards(post, color, isMobile)}
+                    </>
+                )}
+                <div className={AuthorPost({color:color})}>
+                    <div className={Author()}>
+                        <div className={AuthorIcon()}>
+                            <img src={post.post.author?.avatar}></img>
                         </div>
-                    )}
-                    {translatedText !== null && viewTranslatedText && (
-                        <>
-                            <div className={'select-none'}>
-                                Translated by Google
+                        <div>
+                            <div className={AuthorDisplayName()}>{post.post.author?.displayName}</div>
+                            <div className={AuthorHandle()}>{post.post.author?.handle}</div>
+                        </div>
+                    </div>
+                    <div className={PostContent()}>
+                        {renderTextWithLinks()}
+                        {translateError && (
+                            <div className={'text-red-500'}>
+                                Translation error
                             </div>
-                            <div>
-                                {translatedText}
-                                <span
-                                    onClick={() => {
-                                        setViewTranslatedText(false)
-                                    }}
-                                    className={'cursor-pointer'}
-                                > - View original text </span>
-                            </div>
-                        </>
+                        )}
+                        {translatedText !== null && viewTranslatedText && (
+                            <>
+                                <div className={'select-none'}>
+                                    Translated by Google
+                                </div>
+                                <div>
+                                    {translatedText}
+                                    <span
+                                        onClick={() => {
+                                            setViewTranslatedText(false)
+                                        }}
+                                        className={'cursor-pointer'}
+                                    > - View original text </span>
+                                </div>
+                            </>
 
-                    )}
-                </div>
-                <div className={PostCreatedAt()}>
-                    {post.post.indexedAt}
-                </div>
-                <div className={ReactionButtonContainer()}>
-                    <FontAwesomeIcon icon={faComment} className={ReactionButton()}></FontAwesomeIcon>
-                    <FontAwesomeIcon icon={faQuoteLeft} className={ReactionButton()}></FontAwesomeIcon>
-                    <FontAwesomeIcon icon={faRetweet} className={ReactionButton()}></FontAwesomeIcon>
-                    <FontAwesomeIcon icon={!isLiked ? faRegularSquare : faSolidSquare} className={ReactionButton()}></FontAwesomeIcon>
-                    <FontAwesomeIcon icon={!isBookmarked ? faRegularBookmark: faSolidBookmark} className={ReactionButton()}></FontAwesomeIcon>
-                    <Dropdown className={dropdown({color:color})}>
-                        <DropdownTrigger>
-                            <FontAwesomeIcon icon={faEllipsis} className={ReactionButton()}/>
-                        </DropdownTrigger>
-                        <DropdownMenu>
-                            <DropdownSection title="Actions" showDivider>
-                                <DropdownItem key="share"
-                                              startContent={<FontAwesomeIcon icon={faArrowUpFromBracket} />}
-                                >
-                                    Share
-                                </DropdownItem>
-                                {post.post.record?.text && (
-                                    <DropdownItem key="translate"
-                                                  startContent={<FontAwesomeIcon icon={faLanguage} />}
-                                                  onClick={async() => {
-                                                      setIsTranslated(true)
-                                                      setViewTranslatedText(true)
-                                                      const res = await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=auto&dt=t&q=' + encodeURIComponent(post.post.record.text))
-                                                      if(res.status === 200) {
-                                                          const json = await res.json()
-                                                          if(json[0] !== undefined) {
-                                                              const combinedText = json[0].reduce((acc: string, item: any[]) => {
-                                                                  if (item[0]) {
-                                                                      return acc + item[0];
-                                                                  }
-                                                                  return acc;
-                                                              }, '');
-                                                              setTranslatedText(combinedText)
+                        )}
+                    </div>
+                    <div className={PostCreatedAt()}>
+                        {post.post.indexedAt}
+                    </div>
+                    <div className={ReactionButtonContainer()}>
+                        <FontAwesomeIcon icon={faComment} className={ReactionButton()}
+                                         onClick={() => {
+                                             handleReply()
+                                         }}
+                        />
+                        <FontAwesomeIcon icon={faQuoteLeft} className={ReactionButton()}
+                                         onClick={() => {
+                                             //handleQuote()
+                                         }}
+                        />
+                        <FontAwesomeIcon icon={faRetweet} className={ReactionButton()}
+                                         style={{color:isReposted ? '#17BF63' : '#909090',}}
+                                         onClick={() => {
+                                             handleRepost()
+                                         }}
+                        />
+                        <FontAwesomeIcon icon={!isLiked ? faRegularStar : faSolidStar} className={ReactionButton()}
+                                         style={{color:isLiked ? '#fd7e00' : '#909090',}}
+                                         onClick={() => {
+                                                handleLike()
+                                         }}
+                        />
+                        <FontAwesomeIcon icon={!isBookmarked ? faRegularBookmark: faSolidBookmark} className={ReactionButton()}></FontAwesomeIcon>
+                        <Dropdown className={dropdown({color:color})}>
+                            <DropdownTrigger>
+                                <FontAwesomeIcon icon={faEllipsis} className={ReactionButton()}/>
+                            </DropdownTrigger>
+                            <DropdownMenu>
+                                <DropdownSection title="Actions" showDivider>
+                                    <DropdownItem key="share"
+                                                  startContent={<FontAwesomeIcon icon={faArrowUpFromBracket} />}
+                                    >
+                                        Share
+                                    </DropdownItem>
+                                    {post.post.record?.text && (
+                                        <DropdownItem key="translate"
+                                                      startContent={<FontAwesomeIcon icon={faLanguage} />}
+                                                      onClick={async() => {
+                                                          setIsTranslated(true)
+                                                          setViewTranslatedText(true)
+                                                          const res = await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=auto&dt=t&q=' + encodeURIComponent(post.post.record.text))
+                                                          if(res.status === 200) {
+                                                              const json = await res.json()
+                                                              if(json[0] !== undefined) {
+                                                                  const combinedText = json[0].reduce((acc: string, item: any[]) => {
+                                                                      if (item[0]) {
+                                                                          return acc + item[0];
+                                                                      }
+                                                                      return acc;
+                                                                  }, '');
+                                                                  setTranslatedText(combinedText)
+                                                              }
+
+                                                          } else {
+                                                              setTranslateError(true)
                                                           }
-
-                                                      } else {
-                                                          setTranslateError(true)
-                                                      }
+                                                      }}
+                                        >
+                                            Translate
+                                        </DropdownItem>
+                                    )}
+                                </DropdownSection>
+                                <DropdownSection title="Copy" showDivider={isPostMine}>
+                                    <DropdownItem key="json" startContent={<FontAwesomeIcon icon={faCode} />}
+                                                  onClick={() => {
+                                                      navigator.clipboard.writeText(JSON.stringify(post.post))
                                                   }}
                                     >
-                                        Translate
+                                        JSON
                                     </DropdownItem>
-                                )}
-                            </DropdownSection>
-                            <DropdownSection title="Copy" showDivider={isPostMine}>
-                                <DropdownItem key="json" startContent={<FontAwesomeIcon icon={faCode} />}
-                                              onClick={() => {
-                                                  navigator.clipboard.writeText(JSON.stringify(post.post))
-                                              }}
-                                >
-                                    JSON
-                                </DropdownItem>
-                                <DropdownItem key="uri" startContent={<FontAwesomeIcon icon={faU} />}
-                                              onClick={() => {
-                                                  navigator.clipboard.writeText(atUri)
-                                              }}
-                                >
-                                    Post URI
-                                </DropdownItem>
-                                <DropdownItem key="did" startContent={<FontAwesomeIcon icon={faUser} />}
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(post.post.author.did)
-                                                }}
-                                >
-                                    Author DID
-                                </DropdownItem>
-                            </DropdownSection>
-                            <DropdownSection title="Danger zone">
-                                {agent?.session?.did !== post.post.author.did ? (
-                                    <DropdownItem
-                                        key="delete"
-                                        className="text-danger"
-                                        color="danger"
-                                        startContent={<FontAwesomeIcon icon={faFlag} />}
+                                    <DropdownItem key="uri" startContent={<FontAwesomeIcon icon={faU} />}
+                                                  onClick={() => {
+                                                      navigator.clipboard.writeText(atUri)
+                                                  }}
                                     >
-                                        Report
+                                        Post URI
                                     </DropdownItem>
-                                ) : (
-                                    <DropdownItem
-                                        key="delete"
-                                        className="text-danger"
-                                        color="danger"
-                                        startContent={<FontAwesomeIcon icon={faTrash} />}
+                                    <DropdownItem key="did" startContent={<FontAwesomeIcon icon={faUser} />}
+                                                  onClick={() => {
+                                                      navigator.clipboard.writeText(post.post.author.did)
+                                                  }}
                                     >
-                                        Delete
+                                        Author DID
                                     </DropdownItem>
-                                )
-                                }
-                            </DropdownSection>
-                        </DropdownMenu>
-                    </Dropdown>
+                                </DropdownSection>
+                                <DropdownSection title="Danger zone">
+                                    {agent?.session?.did !== post.post.author.did ? (
+                                        <DropdownItem
+                                            key="delete"
+                                            className="text-danger"
+                                            color="danger"
+                                            startContent={<FontAwesomeIcon icon={faFlag} />}
+                                        >
+                                            Report
+                                        </DropdownItem>
+                                    ) : (
+                                        <DropdownItem
+                                            key="delete"
+                                            className="text-danger"
+                                            color="danger"
+                                            startContent={<FontAwesomeIcon icon={faTrash} />}
+                                        >
+                                            Delete
+                                        </DropdownItem>
+                                    )
+                                    }
+                                </DropdownSection>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
                 </div>
-            </div>
-        </main>
+                {post.replies && (
+                    <>
+                        {post.replies.map((item:any, index:number) => (
+                            <ViewPostCard key={index} color={color} postJson={item.post} isMobile={isMobile} />
+                        ))}
+                    </>
+                )}
+            </main>
+        </>
     )
 }

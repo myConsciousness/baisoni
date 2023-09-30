@@ -242,6 +242,20 @@ export default function Root() {
         return result
     }
 
+    function formatDate(inputDate: string): string {
+        const date = new Date(inputDate);
+        if (isNaN(date.getTime())) return "Invalid date" // 無効な日付が与えられた場合
+        // 年、月、日、時、分、秒を取得
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+    }
+
     function renderNestedViewPostCards(post:any, color: 'dark'|'light', isMobile:boolean) {
         if (post && post.parent) {
             const nestedViewPostCards = renderNestedViewPostCards(post.parent, color, isMobile); // 再帰呼び出し
@@ -352,7 +366,7 @@ export default function Root() {
                         )}
                     </div>
                     <div className={PostCreatedAt()}>
-                        {post.post.indexedAt}
+                        {formatDate(post.post.indexedAt)}
                     </div>
                     <div className={ReactionButtonContainer()}>
                         <FontAwesomeIcon icon={faComment} className={ReactionButton()}

@@ -57,7 +57,18 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [startX, setStartX] = useState(null);
     const [startY, setStartY] = useState(null);
     const [handleButtonClick, setHandleButtonClick] = useState(false);
+    const [now, setNow] = useState<Date>(new Date())
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
 
     const handleReply = async () => {
         //setIsPostModalOpen(true)
@@ -371,7 +382,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       </Dropdown>
                                   ) : (
                                       <>
-                                          {!isSkeleton && (<div>{formattedSimpleDate(postJson?.indexedAt)}</div>)}
+                                          {!isSkeleton && (<div>{formattedSimpleDate(postJson?.indexedAt, now)}</div>)}
                                       </>
                                   )}
                               </div>

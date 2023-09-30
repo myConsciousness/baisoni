@@ -1,9 +1,9 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useMemo, useCallback} from "react";
 import { viewHeader } from "./styles";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faPlus, faChevronLeft, faBars, faXmark } from '@fortawesome/free-solid-svg-icons'
 import 'react-circular-progressbar/dist/styles.css';
-import {Button, ScrollShadow} from "@nextui-org/react";
+import {Button, Image, ScrollShadow} from "@nextui-org/react";
 import {Tabs, Tab, Chip} from "@nextui-org/react";
 import {useRouter, useSearchParams} from "next/navigation";
 import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
@@ -40,7 +40,8 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
     } = viewHeader();
     const AppearanceColor = color
 
-    const fetchUserPreferences = async () => {
+    const fetchUserPreferences = useCallback(async () => {
+        if(!agent) return
         try{
             console.log('fetch preferences')
             if(!agent) return
@@ -58,7 +59,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
         }catch(e){
             console.log(e)
         }
-    }
+    },[])
 
     useEffect(() => {
         fetchUserPreferences()
@@ -121,9 +122,15 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         )}
                     </div>
                 ) : (
-                    <img
-                        className={'h-[100%] w-[145px]'}
-                        src={'/images/logo/ucho-ten.svg'}/>
+                    <Image
+                        className={'h-[100%] w-[145px] cursor-pointer'}
+                        src={'/images/logo/ucho-ten.svg'}
+                        alt={'logo'}
+                        radius={'none'}
+                        onClick={() => {
+                            router.push('/')
+                        }}
+                    />
                 )}
                 {selectedTab === 'single' && (
                     <Button

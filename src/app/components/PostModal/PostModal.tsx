@@ -1,6 +1,6 @@
 import { BskyAgent } from '@atproto/api'
 export type PostRecordPost = Parameters<BskyAgent['post']>[0]
-import React, {useState, useRef, useCallback, useEffect} from "react";
+import React, {useState, useRef, useCallback, useEffect, useLayoutEffect} from "react";
 import { postModal } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -24,6 +24,7 @@ import Picker from "@emoji-mart/react";
 import data from "@emoji-mart/data";
 import {buildStyles, CircularProgressbar} from "react-circular-progressbar";
 import {useDropzone} from "react-dropzone";
+import {ViewPostCard} from "@/app/components/ViewPostCard";
 
 interface Props {
     children?: React.ReactNode;
@@ -58,7 +59,7 @@ export const PostModal: React.FC<Props> = (props: Props) => {
     const isImageMinLimited = contentImage.length === 0 // 4枚まで
     const [compressProcessing, setCompressProcessing] = useState(false)
     const { PostModal, header, headerTitle, headerPostButton, headerCancelButton,
-        content, contentLeft, contentLeftAuthorIcon, contentLeftAuthorIconImage,
+        content, contentContainer, contentLeft, contentLeftAuthorIcon, contentLeftAuthorIconImage,
         contentRight, contentRightTextArea, contentRightImagesContainer,
         contentRightUrlCard, contentRightUrlCardDeleteButton,
         URLCard, URLCardThumbnail, URLCardDetail, URLCardDetailContent, URLCardTitle, URLCardDescription, URLCardLink,
@@ -290,190 +291,202 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                         {loading ? '' : 'send'}
                     </Button>
                 </div>
-                <div className={content({isDragActive:isDragActive})} {...getRootProps({ onDrop: handleDrop, onDragOver: handleDragOver })}>
-                    <div className={contentLeft()}>
-                        <div className={contentLeftAuthorIcon()}>
-                            <Dropdown placement="right-start" className={dropdown({color:color})}>
-                                <DropdownTrigger>
-                                    <img className={contentLeftAuthorIconImage()}
-                                         alt={"author icon"}
-                                         onDragStart={handleDragStart}
-                                         src={"https://av-cdn.bsky.app/img/avatar/plain/did:plc:txandrhc7afdozk6a2itgltm/bafkreihwad5kaujw2f6kbfg37zmkhclgd3ap7grixl6pusfb5b34s6jite@jpeg"}
-                                    />
-                                </DropdownTrigger>
-                                <DropdownMenu>
-                                    <DropdownSection title='accounts'>
-                                        {userList.map((user, index) => (
-                                            <DropdownItem
-                                                key={index}
-                                                description={user["did"]}
-                                                startContent={<img style={{height: '30px', width: '30px'}} src={user["avatar"]} />}
-                                            >{user["name"]}</DropdownItem>
-                                        ))}
-                                    </DropdownSection>
-                                </DropdownMenu>
-                            </Dropdown>
-                        </div>
+                <div className={`ModalContent ${content({isDragActive:isDragActive})}`}
+                     {...getRootProps({ onDrop: handleDrop, onDragOver: handleDragOver })}
+                >
+                    <div className={'w-full'}>
+                        <ViewPostCard color={color} postJson={postData} isMobile={isMobile} isEmbedToModal={true}/>
                     </div>
-                    <div className={contentRight()}>
-                        <Textarea className={contentRightTextArea()}
-                                  aria-label="post input area"
-                                  placeholder={"Yo, Do you do Brusco?"}
-                                  value={contentText}
-                                  maxLength={10000}
-                                  autoFocus={true}
-                                  onChange={(e) => {
-                                      setContentText(e.target.value)
-                                      detectURL(e.target.value)
-                                  }}
-                                  onKeyDown={handleKeyDown}
-                                  disabled={loading}
-                                  onFocus={(e)=>e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
-                        />
-                        {contentImage.length > 0 && (
-                            <div className={contentRightImagesContainer()}>
-                                {contentImage.map((image, index) => (
-                                    <div key={index} className={"relative w-1/4 h-full flex"}>
-                                        <Image
-                                            src={URL.createObjectURL(image)}
-                                            alt="image"
-                                            style={{borderRadius:'10px', objectFit:'cover'}}
-                                            className={"h-[105px] w-[95px] object-cover object-center"}
+                    <div className={contentContainer()}>
+                        <div className={contentLeft()}>
+                            <div style={{backgroundColor:'white', width:'2px', height:'999px', position:'relative', top:-990, left:12.5, zIndex:1}}/>
+                            <div className={contentLeftAuthorIcon()}>
+                                <Dropdown placement="right-start" className={dropdown({color:color})}>
+                                    <DropdownTrigger>
+                                        <img className={contentLeftAuthorIconImage()}
+                                             alt={"author icon"}
+                                             onDragStart={handleDragStart}
+                                             src={''}
                                         />
-                                        <div style={{ zIndex:'10', position: 'absolute', top: 5, left: 5 }}>
-                                            <button
-                                                className={ImageDeleteButton()}
-                                                onClick={() => handleOnRemoveImage(index)}
-                                            >
-                                                <FontAwesomeIcon icon={faXmark} size="sm" className={' mb-[2px]'}/>
-                                            </button>
-                                        </div>
-                                        <div style={{ zIndex:'10', position: 'absolute', bottom: 5, left: 5 }}>
-                                            <button
-                                                className={ImageAddALTButton()}
-                                                onClick={() => handleOnRemoveImage(index)}
-                                            >
-                                                ALT
-                                            </button>
-                                        </div>
-                                        <div style={{ zIndex:'10', position: 'absolute', bottom: 5, right: '20px' }}>
-                                            <button
-                                                className={ImageEditButton()}
-                                                onClick={() => handleOnRemoveImage(index)}
-                                            >
-                                                <FontAwesomeIcon icon={faPen} size="sm" className={' mb-[2px]'}/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                                    </DropdownTrigger>
+                                    <DropdownMenu>
+                                        <DropdownSection title='accounts'>
+                                            {userList.map((user, index) => (
+                                                <DropdownItem
+                                                    key={index}
+                                                    description={user["did"]}
+                                                    startContent={<img style={{height: '30px', width: '30px'}} src={user["avatar"]} />}
+                                                >{user["name"]}</DropdownItem>
+                                            ))}
+                                        </DropdownSection>
+                                    </DropdownMenu>
+                                </Dropdown>
                             </div>
-                        )}
-                        {isOGPGetProcessing && (
-                            <div className={contentRightUrlCard()}>
-                                <div className={contentRightUrlCardDeleteButton()}>
-                                </div>
-                                <div>
-                                    <div onClick={() => {
-                                        setIsSetURLCard(false)
-                                        setGetOGPData(undefined)
-                                    }}
-                                         style={{textAlign:'left', cursor:'pointer'}}
-                                    >
-                                        <div className={URLCardThumbnail()}>
-                                            <div style={{position: "relative", textAlign: "center",
-                                                top: "50%",
-                                                left: '50%',
-                                                transform: "translateY(-50%) translateX(-50%)",
-                                                WebkitTransform: "translateY(-50%) translateX(-50%)"}}>
-                                                <Spinner color="white" size="md" />
+                        </div>
+                        <div className={contentRight()}>
+                            <Textarea className={contentRightTextArea()}
+                                      aria-label="post input area"
+                                      placeholder={"Yo, Do you do Brusco?"}
+                                      value={contentText}
+                                      maxLength={10000}
+                                      autoFocus={true}
+                                      onChange={(e) => {
+                                          setContentText(e.target.value)
+                                          detectURL(e.target.value)
+                                      }}
+                                      onKeyDown={handleKeyDown}
+                                      disabled={loading}
+                                      onFocus={(e)=>e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length)}
+                            />
+                            {contentImage.length > 0 && (
+                                <div className={contentRightImagesContainer()}>
+                                    {contentImage.map((image, index) => (
+                                        <div key={index} className={"relative w-1/4 h-full flex"}>
+                                            <Image
+                                                src={URL.createObjectURL(image)}
+                                                alt="image"
+                                                style={{borderRadius:'10px', objectFit:'cover'}}
+                                                className={"h-[105px] w-[95px] object-cover object-center"}
+                                            />
+                                            <div style={{ zIndex:'10', position: 'absolute', top: 5, left: 5 }}>
+                                                <button
+                                                    className={ImageDeleteButton()}
+                                                    onClick={() => handleOnRemoveImage(index)}
+                                                >
+                                                    <FontAwesomeIcon icon={faXmark} size="sm" className={' mb-[2px]'}/>
+                                                </button>
+                                            </div>
+                                            <div style={{ zIndex:'10', position: 'absolute', bottom: 5, left: 5 }}>
+                                                <button
+                                                    className={ImageAddALTButton()}
+                                                    onClick={() => handleOnRemoveImage(index)}
+                                                >
+                                                    ALT
+                                                </button>
+                                            </div>
+                                            <div style={{ zIndex:'10', position: 'absolute', bottom: 5, right: '20px' }}>
+                                                <button
+                                                    className={ImageEditButton()}
+                                                    onClick={() => handleOnRemoveImage(index)}
+                                                >
+                                                    <FontAwesomeIcon icon={faPen} size="sm" className={' mb-[2px]'}/>
+                                                </button>
                                             </div>
                                         </div>
-                                        <div className={URLCardDetail()}>
-                                            <div className={URLCardDetailContent()}>
-                                                <div className={URLCardTitle()} style={{ color: 'black' }}>
-                                                    {undefined}
+                                    ))}
+                                </div>
+                            )}
+                            {isOGPGetProcessing && (
+                                <div className={contentRightUrlCard()}>
+                                    <div className={contentRightUrlCardDeleteButton()}>
+                                    </div>
+                                    <div>
+                                        <div onClick={() => {
+                                            setIsSetURLCard(false)
+                                            setGetOGPData(undefined)
+                                        }}
+                                             style={{textAlign:'left', cursor:'pointer'}}
+                                        >
+                                            <div className={URLCardThumbnail()}>
+                                                <div style={{position: "relative", textAlign: "center",
+                                                    top: "50%",
+                                                    left: '50%',
+                                                    transform: "translateY(-50%) translateX(-50%)",
+                                                    WebkitTransform: "translateY(-50%) translateX(-50%)"}}>
+                                                    <Spinner color="white" size="md" />
                                                 </div>
-                                                <div className={URLCardDescription()} style={{ fontSize: 'small' }}>
-                                                    <div style={{textAlign:'center'}}>
-                                                        <Spinner color="white" size="md" />
+                                            </div>
+                                            <div className={URLCardDetail()}>
+                                                <div className={URLCardDetailContent()}>
+                                                    <div className={URLCardTitle()} style={{ color: 'black' }}>
+                                                        {undefined}
+                                                    </div>
+                                                    <div className={URLCardDescription()} style={{ fontSize: 'small' }}>
+                                                        <div style={{textAlign:'center'}}>
+                                                            <Spinner color="white" size="md" />
+                                                        </div>
+                                                    </div>
+                                                    <div className={URLCardLink()}>
+                                                        {undefined}
                                                     </div>
                                                 </div>
-                                                <div className={URLCardLink()}>
-                                                    {undefined}
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                        {isSetURLCard && getOGPData && !isOGPGetProcessing && (
-                            <div className={contentRightUrlCard()}>
-                                <div className={contentRightUrlCardDeleteButton()}
-                                     onClick={() => {
-                                         setIsSetURLCard(false)
-                                         setGetOGPData(undefined)
-                                     }}
-                                >
-                                    <div style={{width:'100%', textAlign:'center', marginTop:'50%'}}>
-                                        <div className={'text-red'}>
-                                            <FontAwesomeIcon icon={faTrashCan} size='lg'/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className={URLCard()}
-                                         style={{textAlign:'left', cursor:'pointer'}}
+                            )}
+                            {isSetURLCard && getOGPData && !isOGPGetProcessing && (
+                                <div className={contentRightUrlCard()}>
+                                    <div className={contentRightUrlCardDeleteButton()}
+                                         onClick={() => {
+                                             setIsSetURLCard(false)
+                                             setGetOGPData(undefined)
+                                         }}
                                     >
-                                        <div className={URLCardThumbnail()}>
-                                            <img
-                                                src={getOGPData?.image ? getOGPData?.image : undefined}
-                                                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                                                alt={getOGPData?.title && getOGPData?.image ? getOGPData.title : undefined}
-                                            ></img>
+                                        <div style={{width:'100%', textAlign:'center', marginTop:'50%'}}>
+                                            <div className={'text-red'}>
+                                                <FontAwesomeIcon icon={faTrashCan} size='lg'/>
+                                            </div>
                                         </div>
-                                        <div className={URLCardDetail()}>
-                                            <div className={URLCardDetailContent()}>
-                                                <div className={URLCardTitle()} style={{ color: 'black' }}>
-                                                    {getOGPData?.title ? getOGPData.title : selectedURL}
-                                                </div>
-                                                <div className={URLCardDescription()} style={{ fontSize: 'small' }}>
-                                                    {getOGPData?.description ? getOGPData.description : "Sorry, no description available."}
-                                                </div>
-                                                <div className={URLCardLink()}>
-                                                    {getOGPData?.url ? getOGPData.url : selectedURL}
+                                    </div>
+                                    <div>
+                                        <div className={URLCard()}
+                                             style={{textAlign:'left', cursor:'pointer'}}
+                                        >
+                                            <div className={URLCardThumbnail()}>
+                                                <img
+                                                    src={getOGPData?.image ? getOGPData?.image : undefined}
+                                                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                                    alt={getOGPData?.title && getOGPData?.image ? getOGPData.title : undefined}
+                                                ></img>
+                                            </div>
+                                            <div className={URLCardDetail()}>
+                                                <div className={URLCardDetailContent()}>
+                                                    <div className={URLCardTitle()} style={{ color: 'black' }}>
+                                                        {getOGPData?.title ? getOGPData.title : selectedURL}
+                                                    </div>
+                                                    <div className={URLCardDescription()} style={{ fontSize: 'small' }}>
+                                                        {getOGPData?.description ? getOGPData.description : "Sorry, no description available."}
+                                                    </div>
+                                                    <div className={URLCardLink()}>
+                                                        {getOGPData?.url ? getOGPData.url : selectedURL}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
                 <div className={footer({color:color})}>
                     <div className={footerTooltip()}>
-                        <div className={footerTooltipStyle()}>
-                            <label htmlFor={inputId}>
-                                <Button
-                                    isIconOnly
-                                    variant="light"
-                                    className={'h-[24px] text-white'}
-                                    isDisabled={loading || compressProcessing || isImageMaxLimited}
-                                >
-                                    <FontAwesomeIcon icon={faImage} className={'h-[20px] mb-[5px]'}/>
-                                </Button>
-                                <input
-                                    hidden multiple
-                                    type="file" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.svg,.bmp,.tiff,.avif,.heic,.heif"
-                                    id={inputId}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                        handleOnAddImage(e)
-                                    }
-                                    disabled={loading || compressProcessing || isImageMaxLimited }
-                                />
-                            </label>
-                        </div>
+                        <label htmlFor={inputId} className={footerTooltipStyle()}>
+                            <Button
+                                disabled={loading || compressProcessing || isImageMaxLimited || getOGPData || isOGPGetProcessing}
+                                as={"span"}
+                                isIconOnly
+                                variant="light"
+                                className={'h-[24px] text-white'}
+                                disableAnimation
+                                disableRipple
+                            >
+                                <FontAwesomeIcon icon={faImage} className={'h-[20px] mb-[5px]'}/>
+                            </Button>
+
+                            <input
+                                hidden
+                                id={inputId}
+                                type="file"
+                                multiple
+                                accept="image/*,.png,.jpg,.jpeg"
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    handleOnAddImage(e)
+                                }
+                                disabled={loading || compressProcessing || isImageMaxLimited || getOGPData || isOGPGetProcessing}
+                            />
+                        </label>
                         <div className={footerTooltipStyle()} style={{bottom:'5%'}}>
                             <Dropdown backdrop="blur" className={dropdown({color:color})}>
                                 <DropdownTrigger>

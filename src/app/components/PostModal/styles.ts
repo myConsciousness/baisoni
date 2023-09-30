@@ -11,9 +11,10 @@ export const postModal = tv({
         headerTitle: 'w-full h-full text-center text-base font-medium fontSize-[16px] items-center flex justify-center',
         headerPostButton: 'w-[91px] h-[37px] right-[8px]',
 
-        content: 'w-full h-[calc(100%-86px)] relative flex items-center overflow-y-scroll',
-        contentLeft: 'w-[54px] h-[calc(100%-10px)] flex select-none justify-center',
-        contentLeftAuthorIcon: 'w-[30px] h-[30px] bg-black rounded-[10px] overflow-hidden cursor-pointer ',
+        content: 'w-full h-[calc(100%-86px)] overflow-y-scroll',
+        contentContainer: 'w-full h-[calc(100%-86px)] relative flex items-center',
+        contentLeft: 'w-[48px] h-[calc(100%-10px)] flex select-none justify-center',
+        contentLeftAuthorIcon: 'w-[28px] h-[28px] bg-black rounded-[10px] overflow-hidden cursor-pointer z-[1]',
         contentLeftAuthorIconImage: 'w-full h-full drag-none',
         contentRight: 'w-[calc(100%)] relative h-[calc(100%-10px)] ',
         contentRightTextArea: 'w-[calc(100%)] min-h-[calc(100%)] placeholder-[#808080] bg-transparent resize-none outline-none overflow-visible',

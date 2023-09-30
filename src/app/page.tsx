@@ -29,7 +29,7 @@ export default function Root(props:any) {
     const color = darkMode ? 'dark' : 'light'
     const searchParams = useSearchParams()
     const selectedFeed = searchParams.get('feed') || 'following'
-
+    console.log('hogehoge')
     const modeMe = (e:any) => {
         setDarkMode(!!e.matches);
     };

@@ -2,7 +2,7 @@ import { tv } from "@nextui-org/react";
 
 export const viewPostCard = tv({
     slots: {
-        PostCard:'w-full min-w-[350px] border-b-[1px] cursor-pointer',
+        PostCard:'w-full min-w-[350px] border-b-[1px] ',
             PostCardContainer: 'pl-[8px] pt-[11px] pb-[24px] w-full',
             PostAuthor: 'w-[100%-16px] h-[28px] items-center flex relative select-none',
                 PostAuthorIcon: 'h-[28px] w-[28px] rounded-[10px] object-cover overflow-hidden hover:cursor-pointer',
@@ -22,6 +22,7 @@ export const viewPostCard = tv({
         skeletonText1line: 'h-3 w-3/5 rounded-lg ',
         skeletonText2line: 'h-3 w-4/5 rounded-lg ',
         chip: '',
+        isEmbedToModal: '',
 
     },
     variants: {
@@ -43,6 +44,9 @@ export const viewPostCard = tv({
                 skeletonText2line: 'dark text-white',
                 chip: 'dark ',
             },
+            null: {
+                PostCard: ' bg-transparent',
+            }
         },
         isMobile: {
             true: {
@@ -56,5 +60,10 @@ export const viewPostCard = tv({
                 PostContent: 'text-[15px] mb-[6px]',
             },
         },
+        isEmbedToModal: {
+            true: {
+                PostModal: 'bg-transparent'
+            }
+        }
     }
 });

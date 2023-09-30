@@ -256,6 +256,20 @@ export default function Root() {
         return null; // ネストが終了したらnullを返す
     }
 
+    function renderNestedRepliesViewPostCards(post:any, color: 'dark'|'light', isMobile:boolean) {
+        if (post && post.replies) {
+            const nestedViewPostCards = renderNestedViewPostCards(post.replies, color, isMobile); // 再帰呼び出し
+
+            return (
+                <>
+                    {nestedViewPostCards}
+                    <ViewPostCard color={color} postJson={post.replies.post} isMobile={isMobile} />
+                </>
+            );
+        }
+        return null; // ネストが終了したらnullを返す
+    }
+
     const handleReply = async () => {
         console.log('open')
         onOpen()
@@ -285,7 +299,7 @@ export default function Root() {
         }
         setLoading(false)
     }
-
+    console.log(post)
     return post && (
         <>
             <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement={isMobile ? 'top' : 'center'} className={'z-[100] max-w-[600px]'}>
@@ -454,6 +468,7 @@ export default function Root() {
                 </div>
                 {post.replies && (
                     <>
+                        
                         {post.replies.map((item:any, index:number) => (
                             <ViewPostCard key={index} color={color} postJson={item.post} isMobile={isMobile} />
                         ))}

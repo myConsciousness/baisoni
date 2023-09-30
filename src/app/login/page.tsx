@@ -1,5 +1,5 @@
 'use client'
-import {useEffect, useState} from "react";
+import {useEffect, useState, useMemo, useCallback} from "react";
 import {createLoginPage} from "./styles";
 import {BskyAgent} from "@atproto/api";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -8,6 +8,7 @@ import {faLink, faList, faLock, faUser} from '@fortawesome/free-solid-svg-icons'
 //import 'react-circular-progressbar/dist/styles.css';
 import {Button, Spinner,} from "@nextui-org/react";
 import {useSearchParams} from "next/navigation";
+import {isMobile} from "react-device-detect";
 
 export default function CreateLoginPage() {
   const [loading, setLoading] = useState(false)
@@ -17,6 +18,9 @@ export default function CreateLoginPage() {
   const [isLoginFailed, setIsLoginFailed] = useState<boolean>(false)
   const searchParams = useSearchParams()
   const toRedirect = searchParams.get('toRedirect')
+  const [identifierIsByAutocomplete, setIdentifierByAutocomplete] = useState<boolean>(false)
+  const [passwordIsByAutocomplete, setPasswordByAutocomplete] = useState<boolean>(false)
+
   const { background,
     LoginForm, LoginFormConnectServer,
     LoginFormHandle, LoginFormPassword,
@@ -117,6 +121,14 @@ export default function CreateLoginPage() {
 
   },[])
 
+  useEffect(() => {
+    if(!isMobile) return
+    if((identifierIsByAutocomplete || passwordIsByAutocomplete) && user.trim() !== '' && password.trim() !== ''){
+      handleLogin()
+    }
+
+  },[identifierIsByAutocomplete, passwordIsByAutocomplete, user, password])
+
   return (
       <main className={background()}>
         <div className={LoginForm()}>
@@ -124,7 +136,14 @@ export default function CreateLoginPage() {
             <FontAwesomeIcon className={'ml-[4px] text-xl'} icon={faLink}/>
             <FontAwesomeIcon className={"absolute right-[10px] text-xl"} icon={faList}/>
             <input
-                onChange={(e) => {setServer(e.target.value)}}
+                onChange={(e) => {
+                  const isKeyboardInput = e.nativeEvent instanceof InputEvent
+                  if(!isKeyboardInput) {
+                    setIdentifierByAutocomplete(true)
+                    console.log('input by autocomplete')
+                  }
+                  setServer(e.target.value)
+                }}
                 className={'h-full w-full bg-transparent ml-[12.5px] text-base font-bold outline-none'} placeholder={'bsky.social (default)'}/>
           </div>
           <div className={LoginFormHandle()}>
@@ -133,7 +152,14 @@ export default function CreateLoginPage() {
                 type={'text'}
                 value={user}
                 autoComplete={'username'}
-                onChange={(e) => {setUser(e.target.value)}}
+                onChange={(e) => {
+                  const isKeyboardInput = e.nativeEvent instanceof InputEvent
+                  if(!isKeyboardInput) {
+                    setPasswordByAutocomplete(true)
+                    console.log('input by autocomplete')
+                  }
+                  setUser(e.target.value)
+                }}
                 className={'h-full w-full bg-transparent ml-[16.5px] text-base font-bold outline-none'} placeholder={'handle, did, e-mail'}></input>
           </div>
           <div className={LoginFormHandle()}>

@@ -6,7 +6,6 @@ import { faImage, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { faHome, faSearch, faInbox, faPenToSquare} from '@fortawesome/free-solid-svg-icons'
 import {Badge,} from "@nextui-org/react";
 import { useRouter } from 'next/navigation'
-import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
 import {useAgent} from "@/app/_atoms/agent";
 
 

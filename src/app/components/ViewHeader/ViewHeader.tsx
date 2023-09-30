@@ -1,26 +1,11 @@
-import React, {useState, useRef, useCallback, useEffect} from "react";
+import React, {useState, useEffect, useMemo, useCallback} from "react";
 import { viewHeader } from "./styles";
-import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { faImage } from '@fortawesome/free-regular-svg-icons'
 import { faPlus, faChevronLeft, faBars, faXmark } from '@fortawesome/free-solid-svg-icons'
 import 'react-circular-progressbar/dist/styles.css';
-import {
-    Dropdown,
-    DropdownTrigger,
-    DropdownMenu,
-    DropdownSection,
-    DropdownItem,
-    Button,
-    Image,
-    Spinner,
-    ScrollShadow,
-    Popover, PopoverTrigger, PopoverContent,
-} from "@nextui-org/react";
-
+import {Button, Image, ScrollShadow} from "@nextui-org/react";
 import {Tabs, Tab, Chip} from "@nextui-org/react";
 import {useRouter, useSearchParams} from "next/navigation";
-import {useAgent} from "@/app/_atoms/agent";
 import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
 
 
@@ -47,7 +32,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
     const [loading, setLoading] = useState(false)
     const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false)
     const [isComposing, setComposing] = useState(false);
-    const [userPrefences, setUserPrefences] = useState<any>({})
+    const [userPreferences, setUserPreferences] = useState<any>({})
     const [pinnedFeeds, setPinnedFeeds] = useState<any>([])
     const {Header, HeaderContentTitleContainer, HeaderContentTitle,
             top,
@@ -55,16 +40,15 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
     } = viewHeader();
     const AppearanceColor = color
 
-    const fetchUserPrefences = async () => {
+    const fetchUserPreferences = useCallback(async () => {
+        if(!agent) return
         try{
-            console.log('fetch prefences')
+            console.log('fetch preferences')
             if(!agent) return
             const res = await agent.getPreferences()
             if (res) {
-                //const { preferences } = res;
-                //console.log(data);
                 console.log(res)
-                setUserPrefences(res)
+                setUserPreferences(res)
                 const {data} = await agent.app.bsky.feed.getFeedGenerators({feeds: res.feeds.pinned as string[]})
                 console.log(data)
                 setPinnedFeeds(data.feeds)
@@ -75,10 +59,10 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
         }catch(e){
             console.log(e)
         }
-    }
+    },[])
 
     useEffect(() => {
-        fetchUserPrefences()
+        fetchUserPreferences()
     },[agent])
 
     useEffect(() => {
@@ -106,7 +90,6 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                 {selectedTab === 'search' ? (
                     <div
                         className={'h-[40px] w-[60%] rounded-[10px] overflow-hidden relative'}
-
                     >
                         <input
                             id={'searchBar'}
@@ -139,9 +122,15 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         )}
                     </div>
                 ) : (
-                    <img
-                        className={'h-[100%] w-[145px]'}
-                        src={'/images/logo/ucho-ten.svg'}/>
+                    <Image
+                        className={'h-[100%] w-[145px] cursor-pointer'}
+                        src={'/images/logo/ucho-ten.svg'}
+                        alt={'logo'}
+                        radius={'none'}
+                        onClick={() => {
+                            router.push('/')
+                        }}
+                    />
                 )}
                 {selectedTab === 'single' && (
                     <Button
@@ -180,7 +169,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         }}
                         style={{marginLeft:'40px'}}
                     >
-                        {Object.keys(userPrefences).length > 0 && (
+                        {Object.keys(userPreferences).length > 0 && (
                             <Tab key="following"
                                  title={
                                      <div className="flex items-center pl-[15px] pr-[15px]">

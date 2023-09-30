@@ -4,7 +4,7 @@ import { createPostPage } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faImage, faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { faCirclePlus, faXmark, faPen, faFaceLaughBeam, faLink } from '@fortawesome/free-solid-svg-icons'
+import { faCirclePlus, faXmark, faPen, faFaceLaughBeam } from '@fortawesome/free-solid-svg-icons'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import { useDropzone, FileWithPath } from 'react-dropzone'
 import 'react-circular-progressbar/dist/styles.css';
@@ -19,21 +19,18 @@ import {
     Button,
     Image,
     Spinner,
-    Input,
     Popover, PopoverTrigger, PopoverContent,
 } from "@nextui-org/react";
 
-import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure} from "@nextui-org/react";
+import {useDisclosure} from "@nextui-org/react";
 
 import Textarea from 'react-textarea-autosize'; // 追加
-import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
 import {useRouter, useSearchParams} from "next/navigation";
 import {useAgent} from "@/app/_atoms/agent";
 
 
 export default function Root() {
     const [agent, setAgent] = useAgent()
-    //const {agent} = useRequiredSession()
     const router = useRouter()
     const searchParams = useSearchParams()
     const postParam = searchParams.get('text')
@@ -137,10 +134,10 @@ export default function Root() {
     const handlePostClick = async () => {
         console.log(agent)
         if(!agent) return
-        if(contentText === '') return
+        if(contentText.trim() === '') return
         setLoading(true)
         try{
-            const res = await agent.post({text: contentText,
+            const res = await agent.post({text: contentText.trim(),
                                                                      langs: Array.from(PostContentLanguage)
 
             })
@@ -270,7 +267,7 @@ export default function Root() {
                             radius={'full'}
                             color={'primary'}
                             onPress={handlePostClick}
-                            isDisabled={loading || contentText.length === 0 || contentText.length > 300 || isImageMaxLimited}
+                            isDisabled={loading || contentText.trim().length === 0 || contentText.trim().length > 300 || isImageMaxLimited}
                             isLoading={loading}
                     >
                         {loading ? '' : 'send'}
@@ -540,11 +537,11 @@ export default function Root() {
                             </div>
                         </BrowserView>
                         <div className={footerCharacterCount()}>
-                            <div className={footerCharacterCountText()} style={{color:contentText.length >= 300 ? "red": 'white'}}>{300 - contentText.length}</div>
+                            <div className={footerCharacterCountText()} style={{color:contentText.length >= 300 ? "red": 'white'}}>{300 - contentText.trim().length}</div>
                             <div style={{width:'20px', height:'20px', marginLeft:'5px'}}>
                                 <CircularProgressbar
-                                    value={contentText.length} maxValue={300}
-                                    styles={buildStyles({pathColor:contentText.length >= 300 ? "red" : "deepskyblue",})}
+                                    value={contentText.trim().length} maxValue={300}
+                                    styles={buildStyles({pathColor:contentText.trim().length >= 300 ? "red" : "deepskyblue",})}
                                 />
                             </div>
                         </div>

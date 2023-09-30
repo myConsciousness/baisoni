@@ -176,7 +176,7 @@ export default function CreateLoginPage() {
                 }}
                 className={'h-full w-full bg-transparent ml-[16.5px] text-base font-bold outline-none'} placeholder={'handle, did, e-mail'}
                 //autocompleteをした時に背景色を設定されないようにする
-                style={{WebkitTextFillColor:'white !important', WebkitBoxShadow:'0 0 0px 1000px inset #000000',caretColor: 'white !important' }}
+                //style={{WebkitTextFillColor:'white !important', WebkitBoxShadow:'0 0 0px 1000px inset #000000',caretColor: 'white !important' }}
             />
           </div>
           <div className={LoginFormHandle({error:isLoginFailed})}>
@@ -187,7 +187,7 @@ export default function CreateLoginPage() {
                 onChange={(e) => {setPassword(e.target.value)}}
                 autoComplete={'current-password'}
                 className={'h-full w-full bg-transparent ml-[16.5px] text-base font-bold outline-none'} placeholder={'password'}
-                style={{WebkitTextFillColor:'white !important', WebkitBoxShadow:'0 0 0px 1000px inset #000000',caretColor: 'white !important'}}
+                //style={{WebkitTextFillColor:'white !important', WebkitBoxShadow:'0 0 0px 1000px inset #000000',caretColor: 'white !important'}}
                 onKeyDown={(e) => {
                   if(e.key === 'Enter' && user.trim() !== '' && password.trim() !== ''){
                     handleLogin()

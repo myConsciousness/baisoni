@@ -50,7 +50,7 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
         <main className={background({ color: color, isMobile: isMobile })}>
             {agent ? (
                 <div className={'h-full max-w-[600px] min-w-[350px] w-full'}>
-                    {pathName !== '/post' && pathName !== '/login' && (
+                    {!isMatchingPath && (
                         <ViewHeader color={color} page={'search'} tab={selectedTab} setValue={setValue} setSearchText={setSearchText} selectedTab={selectedTab}/>
                     )}
                     <div className={`pt-[${isMatchingPath ? `0px` : `100px`}] h-[calc(100%-50px)] overflow-y-scroll`}>
@@ -58,7 +58,7 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                             name: 'hoge',
                         })}
                     </div>
-                    {pathName !== '/post' && pathName !== '/login' && (
+                    {!isMatchingPath && (
                         <TabBar color={color} selected={selectedTab} setValue={setSelectedTab}/>
                     )}
                 </div>

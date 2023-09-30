@@ -144,7 +144,6 @@ export default function CreateLoginPage() {
   return (
       <main className={background()}>
         <div className={LoginForm()}>
-          <Image src={'/images/logo/ucho-ten.svg'}></Image>
           <div className={LoginFormConnectServer()}>
             <FontAwesomeIcon className={'ml-[4px] text-xl'} icon={faLink}/>
             <FontAwesomeIcon className={"absolute right-[10px] text-xl"} icon={faList}/>

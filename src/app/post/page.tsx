@@ -299,7 +299,7 @@ export default function Root() {
                         </div>
                     </div>
                     <div className={contentRight()}>
-                        <Textarea className={contentRightTextArea()}
+                        <Textarea className={contentRightTextArea({uploadImageAvailable: contentImage.length !== 0})}
                                   aria-label="post input area"
                                   placeholder={"Yo, Do you do Brusco?"}
                                   value={contentText}
@@ -436,27 +436,31 @@ export default function Root() {
                 </div>
                 <div className={footer({color:AppearanceColor})}>
                     <div className={footerTooltip()}>
-                        <div className={footerTooltipStyle()}>
-                            <label htmlFor={inputId}>
-                                <Button
-                                    isIconOnly
-                                    variant="light"
-                                    className={'h-[24px] text-white'}
-                                    isDisabled={loading || compressProcessing || isImageMaxLimited}
-                                >
-                                    <FontAwesomeIcon icon={faImage} className={'h-[20px] mb-[5px]'}/>
-                                </Button>
-                                <input
-                                    hidden multiple
-                                    type="file" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.svg,.bmp,.tiff,.avif,.heic,.heif"
-                                    id={inputId}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                        handleOnAddImage(e)
-                                    }
-                                    disabled={loading || compressProcessing || isImageMaxLimited }
-                                />
-                            </label>
-                        </div>
+                        <label htmlFor={inputId} className={footerTooltipStyle()}>
+                            <Button
+                                disabled={loading || compressProcessing || isImageMaxLimited || getOGPData || isOGPGetProcessing}
+                                as={"span"}
+                                isIconOnly
+                                variant="light"
+                                className={'h-[24px] text-white'}
+                                disableAnimation
+                                disableRipple
+                            >
+                                <FontAwesomeIcon icon={faImage} className={'h-[20px] mb-[5px]'}/>
+                            </Button>
+
+                            <input
+                                hidden
+                                id={inputId}
+                                type="file"
+                                multiple
+                                accept="image/*,.png,.jpg,.jpeg"
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    handleOnAddImage(e)
+                                }
+                                disabled={loading || compressProcessing || isImageMaxLimited || getOGPData || isOGPGetProcessing}
+                            />
+                        </label>
                         <div className={footerTooltipStyle()} style={{bottom:'5%'}}>
                             <Dropdown backdrop="blur" className={dropdown({color:color})}>
                                 <DropdownTrigger>

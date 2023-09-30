@@ -33,15 +33,16 @@ interface Props {
     uploadImageAvailable?: boolean
     isDragActive?: boolean
     open?: boolean
-    numbersOfImage: 0 | 1 | 2 | 3 | 4,
+    numbersOfImage?: 0 | 1 | 2 | 3 | 4,
     postJson?: any
     isSkeleton?: boolean
     json?: any
+    isEmbedToModal?: boolean
 }
 export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [ agent ] = useAgent()
     const router = useRouter()
-    const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json} = props;
+    const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json, isEmbedToModal} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063]*$/;
     const [loading, setLoading] = useState(false)
     const [isHover, setIsHover] = useState<boolean>(false)
@@ -258,18 +259,20 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                   )}
               </ModalContent>
           </Modal>
-          <main className={PostCard({color:color})}
+          <main className={`${PostCard({color:color})} ${isEmbedToModal ? `bg-transparent border-none` : `cursor-pointer`}`}
+                //style={{backgroundColor: isEmbedToModal ? 'transparent'}}
                 onMouseDown={(e) => {
                     handleMouseDown(e)
                 }}
                 onMouseUp={(e) => {
+                    if(isEmbedToModal) return
                     handleMouseUp(e)
                 }}
           >
               <>
                   <>
 
-                      <div className={PostCardContainer()}
+                      <div className={`${PostCardContainer()} ${isEmbedToModal && `pt-[0]`}`}
                            onMouseEnter={() => {
                                setIsHover(true)
                            }}
@@ -280,7 +283,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                           {json?.reason && (
                               <span className={'text-[13px] ml-[40px] text-[#909090] text-bold hover:cursor-pointer'}
                                  onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
-
                               >
                                   Reposted by {json.reason.by.displayName}
                               </span>
@@ -294,7 +296,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonIcon({color:color})}/>
                                   ) : (
-                                      <Image src={postJson?.author?.avatar} radius={'none'} className={'z-0'} alt={postJson.author.did}/>
+                                      <>
+                                          <Image src={postJson?.author?.avatar} radius={'none'} className={`${isEmbedToModal ? `z-[2]` : `z-[0]`}`} alt={postJson.author.did}/>
+                                      </>
 
                                   )}
                               </span>
@@ -318,7 +322,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   )}
                               </span>
                               <div className={PostCreatedAt()} style={{fontSize:'12px'}}>
-                                  {!isMobile && isHover && !isSkeleton ? (
+                                  {!isEmbedToModal && !isMobile && isHover && !isSkeleton ? (
                                       <Dropdown className={dropdown({color:color})}>
                                           <DropdownTrigger>
                                               <FontAwesomeIcon icon={faEllipsis} className={'h-[20px] mb-[4px] cursor-pointer text-[#909090]'}/>
@@ -400,10 +404,10 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           <ScrollShadow hideScrollBar orientation="horizontal">
                                               <div className={`flex overflow-x-auto overflow-y-hidden w-[${postJson.embed.images.length !== 1 ? `100svw` : `100%`}]`}>
                                                   {postJson.embed.images.map((image: any, index: number) => (
-                                                      <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden ${postJson.embed.images.length !== 1 && `max-w-[600px] h-[300px] mr-[10px] bg-cover`}`}
+                                                      <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden ${postJson.embed.images.length !== 1 && `min-w-[280px] max-w-[500px] h-[300px] mr-[10px] bg-cover`}`}
                                                            key={`image-${index}`}
                                                       >
-                                                          <img className="w-full h-full z-0" src={image.thumb} alt={image?.alt} />
+                                                          <img className="w-full h-full z-0 object-cover" src={image.thumb} alt={image?.alt} />
                                                       </div>
                                                   ))}
                                               </div>
@@ -448,7 +452,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                           </div>
                           <div className={PostReactionButtonContainer()} style={{}}>
                               <div className={`mr-[12px]`}>
-                                  {isMobile && (
+                                  {isMobile && !isEmbedToModal && (
                                       <>
                                           <FontAwesomeIcon icon={faComment}
                                                            className={PostReactionButton()}
@@ -483,7 +487,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           />
                                       </>
                                   )}
-                                  {!isMobile && (
+                                  {!isMobile && !isEmbedToModal && (
                                       <>
                                           <FontAwesomeIcon icon={faComment} style={{display: isHover && !isSkeleton ? undefined : 'none'}}
                                                            className={PostReactionButton()}

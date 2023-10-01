@@ -18,9 +18,19 @@ export default function Root() {
     const [list, setList] = useState([]);          //表示するデータ
     const [hasMore, setHasMore] = useState(true);  //再読み込み判定
     const [cursor, setCursor] = useState<string>('')
-
     const [darkMode, setDarkMode] = useState(false);
+    const [now, setNow] = useState<Date>(new Date())
     const color = darkMode ? 'dark' : 'light'
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
 
     const fetchNotification = async () => {
         try{
@@ -103,13 +113,13 @@ export default function Root() {
                 <InfiniteScroll
                     loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
                     hasMore={!loading2}         //読み込みを行うかどうかの判定
-                    loader={<Spinner/>}
+                    loader={<Spinner key="spinner-inbox"/>}
                     threshold={700}
                     useWindow={false}
                 >
                     {notification.map((post, index) => (
                         // eslint-disable-next-line react/jsx-key
-                        <ViewPostCard key={post.uri} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
+                        <ViewPostCard key={post.uri} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile} now={now}/>
                     ))}
                 </InfiniteScroll>
             )}

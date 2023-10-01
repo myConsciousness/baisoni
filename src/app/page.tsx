@@ -26,6 +26,7 @@ export default function Root(props:any) {
     const [cursor, setCursor] = useState<string | null>(null)
     const [hasCursor, setHasCursor] = useState<string | null>(null)
     const [darkMode, setDarkMode] = useState(false);
+    const [now, setNow] = useState<Date>(new Date())
     const color = darkMode ? 'dark' : 'light'
     const searchParams = useSearchParams()
     const selectedFeed = searchParams.get('feed') || 'following'
@@ -43,6 +44,15 @@ export default function Root(props:any) {
         return () => matchMedia.removeEventListener("change", modeMe);
     }, []);
 
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
 
     const handleRefresh = () => {
         console.log('refresh');
@@ -217,14 +227,12 @@ export default function Root(props:any) {
                         <InfiniteScroll
                             loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
                             hasMore={!loading2}         //読み込みを行うかどうかの判定
-                            loader={<Spinner/>}
+                            loader={<Spinner key="spinner-feed"/>}
                             threshold={1500}
                             useWindow={false}
                         >
                             {timeline.map((post, index) => (
-                                <>
                                     <ViewPostCard key={`${post?.reason ? `reason-${(post.reason as any).by.did}` : `post`}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
-                                </>
                             ))}
                         </InfiniteScroll>
                     )}

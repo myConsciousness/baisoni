@@ -31,6 +31,7 @@ export const ViewScreen: React.FC<Props> = (props: Props) => {
     const [value, setValue] = useState(false)
     const [selectedTab, setSelectedTab] = useState(tab);
     const [searchText, setSearchText] = useState("");
+    const [now, setNow] = useState<Date>(new Date())
     const darkMode = true
     const color = darkMode ? 'dark' : 'light'
 
@@ -72,6 +73,16 @@ export const ViewScreen: React.FC<Props> = (props: Props) => {
     };
 
     useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
+
+    useEffect(() => {
         console.log('Effect')
         fetchResult(searchText);
     }, [searchText]);
@@ -98,7 +109,7 @@ export const ViewScreen: React.FC<Props> = (props: Props) => {
                             ) : (
                                 searchResult.map((post, index) => (
                                     // eslint-disable-next-line react/jsx-key
-                                    <ViewPostCard key={`search-${index}-${post.uri}`} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile}/>
+                                    <ViewPostCard key={`search-${index}-${post.uri}`} color={color} numbersOfImage={0} postJson={post} isMobile={isMobile} now={now}/>
                                 ))
                             )
                         )}

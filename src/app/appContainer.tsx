@@ -7,8 +7,8 @@ import {isMobile} from "react-device-detect";
 import {usePathname, useRouter, useSearchParams} from 'next/navigation';
 import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
 import {ViewSideBar} from "@/app/components/ViewSideBar";
-import { useSpring, animated, interpolate } from '@react-spring/web'
-import { useDrag } from '@use-gesture/react';
+//import { useSpring, animated, interpolate } from '@react-spring/web'
+//import { useDrag } from '@use-gesture/react';
 import './sidebar.css'
 
 export function AppConatiner({ children }: { children: React.ReactNode }) {
@@ -50,11 +50,11 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
         return () => matchMedia.removeEventListener("change", modeMe);
     }, []);
 
-    const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }))
+    /*const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }))
     const bind = useDrag(({ down, offset: [ox, oy] }) => api.start({ x: ox, y: oy, immediate: down }), {
         bounds: { left: 0, right: 300, top: 0, bottom: 0 }
-    })
-
+    })*/
+    console.log(isMatchingPath)
     return (
 
         <main className={background({ color: color, isMobile: isMobile })}>
@@ -66,13 +66,15 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                     <div className={`z-[11] bg-black bg-opacity-50 absolute h-full w-full ${!isSideBarOpen && `hidden`}`}
                          onClick={() => setIsSideBarOpen(false)}
                     >
-                        <animated.div className={`${isSideBarOpen && `openSideBar`} absolute h-full w-[70svw] min-w-[210px] max-w-[350px] bg-black z-[12] left-[-300px]`}
-                                      style={{x:x}}
+                        {/*<animated.div
+                            className={`${isSideBarOpen && `openSideBar`} absolute h-full w-[70svw] min-w-[210px] max-w-[350px] bg-black z-[12] left-[-300px]`}
+                            style={{x: x}}
                         >
                             <ViewSideBar color={color} setSideBarOpen={setIsSideBarOpen} isMobile={isMobile}/>
-                        </animated.div>
+                        </animated.div>*/}
+                        <ViewSideBar color={color} setSideBarOpen={setIsSideBarOpen} isMobile={isMobile}/>
                     </div>
-                    <div {...bind()} className={`pt-[${isMatchingPath ? `0px` : `100px`}] h-[calc(100%-50px)] overflow-y-scroll`}>
+                    <div className={`pt-[${isMatchingPath ? `0px` : `100px`}] h-[calc(100%-50px)] overflow-y-scroll`}>
                         {children}
                     </div>
                     {!isMatchingPath && (

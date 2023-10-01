@@ -32,7 +32,7 @@ export function formattedSimpleDate(dateStr: string, now: Date = new Date(), use
     return `Today ${hours}:${zeroIfNeeded}${minutes}`
   }
 
-  const twentyFourHoursAgo = now
+  const twentyFourHoursAgo = new Date(now)
   twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24)
   
   if (date.toDateString() === twentyFourHoursAgo.toDateString()) {

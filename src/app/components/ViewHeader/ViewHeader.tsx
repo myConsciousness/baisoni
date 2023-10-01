@@ -159,7 +159,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         onSelectionChange={(e) => {
                             console.log(e)
                             //profileやpost固有の画面に移動するとtopページに飛ばされるバグはここにあった
-                            //router.push(`/?feed=${e}`)
+                            router.push(`/?feed=${e}`)
                         }}
                         classNames={{
                             tabList: "w-full relative rounded-none p-0 border-b border-divider",

@@ -15,6 +15,7 @@ import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure}
 import Textarea from 'react-textarea-autosize'; // 追加
 import {useRouter} from "next/navigation";
 import {useAgent} from "@/app/_atoms/agent";
+import {useUserProfileDetailedAtom} from "@/app/_atoms/userProfileDetail";
 
 interface Props {
     className?: string
@@ -30,6 +31,7 @@ export const ViewSideBar: React.FC<Props> = (props: Props) => {
     const {className, color, isMobile, uploadImageAvailable, open, isSideBarOpen, setSideBarOpen} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;
     const router = useRouter()
+    const [userProfileDetailed] = useUserProfileDetailedAtom()
     const [loading, setLoading] = useState(false)
     const { background, AuthorIconContainer,Content, Footer, AuthorDisplayName, AuthorHandle, NavBarIcon,NavBarItem,bg, modal
     } = viewSideBar();
@@ -81,10 +83,10 @@ export const ViewSideBar: React.FC<Props> = (props: Props) => {
                          }}
                     >
                         <img className={'h-[64px] w-[64px] rounded-[10px]'}
-                             src={'https://av-cdn.bsky.app/img/avatar/plain/did:plc:txandrhc7afdozk6a2itgltm/bafkreihwad5kaujw2f6kbfg37zmkhclgd3ap7grixl6pusfb5b34s6jite@jpeg'}/>
+                             src={userProfileDetailed?.avatar}/>
                         <div className={'ml-[12px]'}>
-                            <div className={AuthorDisplayName()}>ばいそに</div>
-                            <div className={AuthorHandle({color:color})}>@bisn.ucho-ten.net</div>
+                            <div className={AuthorDisplayName()}>{userProfileDetailed?.displayName}</div>
+                            <div className={AuthorHandle({color:color})}>@{userProfileDetailed?.handle}</div>
                         </div>
                     </div>
                     <div className={Content()}>

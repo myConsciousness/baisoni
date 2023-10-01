@@ -27,9 +27,11 @@ import {useDisclosure} from "@nextui-org/react";
 import Textarea from 'react-textarea-autosize'; // 追加
 import {useRouter, useSearchParams} from "next/navigation";
 import {useAgent} from "@/app/_atoms/agent";
+import { useUserProfileDetailedAtom } from "../_atoms/userProfileDetail";
 
 
 export default function Root() {
+    const [userProfileDetailed, setUserProfileDetailed] = useUserProfileDetailedAtom()
     const [agent, setAgent] = useAgent()
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -281,7 +283,7 @@ export default function Root() {
                                     <img className={contentLeftAuthorIconImage()}
                                          alt={"author icon"}
                                          onDragStart={handleDragStart}
-                                         src={"https://av-cdn.bsky.app/img/avatar/plain/did:plc:txandrhc7afdozk6a2itgltm/bafkreihwad5kaujw2f6kbfg37zmkhclgd3ap7grixl6pusfb5b34s6jite@jpeg"}
+                                         src={userProfileDetailed?.avatar || ""}
                                     ></img>
                                 </DropdownTrigger>
                                 <DropdownMenu>

@@ -5,7 +5,7 @@ import { postModal } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faImage, faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { faXmark, faPen, faCirclePlus, faFaceLaughBeam } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faPen, faCirclePlus, faFaceLaughBeam, faUser } from '@fortawesome/free-solid-svg-icons'
 import 'react-circular-progressbar/dist/styles.css';
 import {
     Dropdown,
@@ -25,6 +25,7 @@ import data from "@emoji-mart/data";
 import {buildStyles, CircularProgressbar} from "react-circular-progressbar";
 import {useDropzone} from "react-dropzone";
 import {ViewPostCard} from "@/app/components/ViewPostCard";
+import { useUserProfileDetailedAtom } from '@/app/_atoms/userProfileDetail';
 
 interface Props {
     children?: React.ReactNode;
@@ -35,6 +36,7 @@ interface Props {
 }
 export const PostModal: React.FC<Props> = (props: Props) => {
     const {color, type, postData} = props
+    const [userProfileDetailedAtom, setUserProfileDetailedAtom] = useUserProfileDetailedAtom()
     const [agent, setAgent] = useAgent()
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -303,11 +305,20 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                             <div className={contentLeftAuthorIcon()}>
                                 <Dropdown placement="right-start" className={dropdown({color:color})}>
                                     <DropdownTrigger>
-                                        <img className={contentLeftAuthorIconImage()}
-                                             alt={"author icon"}
-                                             onDragStart={handleDragStart}
-                                             src={''}
-                                        />
+                                        {userProfileDetailedAtom?.avatar ? (
+                                            <img className={contentLeftAuthorIconImage()}
+                                                 alt={"author icon"}
+                                                 onDragStart={handleDragStart}
+                                                 src={userProfileDetailedAtom?.avatar}
+                                            />
+                                        ):(
+                                            <FontAwesomeIcon
+                                                className={contentLeftAuthorIconImage()}
+                                                onDragStart={handleDragStart}
+                                                icon={faUser}
+                                            />
+                                        )
+                                        }
                                     </DropdownTrigger>
                                     <DropdownMenu>
                                         <DropdownSection title='accounts'>

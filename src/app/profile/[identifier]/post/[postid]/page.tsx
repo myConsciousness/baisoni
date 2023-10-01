@@ -28,7 +28,7 @@ import {
     DropdownMenu,
     DropdownSection,
     DropdownItem,
-    Link, Chip, Tooltip, ModalContent, Modal, useDisclosure
+    Link, Chip, Tooltip, ModalContent, Modal, useDisclosure, Image
 } from "@nextui-org/react";
 import 'react-swipeable-list/dist/styles.css';
 import {ViewPostCard} from "@/app/components/ViewPostCard";
@@ -345,7 +345,14 @@ export default function Root() {
                             }}
                     >
                         <div className={AuthorIcon()}>
-                            <img src={post.post.author?.avatar}/>
+                            {post.post.author?.avatar ? (
+                                <img src={post.post.author?.avatar}/>
+                            ):(
+                                <FontAwesomeIcon
+                                    className={`h-full w-full`}
+                                    icon={faUser}
+                                />
+                            )}
                         </div>
                         <div>
                             <div className={AuthorDisplayName()}>{post.post.author?.displayName}</div>

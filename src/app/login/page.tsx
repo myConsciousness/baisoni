@@ -1,4 +1,5 @@
 'use client'
+import { useAtom } from "jotai";
 import {useEffect, useState, useMemo, useCallback} from "react";
 import {createLoginPage} from "./styles";
 import {BskyAgent} from "@atproto/api";
@@ -9,9 +10,12 @@ import {faLink, faList, faLock, faUser} from '@fortawesome/free-solid-svg-icons'
 import {Button, Spinner,Image} from "@nextui-org/react";
 import {useSearchParams} from "next/navigation";
 import {isMobile} from "react-device-detect";
+import { useUserProfileDetailedAtom } from "../_atoms/userProfileDetail"
+
 import "./shakeButton.css"
 
 export default function CreateLoginPage() {
+  const [userProfileDetailed, setUserProfileDetailed] = useUserProfileDetailedAtom()
   const [loading, setLoading] = useState(false)
   const [server, setServer] = useState<string>('bsky.social')
   const [user, setUser] = useState<string>('')
@@ -32,16 +36,20 @@ export default function CreateLoginPage() {
   const agent = new BskyAgent({ service: `https://${server}` })
 
   const handleLogin = async () => {
+    if(user.trim() == '' || password.trim() == '') {
+      return
+    }
+
     setIsLoginFailed(false)
     setLoading(true)
+
     try{
-      if(user.trim() !== '' && password.trim() !== '') {
-        const res = await agent.login({
-          identifier: user,
-          password: password });
-        const {data} = res
-        console.log(data)
-      }
+      const res = await agent.login({
+        identifier: user,
+        password: password });
+      const {data} = res
+      console.log(data)
+
       setLoading(false)
       console.log(agent)
       //const postres= await agent.post({text:'test'})

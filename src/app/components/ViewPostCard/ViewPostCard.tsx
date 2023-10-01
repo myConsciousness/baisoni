@@ -438,9 +438,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                                   {postJson.embed.external?.description}
                                                               </div>
                                                               <div className="text-xs text-gray-700 mt-1">
-                                                                  <a href={postJson.embed.external?.uri} className="text-gray-400 no-underline">
+                                                                  <div className="text-gray-400">
                                                                       {postJson.embed.external?.uri.match(/^https?:\/{2,}(.*?)(?:\/|\?|#|$)/)[1]}
-                                                                  </a>
+                                                                  </div>
                                                               </div>
                                                           </div>
                                                       </div>

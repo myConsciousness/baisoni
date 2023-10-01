@@ -131,13 +131,14 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             switch (facet.features[0].$type) {
                 case "app.bsky.richtext.facet#mention":
                     result.push(
-                        <div key={`link-${index}-${byteStart}`}
+                        <span key={`link-${index}-${byteStart}`}
+                              className={'text-blue-500'}
                              onClick={() => {
                                  router.push(`/profile/${facet.features[0].did}`)
                              }}
                         >
                             {facetText}
-                        </div>
+                        </span>
                     )
                     break
 
@@ -155,13 +156,13 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                 color={facetText === facet.features[0].uri ? "success" : facet.features[0].uri.includes(facetText.replace('...', '')) ? 'default' : "danger"}
                             >
                                 {(facet.features[0].uri).startsWith('https://bsky.app') ? (
-                                    <div key={`a-${index}-${byteStart}`}
+                                    <span key={`a-${index}-${byteStart}`}
                                          onClick={() => {
                                              router.push(facet.features[0].uri.replace('https://bsky.app',`${location.protocol}//${window.location.host}`))
                                          }}
                                     >
                                         {facetText}
-                                    </div>
+                                    </span>
                                 ) : (
                                     <a key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
                                         {facetText}
@@ -284,7 +285,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
               <>
                   <>
 
-                      <div className={`${PostCardContainer()} ${isEmbedToModal && `pt-[0]`}`}
+                      <div className={`${PostCardContainer()} ${isEmbedToModal && `pt-[0px]`}`}
                            onMouseEnter={() => {
                                setIsHover(true)
                            }}

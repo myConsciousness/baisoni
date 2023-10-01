@@ -339,12 +339,12 @@ export default function Root() {
                     </>
                 )}
                 <div className={AuthorPost({color:color})}>
-                    <div className={Author()}
-                            onClick={() => {
-                                router.push(`/profile/${post.post.author.did}`)
-                            }}
-                    >
-                        <div className={AuthorIcon()}>
+                    <div className={Author()}>
+                        <div className={AuthorIcon()}
+                             onClick={() => {
+                                 router.push(`/profile/${post.post.author.did}`)
+                             }}
+                        >
                             {post.post.author?.avatar ? (
                                 <img src={post.post.author?.avatar}/>
                             ):(
@@ -355,8 +355,20 @@ export default function Root() {
                             )}
                         </div>
                         <div>
-                            <div className={AuthorDisplayName()}>{post.post.author?.displayName}</div>
-                            <div className={AuthorHandle()}>{post.post.author?.handle}</div>
+                            <div className={AuthorDisplayName()}
+                                 onClick={() => {
+                                     router.push(`/profile/${post.post.author.did}`)
+                                 }}
+                            >
+                                {post.post.author?.displayName}
+                            </div>
+                            <div className={AuthorHandle()}
+                                 onClick={() => {
+                                     router.push(`/profile/${post.post.author.did}`)
+                                 }}
+                            >
+                                {post.post.author?.handle}
+                            </div>
                         </div>
                     </div>
                     <div className={PostContent()}>

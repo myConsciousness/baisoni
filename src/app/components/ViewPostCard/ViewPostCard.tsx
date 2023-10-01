@@ -133,7 +133,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                     result.push(
                         <span key={`link-${index}-${byteStart}`}
                               className={'text-blue-500'}
-                             onClick={() => {
+                             onClick={(e) => {
+                                 e.preventDefault()
+                                 e.stopPropagation()
                                  router.push(`/profile/${facet.features[0].did}`)
                              }}
                         >
@@ -157,14 +159,17 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                             >
                                 {(facet.features[0].uri).startsWith('https://bsky.app') ? (
                                     <span key={`a-${index}-${byteStart}`}
-                                         onClick={() => {
+                                         onClick={(e) => {
+                                             e.preventDefault()
+                                             e.stopPropagation()
                                              router.push(facet.features[0].uri.replace('https://bsky.app',`${location.protocol}//${window.location.host}`))
                                          }}
                                     >
                                         {facetText}
                                     </span>
                                 ) : (
-                                    <a key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
+                                    <a onMouseUp={(e) => e.stopPropagation()}
+                                       key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
                                         {facetText}
                                     </a>
                                 )}
@@ -182,9 +187,15 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                 variant="faded"
                                 color="primary"
                             >
-                                <a key={`a-${index}-${byteStart}`} href={`/search?word=%23${(facet.features[0].tag.replace('#', ''))}&target=posts`}>
+                                <span key={`a-${index}-${byteStart}`}
+                                      onClick={(e) => {
+                                          e.preventDefault()
+                                          e.stopPropagation()
+                                          router.push(`/search?word=%23${(facet.features[0].tag.replace('#', ''))}&target=posts`)
+                                      }}
+                                >
                                    {facetText.replace('#', '')}
-                                </a>
+                                </span>
                             </Chip>
                         </span>
                     )
@@ -295,16 +306,22 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                       >
                           {json?.reason && (
                               <span className={'text-[13px] ml-[40px] text-[#909090] text-bold hover:cursor-pointer'}
-                                 onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
+                                 onClick={(e) => {
+                                     e.preventDefault()
+                                     e.stopPropagation()
+                                     router.push(`/profile/${postJson?.author.did}`)
+                                 }}
                               >
                                   Reposted by {json.reason.by.displayName}
                               </span>
                           )}
                           <div className={`${PostAuthor()}`}>
                               <span className={PostAuthorIcon()}
-                                onClick={() => (
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
                                     router.push(`/profile/${postJson?.author.did}`)
-                                )}
+                                }}
                               >
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonIcon({color:color})}/>
@@ -324,7 +341,11 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   )}
                               </span>
                               <span className={PostAuthorDisplayName({color: color})} style={{fontSize:'13px'}}
-                                onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    router.push(`/profile/${postJson?.author.did}`)
+                                }}
                               >
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonName({color:color})}/>
@@ -334,7 +355,11 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                               </span>
                               <div className={'text-[#BABABA]'}>&nbsp;-&nbsp;</div>
                               <span className={PostAuthorHandle({color: color})}
-                                    onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        router.push(`/profile/${postJson?.author.did}`)
+                                    }}
                               >
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonHandle({color: color})}/>
@@ -439,6 +464,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                   href={postJson.embed.external?.uri}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
+                                                  onMouseUp={(e) => e.stopPropagation()}
+
                                               >
                                                   <div className="h-[100px] w-full rounded-lg overflow-hidden border border-gray-600 flex items-center text-gray-800 hover:bg-[#1C1C1C]">
                                                       <div className="h-[100px] w-[100px] border-r border-gray-600">
@@ -481,7 +508,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                                e.preventDefault()
                                                                e.stopPropagation()
                                                                setHandleButtonClick(true)
-
                                                                handleReply()
                                                            }}
                                                            onMouseUp={(e) => e.stopPropagation()}

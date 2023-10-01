@@ -1,5 +1,4 @@
 'use client';
-import {ViewScreen} from "@/app/components/ViewScreen";
 import {ViewPostCard} from "@/app/components/ViewPostCard";
 import React, {useEffect} from "react";
 import {useState} from "react";

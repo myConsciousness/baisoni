@@ -25,6 +25,7 @@ import data from "@emoji-mart/data";
 import {buildStyles, CircularProgressbar} from "react-circular-progressbar";
 import {useDropzone} from "react-dropzone";
 import {ViewPostCard} from "@/app/components/ViewPostCard";
+import { useUserProfileDetailedAtom } from '@/app/_atoms/userProfileDetail';
 
 interface Props {
     children?: React.ReactNode;
@@ -35,6 +36,7 @@ interface Props {
 }
 export const PostModal: React.FC<Props> = (props: Props) => {
     const {color, type, postData} = props
+    const [userProfileDetailedAtom, setUserProfileDetailedAtom] = useUserProfileDetailedAtom()
     const [agent, setAgent] = useAgent()
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -306,7 +308,7 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                                         <img className={contentLeftAuthorIconImage()}
                                              alt={"author icon"}
                                              onDragStart={handleDragStart}
-                                             src={''}
+                                             src={userProfileDetailedAtom?.avatar || ""}
                                         />
                                     </DropdownTrigger>
                                     <DropdownMenu>

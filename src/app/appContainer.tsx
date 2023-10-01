@@ -72,7 +72,9 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                         >
                             <ViewSideBar color={color} setSideBarOpen={setIsSideBarOpen} isMobile={isMobile}/>
                         </animated.div>*/}
-                        <ViewSideBar color={color} setSideBarOpen={setIsSideBarOpen} isMobile={isMobile}/>
+                        <div className={`${isSideBarOpen && `openSideBar`} absolute h-[calc(100%-50px)] w-[70svw] min-w-[210px] max-w-[350px] bg-black bg-opacity-90 z-[12] left-[-300px]`}>
+                            <ViewSideBar color={color} setSideBarOpen={setIsSideBarOpen} isMobile={isMobile}/>
+                        </div>
                     </div>
                     <div className={`pt-[${isMatchingPath ? `0px` : `100px`}] h-[calc(100%-50px)] overflow-y-scroll`}>
                         {children}

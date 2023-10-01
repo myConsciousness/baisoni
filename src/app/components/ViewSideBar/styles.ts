@@ -10,7 +10,7 @@ export const viewSideBar = tv({
         Content: 'h-[60%] w-full pl-[18px] pt-[24px] pb-[24px] bg-white bg-opacity-40',
         NavBarIcon: 'h-[24px] w-[24px] mr-[17px]',
         NavBarItem: 'h-[28px] w-full mb-[15px] flex items-center font-bold cursor-pointer',
-        Footer: 'h-[calc(100svh-75%)] w-full pl-[18px] pt-[24px] border-t-[1px] border-[#E3E3E3] pb-[75px] bg-white bg-opacity-40',
+        Footer: 'h-[calc(25%)] w-full pl-[18px] pt-[24px] border-t-[1px] border-[#E3E3E3] pb-[75px] bg-white bg-opacity-40',
         isBarOpen: '',
         modal: '',
 

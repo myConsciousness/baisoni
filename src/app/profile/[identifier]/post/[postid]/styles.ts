@@ -22,7 +22,7 @@ export const postOnlyPage = tv({
                 Container: 'bg-white text-black',
                 PostContent: 'text-black',
                 PostCreatedAt: 'text-black',
-                AuthorPost: 'border-[#AAAAAA]'
+                AuthorPost: 'border-[#AAAAAA] bg-white'
             },
             dark: {
                 Container: 'bg-[#2C2C2C] text-[#D7D7D7] border-[#181818]',

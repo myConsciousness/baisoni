@@ -50,6 +50,7 @@ export default function Root() {
     const [onHoverButton, setOnHoverButton] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
     const [hasMoreLimit, setHasMoreLimit] = useState(false)
+    const [now, setNow] = useState<Date>(new Date())
     const color = darkMode ? 'dark' : 'light'
 
     const { background, ProfileContainer, ProfileInfoContainer, HeaderImageContainer, ProfileHeaderImage,
@@ -62,6 +63,16 @@ export default function Root() {
     };
 
     useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
+
+    useEffect(() => {
         const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
 
         setDarkMode(matchMedia.matches);
@@ -69,8 +80,6 @@ export default function Root() {
 
         return () => matchMedia.removeEventListener("change", modeMe);
     }, []);
-
-
 
     const handleRefresh = () => {
         console.log('refresh');

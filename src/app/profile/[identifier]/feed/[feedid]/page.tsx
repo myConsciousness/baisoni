@@ -64,6 +64,7 @@ export default function Root() {
     const [hasMoreLimit, setHasMoreLimit] = useState(false)
     const [feedInfo, setFeedInfo] = useState<any>(null)
     const [userPreference, setUserPreference] = useState<any>(null)
+    const [now, setNow] = useState<Date>(new Date())
 
     const color = darkMode ? 'dark' : 'light'
 
@@ -82,6 +83,16 @@ export default function Root() {
         matchMedia.addEventListener("change", modeMe);
 
         return () => matchMedia.removeEventListener("change", modeMe);
+    }, []);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
     }, []);
 
     const FormattingTimeline = (timeline: FeedViewPost[]) => {

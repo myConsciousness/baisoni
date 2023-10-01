@@ -39,11 +39,12 @@ interface Props {
     isSkeleton?: boolean
     json?: any
     isEmbedToModal?: boolean
+    now?: Date
 }
 export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [ agent ] = useAgent()
     const router = useRouter()
-    const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json, isEmbedToModal} = props;
+    const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json, isEmbedToModal, now} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063]*$/;
     const [loading, setLoading] = useState(false)
     const [isHover, setIsHover] = useState<boolean>(false)
@@ -58,18 +59,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [startX, setStartX] = useState(null);
     const [startY, setStartY] = useState(null);
     const [handleButtonClick, setHandleButtonClick] = useState(false);
-    const [now, setNow] = useState<Date>(new Date())
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
-
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            setNow(new Date())
-        }, 60 * 1000);
-    
-        return () => {
-            clearInterval(intervalId);
-        };
-    }, []);
 
     const handleReply = async () => {
         //setIsPostModalOpen(true)
@@ -386,7 +376,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       </Dropdown>
                                   ) : (
                                       <>
-                                          {!isSkeleton && (<div>{formattedSimpleDate(postJson?.indexedAt, now)}</div>)}
+                                          {!isSkeleton && (<div>{formattedSimpleDate(postJson?.indexedAt, now || new Date())}</div>)}
                                       </>
                                   )}
                               </div>

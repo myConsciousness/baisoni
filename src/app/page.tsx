@@ -26,6 +26,7 @@ export default function Root(props:any) {
     const [cursor, setCursor] = useState<string | null>(null)
     const [hasCursor, setHasCursor] = useState<string | null>(null)
     const [darkMode, setDarkMode] = useState(false);
+    const [now, setNow] = useState<Date>(new Date())
     const color = darkMode ? 'dark' : 'light'
     const searchParams = useSearchParams()
     const selectedFeed = searchParams.get('feed') || 'following'
@@ -43,6 +44,15 @@ export default function Root(props:any) {
         return () => matchMedia.removeEventListener("change", modeMe);
     }, []);
 
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
 
     const handleRefresh = () => {
         console.log('refresh');

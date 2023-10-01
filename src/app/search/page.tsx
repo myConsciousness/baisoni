@@ -29,6 +29,7 @@ export default function Root() {
     const [searchTarget, setSearchTarget] = useState(target)
     const [darkMode, setDarkMode] = useState(false);
     const [numOfResult, setNumOfResult] = useState(0)
+    const [now, setNow] = useState<Date>(new Date())
     const color = darkMode ? 'dark' : 'light'
 
     const modeMe = (e:any) => {
@@ -44,6 +45,15 @@ export default function Root() {
         return () => matchMedia.removeEventListener("change", modeMe);
     }, []);
 
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
 
     const fetchSearchResult = async (query: string) => {
         try {
@@ -180,7 +190,7 @@ export default function Root() {
                              {searchPostsResult.map((post: PostView, index) => (
                                 // eslint-disable-next-line react/jsx-key
                                 <ViewPostCard key={`search-post-${post.uri}`} color={color} numbersOfImage={0} postJson={post}
-                                           isMobile={isMobile}/>
+                                           isMobile={isMobile} now={now}/>
                              ))}
                             {loading2 && (
                                 <Spinner className={'flex justify-center '}/>

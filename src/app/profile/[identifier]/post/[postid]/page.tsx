@@ -34,10 +34,12 @@ import 'react-swipeable-list/dist/styles.css';
 import {ViewPostCard} from "@/app/components/ViewPostCard";
 import {isMobile} from "react-device-detect";
 import {PostModal} from "@/app/components/PostModal";
+import {useRouter} from "next/navigation";
 
 
 export default function Root() {
     const [agent, setAgent] = useAgent()
+    const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [loading2, setLoading2] = useState(false)
     const pathname = usePathname()
@@ -176,9 +178,12 @@ export default function Root() {
             switch (facet.features[0].$type) {
                 case "app.bsky.richtext.facet#mention":
                     result.push(
-                        <Link key={`link-${index}-${byteStart}`} href={`/profile/${facet.features[0].did}`}>
+                        <div key={`link-${index}-${byteStart}`}
+                             onClick={() => {
+                                 router.push(`/profile/${facet.features[0].did}`)
+                             }}>
                             {facetText}
-                        </Link>
+                        </div>
                     )
                     break
 
@@ -215,9 +220,12 @@ export default function Root() {
                                 variant="faded"
                                 color="primary"
                             >
-                            <Link key={`a-${index}-${byteStart}`} href={`/search?searchWord=${(facet.features[0].tag.replace('#', '%23'))}&target=posts`}>
+                            <div key={`a-${index}-${byteStart}`}
+                                 onClick={() => {
+                                     router.push(`/search?searchWord=${(facet.features[0].tag.replace('#', '%23'))}&target=posts`)
+                                 }}>
                                 {facetText.replace('#', '')}
-                            </Link>
+                            </div>
                         </Chip>
                         </span>
                     )

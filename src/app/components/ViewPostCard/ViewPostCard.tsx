@@ -131,9 +131,13 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             switch (facet.features[0].$type) {
                 case "app.bsky.richtext.facet#mention":
                     result.push(
-                        <Link key={`link-${index}-${byteStart}`} href={`/profile/${facet.features[0].did}`}>
+                        <div key={`link-${index}-${byteStart}`}
+                             onClick={() => {
+                                 router.push(`/profile/${facet.features[0].did}`)
+                             }}
+                        >
                             {facetText}
-                        </Link>
+                        </div>
                     )
                     break
 
@@ -151,7 +155,13 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                 color={facetText === facet.features[0].uri ? "success" : facet.features[0].uri.includes(facetText.replace('...', '')) ? 'default' : "danger"}
                             >
                                 {(facet.features[0].uri).startsWith('https://bsky.app') ? (
-                                    <Link key={`a-${index}-${byteStart}`} href={facet.features[0].uri.replace('https://bsky.app',`${location.protocol}//${window.location.host}`)}>{facetText}</Link>
+                                    <div key={`a-${index}-${byteStart}`}
+                                         onClick={() => {
+                                             router.push(facet.features[0].uri.replace('https://bsky.app',`${location.protocol}//${window.location.host}`))
+                                         }}
+                                    >
+                                        {facetText}
+                                    </div>
                                 ) : (
                                     <a key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
                                         {facetText}
@@ -434,7 +444,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                               <div className="text-sm font-bold text-white whitespace-nowrap overflow-hidden overflow-ellipsis">
                                                                   {postJson.embed.external?.title}
                                                               </div>
-                                                              <div className="text-xs text-gray-200 mt-1 overflow-hidden" style={{WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>
+                                                              <div className="text-xs text-gray-200 mt-1" style={{WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', display: '-webkit-box', overflow: 'hidden'}}>
                                                                   {postJson.embed.external?.description}
                                                               </div>
                                                               <div className="text-xs text-gray-700 mt-1">

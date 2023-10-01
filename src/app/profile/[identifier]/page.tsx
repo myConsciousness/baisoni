@@ -27,16 +27,17 @@ import {
     Popover, PopoverTrigger, PopoverContent,useDisclosure
 } from "@nextui-org/react";
 import reactStringReplace from 'react-string-replace'
+import {useRouter} from "next/router";
 
 
 
 export default function Root() {
     const [agent, setAgent] = useAgent()
+    const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [loading2, setLoading2] = useState(false)
     const pathname = usePathname()
     const username = pathname.replace('/profile/','')
-    console.log(username)
     const [timeline, setTimeline] = useState<FeedViewPost[]>([])
     const [availavleNewTimeline, setAvailableNewTimeline] = useState(false)
     const [newTimeline, setNewTimeline] = useState<FeedViewPost[]>([])
@@ -299,9 +300,12 @@ export default function Root() {
                                                     domain = domain.slice(0, -1)
                                                 }
                                                 return (
-                                                    <Link key={j} href={`/profile/${domain}`}>
+                                                    <div key={j}
+                                                         onClick={() => {
+                                                             router.push(`/profile/${domain}`)
+                                                         }}>
                                                         {match}
-                                                    </Link>
+                                                    </div>
                                                 )
                                             } else if (match.startsWith('http')) {
                                                 let url = match

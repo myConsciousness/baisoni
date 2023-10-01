@@ -256,10 +256,9 @@ export default function Root() {
         return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
     }
 
-    function renderNestedViewPostCards(post:any, color: 'dark'|'light', isMobile:boolean) {
+    function renderNestedViewPostCards(post:any, color:'dark' | 'light', isMobile:boolean): JSX.Element | null {
         if (post && post.parent) {
-            const nestedViewPostCards = renderNestedViewPostCards(post.parent, color, isMobile); // 再帰呼び出し
-
+            const nestedViewPostCards = renderNestedViewPostCards(post.parent, color, isMobile);
             return (
                 <>
                     {nestedViewPostCards}
@@ -267,10 +266,11 @@ export default function Root() {
                 </>
             );
         }
-        return null; // ネストが終了したらnullを返す
+        return null;
     }
 
-    function renderNestedRepliesViewPostCards(post:any, color: 'dark'|'light', isMobile:boolean) {
+
+    function renderNestedRepliesViewPostCards(post:any, color: 'dark'|'light', isMobile:boolean): JSX.Element | null {
         if (post && post.replies) {
             const nestedViewPostCards = renderNestedViewPostCards(post.replies, color, isMobile); // 再帰呼び出し
 

@@ -414,7 +414,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                               Reply to {json.reply.parent.author?.displayName}
                                           </div>
                                       )}
-                                      <div>
+                                      <div style={{wordBreak: 'break-word'}}>
                                           {renderTextWithLinks}
                                       </div>
                                   </>

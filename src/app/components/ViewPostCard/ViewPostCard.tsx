@@ -104,7 +104,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         if(!postJson.record?.facets){
             let post: any[] = []
             postJson.record.text.split('\n').map((line:any, i:number) => {
-                post.push(<p key={i}>{line}</p>)
+                post.push(<p key={i}>{line}<br/></p>)
             })
             return post
         }

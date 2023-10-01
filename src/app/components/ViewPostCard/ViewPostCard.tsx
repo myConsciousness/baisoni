@@ -2,7 +2,7 @@ import React, {useCallback, useState, useMemo, useEffect} from "react";
 import { viewPostCard } from "./styles";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faComment } from '@fortawesome/free-regular-svg-icons'
-import {faRetweet, faEllipsis, faFlag, faLink, faCode, faTrash} from '@fortawesome/free-solid-svg-icons'
+import {faRetweet, faEllipsis, faFlag, faLink, faCode, faTrash, faUser} from '@fortawesome/free-solid-svg-icons'
 import { faStar as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { faStar as faHeartSolid, faHashtag, faCheckCircle, faCircleXmark, faCircleQuestion, faReply } from '@fortawesome/free-solid-svg-icons'
 import {PostModal} from "../PostModal";
@@ -309,7 +309,15 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <Skeleton className={skeletonIcon({color:color})}/>
                                   ) : (
                                       <>
-                                          <Image src={postJson?.author?.avatar} radius={'none'} className={`${isEmbedToModal ? `z-[2]` : `z-[0]`}`} alt={postJson.author.did}/>
+                                          {postJson?.author?.avatar ? (
+                                              <Image src={postJson?.author?.avatar} radius={'none'} className={`${isEmbedToModal ? `z-[2]` : `z-[0]`}`} alt={postJson.author.did}/>
+                                          ):(
+                                              <FontAwesomeIcon
+                                                  className={`${isEmbedToModal ? `z-[2]` : `z-[0]`} h-full w-full`}
+                                                  icon={faUser}
+                                                />
+                                              )
+                                          }
                                       </>
 
                                   )}

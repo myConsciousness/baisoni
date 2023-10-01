@@ -12,7 +12,7 @@ import {usePathname} from "next/navigation";
 import { viewProfilePage } from "./styles";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faImage, faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { faCopy, faEllipsis } from '@fortawesome/free-solid-svg-icons'
+import { faCopy, faEllipsis, faUser } from '@fortawesome/free-solid-svg-icons'
 import {
     Dropdown,
     DropdownTrigger,
@@ -229,7 +229,15 @@ export default function Root() {
                         <img className={ProfileHeaderImage()} src={profile?.banner}/>
                     </div>
                     <div className={ProfileInfoContainer({color:color})}>
-                        <img className={ProfileImage()} src={profile?.avatar}/>
+                        {profile?.avatar ?
+                            (
+                                <img className={ProfileImage()} src={profile.avatar}/>
+                            ):(
+                                <div className={`${ProfileImage()} bg-white`}>
+                                    <FontAwesomeIcon icon={faUser} className={'w-full h-full'}/>
+                                </div>
+                            )
+                        }
                         <div className={Buttons()}>
                             <Dropdown className={dropdown({color: color})}>
                                 <DropdownTrigger>

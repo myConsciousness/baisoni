@@ -5,7 +5,7 @@ import { postModal } from "./styles";
 import { BrowserView, MobileView, isMobile } from "react-device-detect"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faImage, faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { faXmark, faPen, faCirclePlus, faFaceLaughBeam } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faPen, faCirclePlus, faFaceLaughBeam, faUser } from '@fortawesome/free-solid-svg-icons'
 import 'react-circular-progressbar/dist/styles.css';
 import {
     Dropdown,
@@ -305,11 +305,20 @@ export const PostModal: React.FC<Props> = (props: Props) => {
                             <div className={contentLeftAuthorIcon()}>
                                 <Dropdown placement="right-start" className={dropdown({color:color})}>
                                     <DropdownTrigger>
-                                        <img className={contentLeftAuthorIconImage()}
-                                             alt={"author icon"}
-                                             onDragStart={handleDragStart}
-                                             src={userProfileDetailedAtom?.avatar || ""}
-                                        />
+                                        {userProfileDetailedAtom?.avatar ? (
+                                            <img className={contentLeftAuthorIconImage()}
+                                                 alt={"author icon"}
+                                                 onDragStart={handleDragStart}
+                                                 src={userProfileDetailedAtom?.avatar}
+                                            />
+                                        ):(
+                                            <FontAwesomeIcon
+                                                className={contentLeftAuthorIconImage()}
+                                                onDragStart={handleDragStart}
+                                                icon={faUser}
+                                            />
+                                        )
+                                        }
                                     </DropdownTrigger>
                                     <DropdownMenu>
                                         <DropdownSection title='accounts'>

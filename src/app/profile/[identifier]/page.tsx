@@ -27,7 +27,7 @@ import {
     Popover, PopoverTrigger, PopoverContent,useDisclosure
 } from "@nextui-org/react";
 import reactStringReplace from 'react-string-replace'
-import {useRouter} from "next/router";
+import {useRouter} from "next/navigation";
 
 
 

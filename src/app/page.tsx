@@ -217,14 +217,12 @@ export default function Root(props:any) {
                         <InfiniteScroll
                             loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
                             hasMore={!loading2}         //読み込みを行うかどうかの判定
-                            loader={<Spinner/>}
+                            loader={<Spinner key="spinner-feed"/>}
                             threshold={1500}
                             useWindow={false}
                         >
                             {timeline.map((post, index) => (
-                                <>
                                     <ViewPostCard key={`${post?.reason ? `reason-${(post.reason as any).by.did}` : `post`}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
-                                </>
                             ))}
                         </InfiniteScroll>
                     )}

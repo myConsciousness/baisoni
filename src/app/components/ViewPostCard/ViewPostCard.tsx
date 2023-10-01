@@ -149,7 +149,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
 
                 case "app.bsky.richtext.facet#link":
                     result.push(
-                        <span>
+                        <span key={`link-${index}-${byteStart}`}>
                             <Chip
                                 className={chip({color:color})}
                                 startContent={<Tooltip showArrow={true} color={'foreground'}
@@ -174,7 +174,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
 
                 case "app.bsky.richtext.facet#tag":
                     result.push(
-                        <span>
+                        <span key={`link-${index}-${byteStart}`}>
                             <Chip
                                 className={chip({color:color})}
                                 startContent={<FontAwesomeIcon icon={faHashtag} />}

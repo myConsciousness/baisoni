@@ -331,14 +331,12 @@ export default function Root() {
                             <InfiniteScroll
                                 loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
                                 hasMore={!loading && !loading2 && !hasMoreLimit}         //読み込みを行うかどうかの判定
-                                loader={<Spinner/>}
+                                loader={<Spinner key="spinner-profile" />}
                                 threshold={300}
                                 useWindow={false}
                             >
                                 {timeline.map((post, index) => (
-                                    <>
-                                        <ViewPostCard key={`post-${index}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
-                                    </>
+                                    <ViewPostCard key={`post-${index}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
                                 ))}
                             </InfiniteScroll>
                         )}

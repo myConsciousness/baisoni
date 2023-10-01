@@ -103,7 +103,7 @@ export default function Root() {
                 <InfiniteScroll
                     loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
                     hasMore={!loading2}         //読み込みを行うかどうかの判定
-                    loader={<Spinner/>}
+                    loader={<Spinner key="spinner-inbox"/>}
                     threshold={700}
                     useWindow={false}
                 >

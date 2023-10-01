@@ -339,9 +339,13 @@ export default function Root() {
                     </>
                 )}
                 <div className={AuthorPost({color:color})}>
-                    <div className={Author()}>
+                    <div className={Author()}
+                            onClick={() => {
+                                router.push(`/profile/${post.post.author.did}`)
+                            }}
+                    >
                         <div className={AuthorIcon()}>
-                            <img src={post.post.author?.avatar}></img>
+                            <img src={post.post.author?.avatar}/>
                         </div>
                         <div>
                             <div className={AuthorDisplayName()}>{post.post.author?.displayName}</div>

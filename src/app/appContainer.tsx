@@ -23,7 +23,7 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
     const [userPreferences, setUserPreferences] = useUserPreferencesAtom()
     const [feedGenerators, setFeedGenerators] = useFeedGeneratorsAtom()
     const router = useRouter()
-    let pathName = usePathname()
+    const pathName = usePathname()
     const searchParams = useSearchParams()
     const target = searchParams.get('target')
     const [value, setValue] = useState(false)
@@ -43,7 +43,7 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
         setDarkMode(!!e.matches);
     };
 
-    const pathname = usePathname()
+    // const pathname = usePathname()
 
     useEffect(() => {
         if (agent?.hasSession === true) {
@@ -54,9 +54,9 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
             const sessionJson = localStorage.getItem('session')
 
             if (!sessionJson) {
-                if(pathname === '/login') return
+                if(pathName === '/login') return
                 if (router) {
-                    router.push(`/login${pathname? `?toRedirect=${pathname.replace('/', '')}${searchParams ? `&${searchParams}` : ``}` : ``}`)
+                    router.push(`/login${pathName? `?toRedirect=${pathName.replace('/', '')}${searchParams ? `&${searchParams}` : ``}` : ``}`)
                 } else {
                     location.href = '/login'
                 }
@@ -72,22 +72,22 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                 setAgent(agent)
             } catch (error) {
                 console.error(error)
-                if(pathname === '/login') return
+                if(pathName === '/login') return
                 if (router) {
-                    router.push(`/login${pathname? `?toRedirect=${pathname.replace('/', '')}${searchParams ? `&${searchParams}` : ``}` : ``}`)
+                    router.push(`/login${pathName? `?toRedirect=${pathName.replace('/', '')}${searchParams ? `&${searchParams}` : ``}` : ``}`)
                 } else {
                     location.href = '/login'
                 }
             }
 
-            if (!userProfileDetailed) {
+            if (!userProfileDetailed && agent.hasSession === true) {
                 const res = await agent.getProfile({ actor: agent.session?.did || "" })
                 const {data} = res
         
                 setUserProfileDetailed(data)
             }
 
-            if (!userPreferences) {
+            if (!userPreferences && agent.hasSession === true) {
                 try {
                     console.log('fetch preferences')
                     const res = await agent.getPreferences()
@@ -113,7 +113,7 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
         }
 
         restoreSession()
-    }, [agent && agent?.hasSession, location.href])
+    }, [agent && agent.hasSession, pathName])
 
     useEffect(() => {
         console.log(searchText)

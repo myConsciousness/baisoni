@@ -8,6 +8,7 @@ import {Tabs, Tab, Chip} from "@nextui-org/react";
 import {useRouter, useSearchParams} from "next/navigation";
 import { useAgent } from "@/app/_atoms/agent";
 import { useFeedGeneratorsAtom } from "@/app/_atoms/feedGenerators";
+import { useUserPreferencesAtom } from "@/app/_atoms/preferences";
 
 
 interface Props {
@@ -25,6 +26,7 @@ interface Props {
 
 export const ViewHeader: React.FC<Props> = (props: Props) => {
     const [agent] = useAgent()
+    const [userPreferences] = useUserPreferencesAtom()
     const [feedGenerators]  = useFeedGeneratorsAtom()
     const {className, color, isMobile, open, tab, page, isNextPage, setSideBarOpen, selectedTab} = props;
     const router = useRouter()
@@ -35,7 +37,6 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
     const [loading, setLoading] = useState(false)
     const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false)
     const [isComposing, setComposing] = useState(false);
-    const [userPreferences, setUserPreferences] = useState<any>({})
     const [pinnedFeeds, setPinnedFeeds] = useState<any>([])
     const {Header, HeaderContentTitleContainer, HeaderContentTitle,
             top,
@@ -155,7 +156,7 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
                         }}
                         style={{marginLeft:'40px'}}
                     >
-                        {Object.keys(userPreferences).length > 0 && (
+                        {userPreferences && (
                             <Tab key="following"
                                  title={
                                      <div className="flex items-center pl-[15px] pr-[15px]">

@@ -42,6 +42,7 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
     },[searchText])
 
     useEffect(() => {
+        console.log('hoge')
         const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
 
         setDarkMode(matchMedia.matches);
@@ -76,7 +77,7 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                             <ViewSideBar color={color} setSideBarOpen={setIsSideBarOpen} isMobile={isMobile}/>
                         </div>
                     </div>
-                    <div className={`pt-[${isMatchingPath ? `0px` : `100px`}] h-[calc(100%-50px)] overflow-y-scroll`}>
+                    <div className={`${isMatchingPath ? `pt-[0px]` : `pt-[100px]`} h-[calc(100%-50px)] overflow-y-scroll`}>
                         {children}
                     </div>
                     {!isMatchingPath && (

@@ -7,6 +7,7 @@ import {Button, Image, ScrollShadow} from "@nextui-org/react";
 import {Tabs, Tab, Chip} from "@nextui-org/react";
 import {useRouter, useSearchParams} from "next/navigation";
 import { useAgent } from "@/app/_atoms/agent";
+import { useFeedGeneratorsAtom } from "@/app/_atoms/feedGenerators";
 
 
 interface Props {
@@ -24,6 +25,7 @@ interface Props {
 
 export const ViewHeader: React.FC<Props> = (props: Props) => {
     const [agent] = useAgent()
+    const [feedGenerators]  = useFeedGeneratorsAtom()
     const {className, color, isMobile, open, tab, page, isNextPage, setSideBarOpen, selectedTab} = props;
     const router = useRouter()
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;
@@ -41,30 +43,13 @@ export const ViewHeader: React.FC<Props> = (props: Props) => {
     } = viewHeader();
     const AppearanceColor = color
 
-    const fetchUserPreferences = useCallback(async () => {
-        if(!agent) return
-        try{
-            console.log('fetch preferences')
-            if(!agent) return
-            const res = await agent.getPreferences()
-            if (res) {
-                console.log(res)
-                setUserPreferences(res)
-                const {data} = await agent.app.bsky.feed.getFeedGenerators({feeds: res.feeds.pinned as string[]})
-                console.log(data)
-                setPinnedFeeds(data.feeds)
-            } else {
-                // もしresがundefinedだった場合の処理
-                console.log('Responseがundefinedです。')
-            }
-        }catch(e){
-            console.log(e)
-        }
-    },[])
-
     useEffect(() => {
-        fetchUserPreferences()
-    },[agent])
+        if (!feedGenerators) {
+            return
+        }
+
+        setPinnedFeeds(feedGenerators)
+    }, [feedGenerators])
 
     useEffect(() => {
         const search = searchParams.get('word')

@@ -13,11 +13,15 @@ import './sidebar.css'
 import { useAgent } from "./_atoms/agent";
 import { useUserProfileDetailedAtom } from "./_atoms/userProfileDetail";
 import { BskyAgent } from "@atproto/api";
+import { useFeedGeneratorsAtom } from "./_atoms/feedGenerators";
+import { useUserPreferencesAtom } from "./_atoms/preferences";
 
 export function AppConatiner({ children }: { children: React.ReactNode }) {
     //ここでsession作っておかないとpost画面を直で行った時にpostできないため
     const [agent, setAgent] = useAgent()
     const [userProfileDetailed, setUserProfileDetailed] = useUserProfileDetailedAtom()
+    const [userPreferences, setUserPreferences] = useUserPreferencesAtom()
+    const [feedGenerators, setFeedGenerators] = useFeedGeneratorsAtom()
     const router = useRouter()
     let pathName = usePathname()
     const searchParams = useSearchParams()
@@ -81,6 +85,30 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                 const {data} = res
         
                 setUserProfileDetailed(data)
+            }
+
+            if (!userPreferences) {
+                try {
+                    console.log('fetch preferences')
+                    const res = await agent.getPreferences()
+            
+                    if (res) {
+                        console.log(res)
+            
+                        setUserPreferences(res)
+            
+                        const {data} = await agent.app.bsky.feed.getFeedGenerators({feeds: res.feeds.pinned as string[]})
+            
+                        console.log(data)
+            
+                        setFeedGenerators(data.feeds)
+                    } else {
+                        // もしresがundefinedだった場合の処理
+                        console.log('Responseがundefinedです。')
+                    }
+                } catch(e) {
+                    console.log(e)
+                }
             }
         }
 

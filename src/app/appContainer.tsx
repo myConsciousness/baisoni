@@ -5,15 +5,19 @@ import {layout} from "@/app/styles";
 import {TabBar} from "@/app/components/TabBar";
 import {isMobile} from "react-device-detect";
 import {usePathname, useRouter, useSearchParams} from 'next/navigation';
-import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
+// import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
 import {ViewSideBar} from "@/app/components/ViewSideBar";
 //import { useSpring, animated, interpolate } from '@react-spring/web'
 //import { useDrag } from '@use-gesture/react';
 import './sidebar.css'
+import { useAgent } from "./_atoms/agent";
+import { useUserProfileDetailedAtom } from "./_atoms/userProfileDetail";
+import { BskyAgent } from "@atproto/api";
 
 export function AppConatiner({ children }: { children: React.ReactNode }) {
     //ここでsession作っておかないとpost画面を直で行った時にpostできないため
-    const {agent} = useRequiredSession()
+    const [agent, setAgent] = useAgent()
+    const [userProfileDetailed, setUserProfileDetailed] = useUserProfileDetailedAtom()
     const router = useRouter()
     let pathName = usePathname()
     const searchParams = useSearchParams()
@@ -34,6 +38,55 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
     const modeMe = (e:any) => {
         setDarkMode(!!e.matches);
     };
+
+    const pathname = usePathname()
+
+    useEffect(() => {
+        if (agent?.hasSession === true) {
+            return
+        }
+
+        const restoreSession = async () => {
+            console.log("here 3")
+            const sessionJson = localStorage.getItem('session')
+
+            if (!sessionJson) {
+                if(pathname === '/login') return
+                if (router) {
+                    router.push(`/login${pathname? `?toRedirect=${pathname.replace('/', '')}${searchParams ? `&${searchParams}` : ``}` : ``}`)
+                } else {
+                    location.href = '/login'
+                }
+                return
+            }
+
+            const session = JSON.parse(sessionJson).session
+            const agent = new BskyAgent({ service: `https://${JSON.parse(sessionJson).server}` })
+
+            try {
+                await agent.resumeSession(session)
+
+                setAgent(agent)
+
+                if (!userProfileDetailed) {
+                    const res = await agent.getProfile({ actor: agent.session?.did || "" })
+                    const {data} = res
+            
+                    setUserProfileDetailed(data)
+                }
+            } catch (error) {
+                console.error(error)
+                if(pathname === '/login') return
+                if (router) {
+                    router.push(`/login${pathname? `?toRedirect=${pathname.replace('/', '')}${searchParams ? `&${searchParams}` : ``}` : ``}`)
+                } else {
+                    location.href = '/login'
+                }
+            }
+        }
+
+        restoreSession()
+    }, [agent, agent && agent.hasSession])
 
     useEffect(() => {
         console.log(searchText)

@@ -6,7 +6,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import {Button, Image, ScrollShadow} from "@nextui-org/react";
 import {Tabs, Tab, Chip} from "@nextui-org/react";
 import {useRouter, useSearchParams} from "next/navigation";
-import {useRequiredSession} from "@/app/_lib/hooks/useRequiredSession";
+import { useAgent } from "@/app/_atoms/agent";
 
 
 interface Props {
@@ -21,8 +21,9 @@ interface Props {
     selectedTab: string
     setSearchText?: any
 }
+
 export const ViewHeader: React.FC<Props> = (props: Props) => {
-    const {agent} = useRequiredSession()
+    const [agent] = useAgent()
     const {className, color, isMobile, open, tab, page, isNextPage, setSideBarOpen, selectedTab} = props;
     const router = useRouter()
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063\ufeff]*$/;

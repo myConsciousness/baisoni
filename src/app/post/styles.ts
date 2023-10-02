@@ -16,8 +16,8 @@ export const createPostPage = tv({
         contentLeftAuthorIcon: 'w-[30px] h-[30px] bg-black rounded-[10px] overflow-hidden cursor-pointer ',
         contentLeftAuthorIconImage: 'w-full h-full drag-none',
         contentRight: 'w-[calc(100%)] relative h-[calc(100%-10px)] ',
-        contentRightTextArea: 'w-[calc(100%)] min-h-[calc(100%)] placeholder-[#808080] bg-transparent resize-none outline-none overflow-visible',
-        contentRightImagesContainer: 'w-[100%] h-[105px] whitespace-nowrap flex flex-wrap flex-col b-0',
+        contentRightTextArea: 'w-[calc(100%)] placeholder-[#808080] bg-transparent resize-none outline-none overflow-visible',
+        contentRightImagesContainer: 'w-[100%] h-[105px] whitespace-nowrap flex flex-wrap b-0',
         contentRightUrlsContainer: 'w-[100%] h-[40px] whitespace-nowrap flex flex-wrap flex-col',
         contentRightUrlCard: 'w-full',
         contentRightUrlCardDeleteButton: 'w-[calc(100%-485px)] bg-red bg-opacity-10 rounded-[10px] cursor-pointer',
@@ -72,9 +72,11 @@ export const createPostPage = tv({
         uploadImageAvailable : {
             true: {
                 contentRightContainer: 'h-[calc(100%-105px)]',
+                contentRightTextArea: 'min-h-[calc(100%-105px)]',
             },
             false: {
                 contentRightContainer: 'h-full',
+                contentRightTextArea: 'min-h-full',
             }
         },
         urlCardAvailable : {

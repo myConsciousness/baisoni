@@ -12,7 +12,7 @@ import {usePathname} from "next/navigation";
 import { viewProfilePage } from "./styles";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faImage, faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { faCopy, faEllipsis } from '@fortawesome/free-solid-svg-icons'
+import { faCopy, faEllipsis, faUser } from '@fortawesome/free-solid-svg-icons'
 import {
     Dropdown,
     DropdownTrigger,
@@ -27,16 +27,17 @@ import {
     Popover, PopoverTrigger, PopoverContent,useDisclosure
 } from "@nextui-org/react";
 import reactStringReplace from 'react-string-replace'
+import {useRouter} from "next/navigation";
 
 
 
 export default function Root() {
     const [agent, setAgent] = useAgent()
+    const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [loading2, setLoading2] = useState(false)
     const pathname = usePathname()
     const username = pathname.replace('/profile/','')
-    console.log(username)
     const [timeline, setTimeline] = useState<FeedViewPost[]>([])
     const [availavleNewTimeline, setAvailableNewTimeline] = useState(false)
     const [newTimeline, setNewTimeline] = useState<FeedViewPost[]>([])
@@ -50,6 +51,7 @@ export default function Root() {
     const [onHoverButton, setOnHoverButton] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
     const [hasMoreLimit, setHasMoreLimit] = useState(false)
+    const [now, setNow] = useState<Date>(new Date())
     const color = darkMode ? 'dark' : 'light'
 
     const { background, ProfileContainer, ProfileInfoContainer, HeaderImageContainer, ProfileHeaderImage,
@@ -62,6 +64,16 @@ export default function Root() {
     };
 
     useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, []);
+
+    useEffect(() => {
         const matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
 
         setDarkMode(matchMedia.matches);
@@ -69,8 +81,6 @@ export default function Root() {
 
         return () => matchMedia.removeEventListener("change", modeMe);
     }, []);
-
-
 
     const handleRefresh = () => {
         console.log('refresh');
@@ -219,7 +229,15 @@ export default function Root() {
                         <img className={ProfileHeaderImage()} src={profile?.banner}/>
                     </div>
                     <div className={ProfileInfoContainer({color:color})}>
-                        <img className={ProfileImage()} src={profile?.avatar}/>
+                        {profile?.avatar ?
+                            (
+                                <img className={ProfileImage()} src={profile.avatar}/>
+                            ):(
+                                <div className={`${ProfileImage()} bg-white`}>
+                                    <FontAwesomeIcon icon={faUser} className={'w-full h-full'}/>
+                                </div>
+                            )
+                        }
                         <div className={Buttons()}>
                             <Dropdown className={dropdown({color: color})}>
                                 <DropdownTrigger>
@@ -290,9 +308,12 @@ export default function Root() {
                                                     domain = domain.slice(0, -1)
                                                 }
                                                 return (
-                                                    <Link key={j} href={`/profile/${domain}`}>
+                                                    <div key={j}
+                                                         onClick={() => {
+                                                             router.push(`/profile/${domain}`)
+                                                         }}>
                                                         {match}
-                                                    </Link>
+                                                    </div>
                                                 )
                                             } else if (match.startsWith('http')) {
                                                 let url = match
@@ -331,14 +352,12 @@ export default function Root() {
                             <InfiniteScroll
                                 loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
                                 hasMore={!loading && !loading2 && !hasMoreLimit}         //読み込みを行うかどうかの判定
-                                loader={<Spinner/>}
+                                loader={<Spinner key="spinner-profile" />}
                                 threshold={300}
                                 useWindow={false}
                             >
                                 {timeline.map((post, index) => (
-                                    <>
-                                        <ViewPostCard key={`post-${index}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
-                                    </>
+                                    <ViewPostCard key={`post-${index}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
                                 ))}
                             </InfiniteScroll>
                         )}

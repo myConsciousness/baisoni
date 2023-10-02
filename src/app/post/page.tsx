@@ -27,9 +27,11 @@ import {useDisclosure} from "@nextui-org/react";
 import Textarea from 'react-textarea-autosize'; // 追加
 import {useRouter, useSearchParams} from "next/navigation";
 import {useAgent} from "@/app/_atoms/agent";
+import { useUserProfileDetailedAtom } from "../_atoms/userProfileDetail";
 
 
 export default function Root() {
+    const [userProfileDetailed, setUserProfileDetailed] = useUserProfileDetailedAtom()
     const [agent, setAgent] = useAgent()
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -281,7 +283,7 @@ export default function Root() {
                                     <img className={contentLeftAuthorIconImage()}
                                          alt={"author icon"}
                                          onDragStart={handleDragStart}
-                                         src={"https://av-cdn.bsky.app/img/avatar/plain/did:plc:txandrhc7afdozk6a2itgltm/bafkreihwad5kaujw2f6kbfg37zmkhclgd3ap7grixl6pusfb5b34s6jite@jpeg"}
+                                         src={userProfileDetailed?.avatar || ""}
                                     ></img>
                                 </DropdownTrigger>
                                 <DropdownMenu>
@@ -299,7 +301,7 @@ export default function Root() {
                         </div>
                     </div>
                     <div className={contentRight()}>
-                        <Textarea className={contentRightTextArea()}
+                        <Textarea className={contentRightTextArea({uploadImageAvailable: contentImage.length !== 0})}
                                   aria-label="post input area"
                                   placeholder={"Yo, Do you do Brusco?"}
                                   value={contentText}
@@ -436,27 +438,31 @@ export default function Root() {
                 </div>
                 <div className={footer({color:AppearanceColor})}>
                     <div className={footerTooltip()}>
-                        <div className={footerTooltipStyle()}>
-                            <label htmlFor={inputId}>
-                                <Button
-                                    isIconOnly
-                                    variant="light"
-                                    className={'h-[24px] text-white'}
-                                    isDisabled={loading || compressProcessing || isImageMaxLimited}
-                                >
-                                    <FontAwesomeIcon icon={faImage} className={'h-[20px] mb-[5px]'}/>
-                                </Button>
-                                <input
-                                    hidden multiple
-                                    type="file" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.svg,.bmp,.tiff,.avif,.heic,.heif"
-                                    id={inputId}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                        handleOnAddImage(e)
-                                    }
-                                    disabled={loading || compressProcessing || isImageMaxLimited }
-                                />
-                            </label>
-                        </div>
+                        <label htmlFor={inputId} className={footerTooltipStyle()}>
+                            <Button
+                                disabled={loading || compressProcessing || isImageMaxLimited || getOGPData || isOGPGetProcessing}
+                                as={"span"}
+                                isIconOnly
+                                variant="light"
+                                className={'h-[24px] text-white'}
+                                disableAnimation
+                                disableRipple
+                            >
+                                <FontAwesomeIcon icon={faImage} className={'h-[20px] mb-[5px]'}/>
+                            </Button>
+
+                            <input
+                                hidden
+                                id={inputId}
+                                type="file"
+                                multiple
+                                accept="image/*,.png,.jpg,.jpeg"
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    handleOnAddImage(e)
+                                }
+                                disabled={loading || compressProcessing || isImageMaxLimited || getOGPData || isOGPGetProcessing}
+                            />
+                        </label>
                         <div className={footerTooltipStyle()} style={{bottom:'5%'}}>
                             <Dropdown backdrop="blur" className={dropdown({color:color})}>
                                 <DropdownTrigger>

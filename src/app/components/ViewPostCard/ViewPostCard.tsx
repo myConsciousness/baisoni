@@ -1,8 +1,8 @@
-import React, {useCallback, useState, useMemo} from "react";
+import React, {useCallback, useState, useMemo, useEffect} from "react";
 import { viewPostCard } from "./styles";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faComment } from '@fortawesome/free-regular-svg-icons'
-import {faRetweet, faEllipsis, faFlag, faLink, faCode, faTrash} from '@fortawesome/free-solid-svg-icons'
+import {faRetweet, faEllipsis, faFlag, faLink, faCode, faTrash, faUser} from '@fortawesome/free-solid-svg-icons'
 import { faStar as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { faStar as faHeartSolid, faHashtag, faCheckCircle, faCircleXmark, faCircleQuestion, faReply } from '@fortawesome/free-solid-svg-icons'
 import {PostModal} from "../PostModal";
@@ -24,6 +24,7 @@ import 'react-swipeable-list/dist/styles.css';
 import {useAgent} from "@/app/_atoms/agent";
 import {useRouter} from "next/navigation";
 import {Modal, ModalContent, useDisclosure} from "@nextui-org/react";
+import { formattedSimpleDate } from "@/app/_lib/strings/datetime";
 
 
 interface Props {
@@ -33,15 +34,17 @@ interface Props {
     uploadImageAvailable?: boolean
     isDragActive?: boolean
     open?: boolean
-    numbersOfImage: 0 | 1 | 2 | 3 | 4,
+    numbersOfImage?: 0 | 1 | 2 | 3 | 4,
     postJson?: any
     isSkeleton?: boolean
     json?: any
+    isEmbedToModal?: boolean
+    now?: Date
 }
 export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [ agent ] = useAgent()
     const router = useRouter()
-    const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json} = props;
+    const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json, isEmbedToModal, now} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063]*$/;
     const [loading, setLoading] = useState(false)
     const [isHover, setIsHover] = useState<boolean>(false)
@@ -53,6 +56,9 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [isSwipeEnabled, setIsSwipeEnabled] = useState(true);
     const [postInfo, setPostInfo] = useState<any>(null)
     const [isTextSelectionInProgress, setIsTextSelectionInProgress] = useState(false);
+    const [startX, setStartX] = useState(null);
+    const [startY, setStartY] = useState(null);
+    const [handleButtonClick, setHandleButtonClick] = useState(false);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     const handleReply = async () => {
@@ -98,7 +104,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         if(!postJson.record?.facets){
             let post: any[] = []
             postJson.record.text.split('\n').map((line:any, i:number) => {
-                post.push(<p key={i}>{line}</p>)
+                post.push(<p key={i}>{line}<br/></p>)
             })
             return post
         }
@@ -125,15 +131,22 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
             switch (facet.features[0].$type) {
                 case "app.bsky.richtext.facet#mention":
                     result.push(
-                        <Link key={`link-${index}-${byteStart}`} href={`/profile/${facet.features[0].did}`}>
+                        <span key={`link-${index}-${byteStart}`}
+                              className={'text-blue-500'}
+                             onClick={(e) => {
+                                 e.preventDefault()
+                                 e.stopPropagation()
+                                 router.push(`/profile/${facet.features[0].did}`)
+                             }}
+                        >
                             {facetText}
-                        </Link>
+                        </span>
                     )
                     break
 
                 case "app.bsky.richtext.facet#link":
                     result.push(
-                        <span>
+                        <span key={`link-${index}-${byteStart}`}>
                             <Chip
                                 className={chip({color:color})}
                                 startContent={<Tooltip showArrow={true} color={'foreground'}
@@ -145,9 +158,18 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                 color={facetText === facet.features[0].uri ? "success" : facet.features[0].uri.includes(facetText.replace('...', '')) ? 'default' : "danger"}
                             >
                                 {(facet.features[0].uri).startsWith('https://bsky.app') ? (
-                                    <Link key={`a-${index}-${byteStart}`} href={facet.features[0].uri.replace('https://bsky.app',`${location.protocol}//${window.location.host}`)}>{facetText}</Link>
+                                    <span key={`a-${index}-${byteStart}`}
+                                         onClick={(e) => {
+                                             e.preventDefault()
+                                             e.stopPropagation()
+                                             router.push(facet.features[0].uri.replace('https://bsky.app',`${location.protocol}//${window.location.host}`))
+                                         }}
+                                    >
+                                        {facetText}
+                                    </span>
                                 ) : (
-                                    <a key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
+                                    <a onMouseUp={(e) => e.stopPropagation()}
+                                       key={`a-${index}-${byteStart}`} href={facet.features[0].uri} target={"_blank"} rel={"noopener noreferrer"}>
                                         {facetText}
                                     </a>
                                 )}
@@ -158,16 +180,22 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
 
                 case "app.bsky.richtext.facet#tag":
                     result.push(
-                        <span>
+                        <span key={`link-${index}-${byteStart}`}>
                             <Chip
                                 className={chip({color:color})}
                                 startContent={<FontAwesomeIcon icon={faHashtag} />}
                                 variant="faded"
                                 color="primary"
                             >
-                                <a key={`a-${index}-${byteStart}`} href={`/search?word=%23${(facet.features[0].tag.replace('#', ''))}&target=posts`}>
+                                <span key={`a-${index}-${byteStart}`}
+                                      onClick={(e) => {
+                                          e.preventDefault()
+                                          e.stopPropagation()
+                                          router.push(`/search?word=%23${(facet.features[0].tag.replace('#', ''))}&target=posts`)
+                                      }}
+                                >
                                    {facetText.replace('#', '')}
-                                </a>
+                                </span>
                             </Chip>
                         </span>
                     )
@@ -189,33 +217,60 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         return result
     },[])
 
-    function formatDate(inputDate: string): string {
-        const date = new Date(inputDate);
-        if (isNaN(date.getTime())) return "Invalid date" // 無効な日付が与えられた場合
-        const now = new Date();
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1; // 月は0から始まるため+1する
-        const day = date.getDate();
+    // function formatDate(inputDate: string): string {
+    //     const date = new Date(inputDate);
+    //     if (isNaN(date.getTime())) return "Invalid date" // 無効な日付が与えられた場合
+    //     const now = new Date();
+    //     const year = date.getFullYear();
+    //     const month = date.getMonth() + 1; // 月は0から始まるため+1する
+    //     const day = date.getDate();
 
-        if (
-            year === now.getFullYear() &&
-            month === now.getMonth() + 1 &&
-            day === now.getDate()
-        ) {
-            // 今日の場合
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-        } else if (year === now.getFullYear()) {
-            // 今年の場合
-            return `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}`;
-        } else {
-            // 今年以外の場合
-            const shortYear = year % 100;
-            return `${String(shortYear).padStart(2, "0")}/${String(month).padStart(2, "0")}/${String(
-                day
-            ).padStart(2, "0")}`;
+    //     if (
+    //         year === now.getFullYear() &&
+    //         month === now.getMonth() + 1 &&
+    //         day === now.getDate()
+    //     ) {
+    //         // 今日の場合
+    //         const hours = date.getHours();
+    //         const minutes = date.getMinutes();
+    //         return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    //     } else if (year === now.getFullYear()) {
+    //         // 今年の場合
+    //         return `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}`;
+    //     } else {
+    //         // 今年以外の場合
+    //         const shortYear = year % 100;
+    //         return `${String(shortYear).padStart(2, "0")}/${String(month).padStart(2, "0")}/${String(
+    //             day
+    //         ).padStart(2, "0")}`;
+    //     }
+    // }
+    const handleMouseUp = (e:any) => {
+        // マウスダウンしていない状態でクリックされた場合は何もしない
+        if (startX === null || startY === null) return
+
+        // マウスが動いた場合の座標
+        const currentX = e.clientX;
+        const currentY = e.clientY;
+
+        // クリックが発生した座標との差を計算
+        const deltaX = Math.abs(currentX - startX);
+        const deltaY = Math.abs(currentY - startY);
+
+        // カーソルが一定の閾値以上動いた場合にクリックをキャンセル
+        if (deltaX > 5 || deltaY > 5) {
+            console.log('cancel click')
+            //e.preventDefault();
+            //e.stopPropagation();
+        }else{
+            router.push(`/profile/${postJson?.author.did}/post/${postJson?.uri.match(/\/(\w+)$/)?.[1] || ""}`)
         }
+    }
+
+    const handleMouseDown = (e:any) => {
+        // マウスダウン時の座標を記録
+        setStartX(e.clientX);
+        setStartY(e.clientY);
     }
 
     return (
@@ -228,18 +283,20 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                   )}
               </ModalContent>
           </Modal>
-          <main className={PostCard({color:color})}
-              //onMouseDown={handleTextSelect}
-              //onMouseUp={handleTextDeselect}
-                onClick={() => {
-                    router.push(`/profile/${postJson?.author.did}/post/${postJson?.uri.match(/\/(\w+)$/)?.[1] || ""}`)
+          <main className={`${PostCard({color:color})} ${isEmbedToModal ? `bg-transparent border-none` : `cursor-pointer`}`}
+                //style={{backgroundColor: isEmbedToModal ? 'transparent'}}
+                onMouseDown={(e) => {
+                    handleMouseDown(e)
                 }}
-
+                onMouseUp={(e) => {
+                    if(isEmbedToModal) return
+                    handleMouseUp(e)
+                }}
           >
               <>
                   <>
 
-                      <div className={PostCardContainer()}
+                      <div className={`${PostCardContainer()} ${isEmbedToModal && `pt-[0px]`}`}
                            onMouseEnter={() => {
                                setIsHover(true)
                            }}
@@ -249,27 +306,46 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                       >
                           {json?.reason && (
                               <span className={'text-[13px] ml-[40px] text-[#909090] text-bold hover:cursor-pointer'}
-                                 onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
-
+                                 onClick={(e) => {
+                                     e.preventDefault()
+                                     e.stopPropagation()
+                                     router.push(`/profile/${postJson?.author.did}`)
+                                 }}
                               >
                                   Reposted by {json.reason.by.displayName}
                               </span>
                           )}
                           <div className={`${PostAuthor()}`}>
                               <span className={PostAuthorIcon()}
-                                onClick={() => (
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
                                     router.push(`/profile/${postJson?.author.did}`)
-                                )}
+                                }}
                               >
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonIcon({color:color})}/>
                                   ) : (
-                                      <Image src={postJson?.author?.avatar} radius={'none'} className={'z-0'} alt={postJson.author.did}/>
+                                      <>
+                                          {postJson?.author?.avatar ? (
+                                              <Image src={postJson?.author?.avatar} radius={'none'} className={`${isEmbedToModal ? `z-[2]` : `z-[0]`}`} alt={postJson.author.did}/>
+                                          ):(
+                                              <FontAwesomeIcon
+                                                  className={`${isEmbedToModal ? `z-[2]` : `z-[0]`} h-full w-full`}
+                                                  icon={faUser}
+                                                />
+                                              )
+                                          }
+                                      </>
 
                                   )}
                               </span>
                               <span className={PostAuthorDisplayName({color: color})} style={{fontSize:'13px'}}
-                                onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    router.push(`/profile/${postJson?.author.did}`)
+                                }}
                               >
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonName({color:color})}/>
@@ -279,7 +355,11 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                               </span>
                               <div className={'text-[#BABABA]'}>&nbsp;-&nbsp;</div>
                               <span className={PostAuthorHandle({color: color})}
-                                    onClick={() => (router.push(`/profile/${postJson?.author.did}`))}
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        router.push(`/profile/${postJson?.author.did}`)
+                                    }}
                               >
                                   {isSkeleton ? (
                                       <Skeleton className={skeletonHandle({color: color})}/>
@@ -288,7 +368,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   )}
                               </span>
                               <div className={PostCreatedAt()} style={{fontSize:'12px'}}>
-                                  {!isMobile && isHover && !isSkeleton ? (
+                                  {!isEmbedToModal && !isMobile && isHover && !isSkeleton ? (
                                       <Dropdown className={dropdown({color:color})}>
                                           <DropdownTrigger>
                                               <FontAwesomeIcon icon={faEllipsis} className={'h-[20px] mb-[4px] cursor-pointer text-[#909090]'}/>
@@ -340,7 +420,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       </Dropdown>
                                   ) : (
                                       <>
-                                          {!isSkeleton && (<div>{formatDate(postJson?.indexedAt)}</div>)}
+                                          {!isSkeleton && (<div>{formattedSimpleDate(postJson?.indexedAt, now || new Date())}</div>)}
                                       </>
                                   )}
                               </div>
@@ -359,7 +439,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                               Reply to {json.reply.parent.author?.displayName}
                                           </div>
                                       )}
-                                      <div onClick={(e) => {e.stopPropagation()}}>
+                                      <div style={{wordBreak: 'break-word'}}>
                                           {renderTextWithLinks}
                                       </div>
                                   </>
@@ -370,10 +450,10 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           <ScrollShadow hideScrollBar orientation="horizontal">
                                               <div className={`flex overflow-x-auto overflow-y-hidden w-[${postJson.embed.images.length !== 1 ? `100svw` : `100%`}]`}>
                                                   {postJson.embed.images.map((image: any, index: number) => (
-                                                      <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden ${postJson.embed.images.length !== 1 && `max-w-[600px] h-[300px] mr-[10px] bg-cover`}`}
+                                                      <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden ${postJson.embed.images.length !== 1 && `min-w-[280px] max-w-[500px] h-[300px] mr-[10px] bg-cover`}`}
                                                            key={`image-${index}`}
                                                       >
-                                                          <img className="w-full h-full z-0" src={image.thumb} alt={image?.alt} />
+                                                          <img className="w-full h-full z-0 object-cover" src={image.thumb} alt={image?.alt} />
                                                       </div>
                                                   ))}
                                               </div>
@@ -384,6 +464,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                   href={postJson.embed.external?.uri}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
+                                                  onMouseUp={(e) => e.stopPropagation()}
+
                                               >
                                                   <div className="h-[100px] w-full rounded-lg overflow-hidden border border-gray-600 flex items-center text-gray-800 hover:bg-[#1C1C1C]">
                                                       <div className="h-[100px] w-[100px] border-r border-gray-600">
@@ -398,13 +480,13 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                               <div className="text-sm font-bold text-white whitespace-nowrap overflow-hidden overflow-ellipsis">
                                                                   {postJson.embed.external?.title}
                                                               </div>
-                                                              <div className="text-xs text-gray-200 mt-1 overflow-hidden" style={{WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>
+                                                              <div className="text-xs text-gray-200 mt-1" style={{WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', display: '-webkit-box', overflow: 'hidden'}}>
                                                                   {postJson.embed.external?.description}
                                                               </div>
                                                               <div className="text-xs text-gray-700 mt-1">
-                                                                  <a href={postJson.embed.external?.uri} className="text-gray-400 no-underline">
+                                                                  <div className="text-gray-400">
                                                                       {postJson.embed.external?.uri.match(/^https?:\/{2,}(.*?)(?:\/|\?|#|$)/)[1]}
-                                                                  </a>
+                                                                  </div>
                                                               </div>
                                                           </div>
                                                       </div>
@@ -418,47 +500,71 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                           </div>
                           <div className={PostReactionButtonContainer()} style={{}}>
                               <div className={`mr-[12px]`}>
-                                  {isMobile && (
+                                  {isMobile && !isEmbedToModal && (
                                       <>
-                                          <FontAwesomeIcon icon={faComment} className={PostReactionButton()}
+                                          <FontAwesomeIcon icon={faComment}
+                                                           className={PostReactionButton()}
                                                            onClick={(e) => {
+                                                               e.preventDefault()
                                                                e.stopPropagation()
+                                                               setHandleButtonClick(true)
                                                                handleReply()
                                                            }}
+                                                           onMouseUp={(e) => e.stopPropagation()}
                                           />
-                                          <FontAwesomeIcon icon={faRetweet} className={PostReactionButton()}
+                                          <FontAwesomeIcon icon={faRetweet} style={{color:isReposted ? '#17BF63' : '#909090',}}
+                                                           className={PostReactionButton()}
                                                            onClick={(e) => {
+                                                               e.preventDefault()
                                                                e.stopPropagation()
+                                                               setHandleButtonClick(true)
                                                                handleRepost()
                                                            }}
-                                                           style={{color:isReposted ? '#17BF63' : '#909090',}}/>
-                                          <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
+                                                           onMouseUp={(e) => e.stopPropagation()}
+                                          />
+                                          <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} style={{color:isLiked ? '#fd7e00' : '#909090',}}
+                                                           className={PostReactionButton()}
                                                            onClick={(e) => {
+                                                               e.preventDefault()
                                                                e.stopPropagation()
+                                                               setHandleButtonClick(true)
                                                                handleLike()}}
-                                                           style={{color:isLiked ? '#fd7e00' : '#909090',}}/>
+                                                           onMouseUp={(e) => e.stopPropagation()}
+
+                                          />
                                       </>
                                   )}
-                                  {!isMobile && (
+                                  {!isMobile && !isEmbedToModal && (
                                       <>
-                                          <FontAwesomeIcon icon={faComment} className={PostReactionButton()}
-                                                           style={{display: isHover && !isSkeleton ? undefined : 'none'}}
+                                          <FontAwesomeIcon icon={faComment} style={{display: isHover && !isSkeleton ? undefined : 'none'}}
+                                                           className={PostReactionButton()}
                                                            onClick={(e) => {
+                                                               e.preventDefault()
                                                                e.stopPropagation()
+                                                               setHandleButtonClick(true)
                                                                handleReply()
                                                            }}
+                                                           onMouseUp={(e) => e.stopPropagation()}
                                           />
-                                          <FontAwesomeIcon icon={faRetweet} className={PostReactionButton()}
+                                          <FontAwesomeIcon icon={faRetweet} style={{color:isReposted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isReposted ? undefined : 'none'}}
+                                                           className={PostReactionButton()}
                                                            onClick={(e) => {
+                                                               e.preventDefault()
                                                                e.stopPropagation()
+                                                               setHandleButtonClick(true)
                                                                handleRepost()
                                                            }}
-                                                           style={{color:isReposted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isReposted ? undefined : 'none'}}/>
-                                          <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} className={PostReactionButton()}
+                                                           onMouseUp={(e) => e.stopPropagation()}
+                                          />
+                                          <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} style={{color:isLiked ? '#fd7e00' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}
+                                                           className={PostReactionButton()}
                                                            onClick={(e) => {
+                                                               e.preventDefault()
                                                                e.stopPropagation()
+                                                               setHandleButtonClick(true)
                                                                handleLike()}}
-                                                           style={{color:isLiked ? '#fd7e00' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}/>
+                                                           onMouseUp={(e) => e.stopPropagation()}
+                                          />
                                       </>
                                   )}
                               </div>

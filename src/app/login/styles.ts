@@ -30,6 +30,12 @@ export const createLoginPage = tv({
             false: {
                 background: "",
             },
+        },
+        error:{
+            true:{
+                LoginFormHandle: 'border-[#FF0000]',
+            },
+            false:{}
         }
     }
 });

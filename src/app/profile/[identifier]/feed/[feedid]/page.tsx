@@ -64,6 +64,7 @@ export default function Root() {
     const [hasMoreLimit, setHasMoreLimit] = useState(false)
     const [feedInfo, setFeedInfo] = useState<any>(null)
     const [userPreference, setUserPreference] = useState<any>(null)
+    const [now, setNow] = useState<Date>(new Date())
 
     const color = darkMode ? 'dark' : 'light'
 
@@ -82,6 +83,16 @@ export default function Root() {
         matchMedia.addEventListener("change", modeMe);
 
         return () => matchMedia.removeEventListener("change", modeMe);
+    }, []);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setNow(new Date())
+        }, 60 * 1000);
+    
+        return () => {
+            clearInterval(intervalId);
+        };
     }, []);
 
     const FormattingTimeline = (timeline: FeedViewPost[]) => {
@@ -251,14 +262,12 @@ export default function Root() {
                         <InfiniteScroll
                             loadMore={loadMore}    //項目を読み込む際に処理するコールバック関数
                             hasMore={!loading && !loading2 && !hasMoreLimit}         //読み込みを行うかどうかの判定
-                            loader={<Spinner/>}
+                            loader={<Spinner key="spinner-profile-feed"/>}
                             threshold={300}
                             useWindow={false}
                         >
                             {timeline.map((post, index) => (
-                                <>
-                                    <ViewPostCard key={`feed-${index}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
-                                </>
+                                <ViewPostCard key={`feed-${index}-${post.post.uri}`} color={color} numbersOfImage={0} postJson={post.post} json={post} isMobile={isMobile}/>
                             ))}
                         </InfiniteScroll>
                     )}

@@ -22,6 +22,7 @@ export const viewPostCard = tv({
         skeletonText1line: 'h-3 w-3/5 rounded-lg ',
         skeletonText2line: 'h-3 w-4/5 rounded-lg ',
         chip: '',
+        isEmbedToModal: '',
 
     },
     variants: {
@@ -43,6 +44,9 @@ export const viewPostCard = tv({
                 skeletonText2line: 'dark text-white',
                 chip: 'dark ',
             },
+            null: {
+                PostCard: ' bg-transparent',
+            }
         },
         isMobile: {
             true: {
@@ -56,5 +60,10 @@ export const viewPostCard = tv({
                 PostContent: 'text-[15px] mb-[6px]',
             },
         },
+        isEmbedToModal: {
+            true: {
+                PostModal: 'bg-transparent'
+            }
+        }
     }
 });

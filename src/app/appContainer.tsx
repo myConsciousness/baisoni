@@ -47,7 +47,6 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
         }
 
         const restoreSession = async () => {
-            console.log("here 3")
             const sessionJson = localStorage.getItem('session')
 
             if (!sessionJson) {
@@ -67,13 +66,6 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                 await agent.resumeSession(session)
 
                 setAgent(agent)
-
-                if (!userProfileDetailed) {
-                    const res = await agent.getProfile({ actor: agent.session?.did || "" })
-                    const {data} = res
-            
-                    setUserProfileDetailed(data)
-                }
             } catch (error) {
                 console.error(error)
                 if(pathname === '/login') return
@@ -83,10 +75,17 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
                     location.href = '/login'
                 }
             }
+
+            if (!userProfileDetailed) {
+                const res = await agent.getProfile({ actor: agent.session?.did || "" })
+                const {data} = res
+        
+                setUserProfileDetailed(data)
+            }
         }
 
         restoreSession()
-    }, [agent, agent && agent.hasSession])
+    }, [agent && agent?.hasSession, location.href])
 
     useEffect(() => {
         console.log(searchText)

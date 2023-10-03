@@ -39,11 +39,11 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
     const [darkMode, setDarkMode] = useState(false);
     const color = darkMode ? 'dark' : 'light'
 
+    const [page, setPage] = useState<'profile' | 'home' | 'post' | 'search'>("home")
+
     const modeMe = (e:any) => {
         setDarkMode(!!e.matches);
     };
-
-    // const pathname = usePathname()
 
     useEffect(() => {
         if (agent?.hasSession === true) {
@@ -131,6 +131,22 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
         return () => matchMedia.removeEventListener("change", modeMe);
     }, []);
 
+    useEffect(() => {
+        if (pathName.startsWith("/search")) {
+            console.log("search", pathName)
+            setPage("search")
+        } else if (pathName.startsWith("/profile")) {
+            console.log("profile", pathName)
+            setPage("profile")
+        } else if (pathName.startsWith("/post")) {
+            console.log("post", pathName)
+            setPage("post")
+        } else {
+            console.log("home", pathName)
+            setPage("home")
+        }
+    }, [pathName])
+
     /*const [{ x, y }, api] = useSpring(() => ({ x: 0, y: 0 }))
     const bind = useDrag(({ down, offset: [ox, oy] }) => api.start({ x: ox, y: oy, immediate: down }), {
         bounds: { left: 0, right: 300, top: 0, bottom: 0 }
@@ -142,7 +158,7 @@ export function AppConatiner({ children }: { children: React.ReactNode }) {
             {agent ? (
                 <div className={'h-full max-w-[600px] min-w-[350px] w-full overflow-x-hidden relative'}>
                     {!isMatchingPath && (
-                        <ViewHeader color={color} page={'search'} tab={selectedTab} setSideBarOpen={setIsSideBarOpen} setSearchText={setSearchText} selectedTab={selectedTab}/>
+                        <ViewHeader color={color} page={page} tab={selectedTab} setSideBarOpen={setIsSideBarOpen} setSearchText={setSearchText} selectedTab={selectedTab}/>
                     )}
                     <div className={`z-[11] bg-black bg-opacity-50 absolute h-full w-full ${!isSideBarOpen && `hidden`}`}
                          onClick={() => setIsSideBarOpen(false)}

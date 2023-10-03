@@ -21,7 +21,7 @@ export const viewPostCard = tv({
         skeletonTime: '',
         skeletonText1line: 'h-3 w-3/5 rounded-lg ',
         skeletonText2line: 'h-3 w-4/5 rounded-lg ',
-        chip: '',
+        chip: 'overflow-clip max-w-full',
         isEmbedToModal: '',
 
     },

@@ -54,35 +54,34 @@ export default function Root() {
                             <ModalBody>
                                 <div>
                                     <div>Mute Target</div>
-                                    <Switch/>
                                 </div>
-                                <div>
+                                <div className={'flex items-center justify-between'}>
                                     <div>Timeline</div>
-                                    <Switch/>
+                                    <Switch size={'lg'}/>
                                 </div>
-                                <div>
+                                <div className={'flex items-center justify-between'}>
                                     <div>Notification</div>
-                                    <Switch/>
+                                    <Switch size={'lg'}/>
                                 </div>
-                                <div>
+                                <div className={'flex items-center justify-between'}>
                                     <div>All Accounts</div>
-                                    <Switch/>
+                                    <Switch size={'lg'}/>
                                 </div>
-                                <div>
+                                <div className={'flex items-center justify-between'}>
                                     <div>Not Followee</div>
-                                    <Switch/>
+                                    <Switch size={'lg'}/>
                                 </div>
-                                <div>
+                                <div className={'flex items-center justify-between'}>
                                     <div>period</div>
-                                    <Switch/>
+                                    <Switch size={'lg'}/>
                                 </div>
                             </ModalBody>
                             <ModalFooter>
                                 <Button color="danger" variant="light" onPress={onClose}>
-                                    Close
+                                    Cancel
                                 </Button>
                                 <Button color="primary" onPress={onClose}>
-                                    Action
+                                    Save
                                 </Button>
                             </ModalFooter>
                         </>

@@ -38,7 +38,7 @@ export default function Root() {
 
     return(
         <>
-            <div className={`w-full h-full ${background({color: color})}`}>
+            <div className={`w-full ${background({color: color})}`}>
                 <Accordion variant="light" defaultExpandedKeys={["general"]} className={accordion({color:color})}>
                     <AccordionItem key="general" aria-label="General" title="General" className={accordion({color:color})}>
                         <div className={'flex justify-between items-center pt-[5px] pb-[5px] h-[40px]'}>

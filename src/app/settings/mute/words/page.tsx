@@ -14,7 +14,10 @@ import {
 } from 'react-swipeable-list';
 import 'react-swipeable-list/dist/styles.css';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faTrash, faEllipsis, faChevronRight} from "@fortawesome/free-solid-svg-icons";
+import {faEye, faEyeSlash, faEdit} from '@fortawesome/free-regular-svg-icons'
+
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Switch} from "@nextui-org/react";
 
 
 export default function Root() {
@@ -22,6 +25,7 @@ export default function Root() {
     const [darkMode, setDarkMode] = useState(false);
     const color = darkMode ? 'dark' : 'light'
     const { background, accordion, button } = viewMutewordsPage();
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     const modeMe = (e:any) => {
         setDarkMode(!!e.matches);
@@ -39,9 +43,55 @@ export default function Root() {
 
     return(
         <>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}
+                   placement={'auto'}
+                   className={color}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+                            <ModalBody>
+                                <div>
+                                    <div>Mute Target</div>
+                                    <Switch/>
+                                </div>
+                                <div>
+                                    <div>Timeline</div>
+                                    <Switch/>
+                                </div>
+                                <div>
+                                    <div>Notification</div>
+                                    <Switch/>
+                                </div>
+                                <div>
+                                    <div>All Accounts</div>
+                                    <Switch/>
+                                </div>
+                                <div>
+                                    <div>Not Followee</div>
+                                    <Switch/>
+                                </div>
+                                <div>
+                                    <div>period</div>
+                                    <Switch/>
+                                </div>
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={onClose}>
+                                    Close
+                                </Button>
+                                <Button color="primary" onPress={onClose}>
+                                    Action
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
             <div className={background({color:color})}>
                 <Table removeWrapper aria-label="Example static collection table"
-                       onRowAction={(key) => alert(`Opening item ${key}...`)}
+                       onRowAction={(key) => onOpen()}
                        className={color}
                 >
                     <TableHeader>
@@ -52,19 +102,26 @@ export default function Root() {
                             <TableCell>
                                 <Accordion>
                                     <AccordionItem
-                                        aria-label="下ネタ"
-                                        title="下ネタ"
+                                        aria-label="hogehoge"
+                                        title="hogehoge"
                                     >
-                                        a
-                                    </AccordionItem>
-                                    <AccordionItem>
-                                        a
-                                    </AccordionItem>
-                                    <AccordionItem>
-                                        a
-                                    </AccordionItem>
-                                    <AccordionItem>
-                                        a
+                                        <Table removeWrapper aria-label="Example static collection table"
+                                               className={`${color} w-full`}
+                                               hideHeader
+                                        >
+                                            <TableHeader>
+                                                <TableColumn>Forever Mute Words</TableColumn>
+                                                <TableColumn>{' '}</TableColumn>
+                                            </TableHeader>
+                                            <TableBody>
+                                                <TableRow key="1" className={''}>
+                                                    <TableCell>hogehoge</TableCell>
+                                                    <TableCell>
+                                                        <FontAwesomeIcon icon={faChevronRight}/>
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
                                     </AccordionItem>
                                 </Accordion>
                             </TableCell>
@@ -78,27 +135,15 @@ export default function Root() {
                     <TableHeader>
                         <TableColumn>Time Limit Mute Words</TableColumn>
                         <TableColumn>period</TableColumn>
+                        <TableColumn>{' '}</TableColumn>
                     </TableHeader>
                     <TableBody>
                         <TableRow key="1" className={'cursor-pointer'}>
                             <TableCell>イーロン</TableCell>
                             <TableCell>~ 23/12/26</TableCell>
-                        </TableRow>
-                        <TableRow key="2" className={'cursor-pointer'}>
-                            <TableCell>イーロン</TableCell>
-                            <TableCell>~ 23/12/26</TableCell>
-                        </TableRow>
-                        <TableRow key="3" className={'cursor-pointer'}>
-                            <TableCell>イーロン</TableCell>
-                            <TableCell>~ 23/12/26</TableCell>
-                        </TableRow>
-                        <TableRow key="4" className={'cursor-pointer'}>
-                            <TableCell>イーロン</TableCell>
-                            <TableCell>~ 23/12/26</TableCell>
-                        </TableRow>
-                        <TableRow key="5" className={'cursor-pointer'}>
-                            <TableCell>イーロン</TableCell>
-                            <TableCell>~ 23/12/26</TableCell>
+                            <TableCell>
+                                <FontAwesomeIcon icon={faChevronRight}/>
+                            </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
@@ -107,28 +152,14 @@ export default function Root() {
                 >
                     <TableHeader>
                         <TableColumn>Forever Mute Words</TableColumn>
-                        <TableColumn> </TableColumn>
+                        <TableColumn>{' '}</TableColumn>
                     </TableHeader>
                     <TableBody>
-                        <TableRow key="1" className={'cursor-pointer'}>
+                        <TableRow key="1" className={''}>
                             <TableCell>イーロン</TableCell>
-                            <TableCell><FontAwesomeIcon icon={faTrash} className={'text-red-500'}/></TableCell>
-                        </TableRow>
-                        <TableRow key="2" className={'cursor-pointer'}>
-                            <TableCell>イーロン</TableCell>
-                            <TableCell><FontAwesomeIcon icon={faTrash} className={'text-red-500'}/></TableCell>
-                        </TableRow>
-                        <TableRow key="3" className={'cursor-pointer'}>
-                            <TableCell>イーロン</TableCell>
-                            <TableCell><FontAwesomeIcon icon={faTrash} className={'text-red-500'}/></TableCell>
-                        </TableRow>
-                        <TableRow key="4" className={'cursor-pointer'}>
-                            <TableCell>イーロン</TableCell>
-                            <TableCell><FontAwesomeIcon icon={faTrash} className={'text-red-500'}/></TableCell>
-                        </TableRow>
-                        <TableRow key="5" className={'cursor-pointer'}>
-                            <TableCell>イーロン</TableCell>
-                            <TableCell><FontAwesomeIcon icon={faTrash} className={'text-red-500'}/></TableCell>
+                            <TableCell>
+                                <FontAwesomeIcon icon={faChevronRight}/>
+                            </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>

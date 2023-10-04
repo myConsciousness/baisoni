@@ -25,6 +25,7 @@ import {useAgent} from "@/app/_atoms/agent";
 import {useRouter} from "next/navigation";
 import {Modal, ModalContent, useDisclosure} from "@nextui-org/react";
 import { formattedSimpleDate } from "@/app/_lib/strings/datetime";
+import { ImageGalleryObject, useImageGalleryAtom } from "@/app/_atoms/imageGallery";
 
 
 interface Props {
@@ -43,6 +44,7 @@ interface Props {
 }
 export const ViewPostCard: React.FC<Props> = (props: Props) => {
     const [ agent ] = useAgent()
+    const [imageGallery, setImageGallery] = useImageGalleryAtom()
     const router = useRouter()
     const {className, color, isMobile, uploadImageAvailable, open, numbersOfImage, postJson, isSkeleton, json, isEmbedToModal, now} = props;
     const reg = /^[\u0009-\u000d\u001c-\u0020\u11a3-\u11a7\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\u3164\ufeff\u034f\u2028\u2029\u202a-\u202e\u2061-\u2063]*$/;
@@ -97,6 +99,27 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
         setLoading(false)
     }
 
+    const handleImageClick = useCallback((index: number) => {
+        if (postJson?.embed?.images && Array.isArray(postJson.embed.images)) {
+            let imageURLs: string[] = []
+
+            for(const image of postJson.embed.images) {
+                if (typeof image.fullsize === "string") {
+                    imageURLs.push(image.fullsize)
+                }
+            }
+
+            if (imageURLs.length > 0) {
+                const gelleryObject: ImageGalleryObject = {
+                    imageURLs: imageURLs,
+                    index,
+                }
+
+                setImageGallery(gelleryObject)
+            }
+        }
+    }, [postJson])
+
     const renderTextWithLinks = useMemo(() => {
         if(!postJson?.record) return
         const encoder = new TextEncoder();
@@ -125,8 +148,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                 ));
                 result.push(textChunks);
             }
-
-
 
             switch (facet.features[0].$type) {
                 case "app.bsky.richtext.facet#mention":
@@ -448,12 +469,20 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                   {postJson?.embed && (
                                       postJson?.embed?.$type === 'app.bsky.embed.images#view' ? (
                                           <ScrollShadow hideScrollBar orientation="horizontal">
-                                              <div className={`flex overflow-x-auto overflow-y-hidden w-[${postJson.embed.images.length !== 1 ? `100svw` : `100%`}]`}>
+                                              <div className={`flex overflow-x-auto overflow-y-hidden w-100svw}]`}>
                                                   {postJson.embed.images.map((image: any, index: number) => (
-                                                      <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden ${postJson.embed.images.length !== 1 && `min-w-[280px] max-w-[500px] h-[300px] mr-[10px] bg-cover`}`}
+                                                      <div className={`mt-[10px] mb-[10px] rounded-[7.5px] overflow-hidden min-w-[280px] max-w-[500px] h-[300px] mr-[10px] bg-cover}`}
                                                            key={`image-${index}`}
                                                       >
-                                                          <img className="w-full h-full z-0 object-cover" src={image.thumb} alt={image?.alt} />
+                                                          <img
+                                                            className="w-full h-full z-0 object-cover"
+                                                            src={image.thumb}
+                                                            alt={image?.alt}
+                                                            onMouseUp={(e) => e.stopPropagation()}
+                                                            onClick={ (e) => {
+                                                                handleImageClick(index)
+                                                            }}
+                                                          />
                                                       </div>
                                                   ))}
                                               </div>
@@ -504,9 +533,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <>
                                           <FontAwesomeIcon icon={faComment}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleReply()
                                                            }}
@@ -514,9 +541,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           />
                                           <FontAwesomeIcon icon={faRetweet} style={{color:isReposted ? '#17BF63' : '#909090',}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleRepost()
                                                            }}
@@ -524,9 +549,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           />
                                           <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} style={{color:isLiked ? '#fd7e00' : '#909090',}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleLike()}}
                                                            onMouseUp={(e) => e.stopPropagation()}
@@ -538,9 +561,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <>
                                           <FontAwesomeIcon icon={faComment} style={{display: isHover && !isSkeleton ? undefined : 'none'}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleReply()
                                                            }}
@@ -548,9 +569,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           />
                                           <FontAwesomeIcon icon={faRetweet} style={{color:isReposted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isReposted ? undefined : 'none'}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleRepost()
                                                            }}
@@ -558,9 +577,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           />
                                           <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} style={{color:isLiked ? '#fd7e00' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleLike()}}
                                                            onMouseUp={(e) => e.stopPropagation()}

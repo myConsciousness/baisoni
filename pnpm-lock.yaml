@@ -107,8 +107,14 @@ dependencies:
   typescript:
     specifier: 5.2.2
     version: 5.2.2
+  yet-another-react-lightbox:
+    specifier: ^3.12.2
+    version: 3.12.2(react-dom@18.2.0)(react@18.2.0)
 
 devDependencies:
+  '@types/react-image-gallery':
+    specifier: ^1.2.1
+    version: 1.2.1
   '@types/react-infinite-scroller':
     specifier: ^1.2.3
     version: 1.2.3
@@ -2492,6 +2498,12 @@ packages:
     dependencies:
       '@types/react': 18.2.22
     dev: false
+
+  /@types/react-image-gallery@1.2.1:
+    resolution: {integrity: sha512-VWJef2WQOR1TqXvuJifNqrBdqrGQVImwz9Zdf1qjSEnBCqkk6LgAAeiQwd9nQ4sq1jmCWkK9lZ3+fqvt5vy1Ow==}
+    dependencies:
+      '@types/react': 18.2.22
+    dev: true
 
   /@types/react-infinite-scroller@1.2.3:
     resolution: {integrity: sha512-l60JckVoO+dxmKW2eEG7jbliEpITsTJvRPTe97GazjF5+ylagAuyYdXl8YY9DQsTP9QjhqGKZROknzgscGJy0A==}
@@ -5209,6 +5221,17 @@ packages:
   /yaml@2.3.2:
     resolution: {integrity: sha512-N/lyzTPaJasoDmfV7YTrYCI0G/3ivm/9wdG0aHuheKowWQwGTsK0Eoiw6utmzAnI6pkJa0DUVygvp3spqqEKXg==}
     engines: {node: '>= 14'}
+    dev: false
+
+  /yet-another-react-lightbox@3.12.2(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-sFypE74Rjjl7WbzKSrGeZ7lbcgduOam/BKj8kqzx/ciC4dJyYdE1SG0dur9oDq/gZiY3VGJh+PYGbq6ZwmPFmA==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /yocto-queue@0.1.0:

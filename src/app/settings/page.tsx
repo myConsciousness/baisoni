@@ -3,12 +3,24 @@ import {isMobile} from "react-device-detect";
 
 import {Accordion, AccordionItem, Button, ButtonGroup, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Switch, Select, SelectItem} from "@nextui-org/react";
 import {useEffect, useState} from "react";
+import {viewProfilePage} from "@/app/profile/[identifier]/styles";
+import {viewSettingsPage} from "@/app/settings/styles"
+import {useRouter} from "next/navigation";
 
 export default function Root() {
-    const contentFilteringList = ['Explicit Sexual Images', 'Other Nudity', 'Sexually Suggestive', 'Violent / Bloody', 'Hate Group Iconography', 'Spam', 'Impersonation']
-    /*
+    const router = useRouter()
+    const contentFilteringList = [
+        {content: 'Explicit Sexual Images', value: 'Warn'},
+        {content: 'Other Nudity', value: 'Warn'},
+        {content: 'Sexually Suggestive', value: 'Warn'},
+        {content: 'Violent / Bloody', value: 'Warn'},
+        {content: 'Hate Group Iconography', value: 'Warn'},
+        {content: 'Spam', value: 'Warn'},
+        {content: 'Impersonation', value: 'Warn'},
+    ]
     const [darkMode, setDarkMode] = useState(false);
     const color = darkMode ? 'dark' : 'light'
+    const { background, accordion, button } = viewSettingsPage();
 
     const modeMe = (e:any) => {
         setDarkMode(!!e.matches);
@@ -22,24 +34,24 @@ export default function Root() {
         matchMedia.addEventListener("change", modeMe);
 
         return () => matchMedia.removeEventListener("change", modeMe);
-    }, []);*/
+    }, []);
 
     return(
         <>
-            <div className={'h-full w-full bg-white'}>
-                <Accordion variant="light" defaultExpandedKeys={["general"]}>
-                    <AccordionItem key="general" aria-label="General" title="General">
-                        <div>
+            <div className={`w-full h-full ${background({color: color})}`}>
+                <Accordion variant="light" defaultExpandedKeys={["general"]} className={accordion({color:color})}>
+                    <AccordionItem key="general" aria-label="General" title="General" className={accordion({color:color})}>
+                        <div className={'flex justify-between items-center pt-[5px] pb-[5px] h-[40px]'}>
                             <div>Theme Color</div>
                             <ButtonGroup>
                                 <Button>System</Button>
-                                <Button>Light</Button>
-                                <Button>Dark</Button>
+                                <Button isDisabled={color === "light"}>Light</Button>
+                                <Button isDisabled={color === "dark"}>Dark</Button>
                             </ButtonGroup>
                         </div>
-                        <div className={'flex'}>
+                        <div className={'flex justify-between items-center pt-[5px] pb-[5px] h-[40px]'}>
                             <div>Language</div>
-                            <Dropdown>
+                            <Dropdown className={accordion({color:color})}>
                                 <DropdownTrigger>
                                     <Button
                                         variant="bordered"
@@ -54,48 +66,55 @@ export default function Root() {
                                 </DropdownMenu>
                             </Dropdown>
                         </div>
-                        <div>
+                        <div className={''}>
                             <div>Notification</div>
-                            <div className={'flex justify-between items-center'}>
+                            <div className={'flex justify-between items-center h-[40px]'}>
                                 <div>FF外からの引用リポスト通知を受け取らない</div>
-                                <Switch></Switch>
+                                <Switch ></Switch>
                             </div>
                         </div>
-                        <div>
+                        <div className={'flex justify-between items-center pt-[5px] pb-[5px] h-[40px]'}>
                             <div>翻訳先の言語</div>
                             <Select
+                                size={'sm'}
                                 label="Select an animal"
-                                className="max-w-xs"
+                                className={`${accordion({color:color})} max-w-xs`}
                             >
-                                <SelectItem key={'a'} value={'a'}>a</SelectItem>
+                                <SelectItem key={'a'} value={'a'} className={accordion({color:color})}>a</SelectItem>
                             </Select>
                         </div>
                     </AccordionItem>
-                    <AccordionItem key="contentFiltering" aria-label="Accordion 1" title="Content Filtering">
+                    <AccordionItem key="contentFiltering" aria-label="Accordion 1" title="Content Filtering" className={`${accordion({color:color})}`}>
                         {contentFilteringList.map((item, index) => (
                             <div key={index}
-                                className={'flex justify-between items-center'}
+                                className={'flex justify-between items-center pt-[5px] pb-[5px]'}
                             >
-                                <div>{item}</div>
+                                <div>{item.content}</div>
                                 <div className={''}>
                                     <ButtonGroup>
-                                        <Button>Hide</Button>
-                                        <Button>Warn</Button>
-                                        <Button>Show</Button>
+                                        <Button size="sm" isDisabled={item.value === 'Hide'}>Hide</Button>
+                                        <Button size="sm" isDisabled={item.value === 'Warn'}>Warn</Button>
+                                        <Button size="sm" isDisabled={item.value === 'Show'}>Show</Button>
                                     </ButtonGroup>
                                 </div>
                             </div>
                         ))}
                     </AccordionItem>
-                    <AccordionItem key='mute' aria-label={'Mute'} title='Mute'>
-                        <Accordion>
-                            <AccordionItem key={'muteWords'} aria-label={'Mute Word'} title={'Mute Words'}>
-
-                            </AccordionItem>
-                            <AccordionItem key={'muteAccounts'} aria-label={'Mute Account'} title={'Mute Accounts'}>
-
-                            </AccordionItem>
-                        </Accordion>
+                    <AccordionItem key='mute' aria-label={'Mute'} title='Mute' className={accordion({color:color})} >
+                        <div className={'flex justify-between items-center h-[60px] w-full select-none cursor-pointer'}
+                             onClick={() => {
+                                 router.push('/settings/mute/words')
+                             }}
+                        >
+                            Mute Words
+                        </div>
+                        <div className={'flex justify-between items-center h-[60px] w-full select-none cursor-pointer'}
+                            onClick={() => {
+                                router.push('/settings/mute/accounts')
+                            }}
+                        >
+                            Mute Accounts
+                        </div>
                     </AccordionItem>
                 </Accordion>
             </div>

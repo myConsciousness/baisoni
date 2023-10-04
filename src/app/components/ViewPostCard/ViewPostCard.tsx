@@ -267,7 +267,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     //     }
     // }
     const handleMouseUp = (e:any) => {
-        return
         // マウスダウンしていない状態でクリックされた場合は何もしない
         if (startX === null || startY === null) return
 
@@ -290,7 +289,6 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
     }
 
     const handleMouseDown = (e:any) => {
-        return // 暫定
         // マウスダウン時の座標を記録
         setStartX(e.clientX);
         setStartY(e.clientY);
@@ -480,7 +478,8 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                                             className="w-full h-full z-0 object-cover"
                                                             src={image.thumb}
                                                             alt={image?.alt}
-                                                            onClick={ () => {
+                                                            onMouseUp={(e) => e.stopPropagation()}
+                                                            onClick={ (e) => {
                                                                 handleImageClick(index)
                                                             }}
                                                           />
@@ -534,9 +533,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <>
                                           <FontAwesomeIcon icon={faComment}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleReply()
                                                            }}
@@ -544,9 +541,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           />
                                           <FontAwesomeIcon icon={faRetweet} style={{color:isReposted ? '#17BF63' : '#909090',}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleRepost()
                                                            }}
@@ -554,9 +549,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           />
                                           <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} style={{color:isLiked ? '#fd7e00' : '#909090',}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleLike()}}
                                                            onMouseUp={(e) => e.stopPropagation()}
@@ -568,9 +561,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                       <>
                                           <FontAwesomeIcon icon={faComment} style={{display: isHover && !isSkeleton ? undefined : 'none'}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleReply()
                                                            }}
@@ -578,9 +569,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           />
                                           <FontAwesomeIcon icon={faRetweet} style={{color:isReposted ? '#17BF63' : '#909090', display: isHover && !isSkeleton ? undefined : isReposted ? undefined : 'none'}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleRepost()
                                                            }}
@@ -588,9 +577,7 @@ export const ViewPostCard: React.FC<Props> = (props: Props) => {
                                           />
                                           <FontAwesomeIcon icon={isLiked ? faHeartSolid : faHeartRegular} style={{color:isLiked ? '#fd7e00' : '#909090', display: isHover && !isSkeleton ? undefined : isLiked ? undefined : 'none'}}
                                                            className={PostReactionButton()}
-                                                           onClick={(e) => {
-                                                               e.preventDefault()
-                                                               e.stopPropagation()
+                                                           onClick={() => {
                                                                setHandleButtonClick(true)
                                                                handleLike()}}
                                                            onMouseUp={(e) => e.stopPropagation()}

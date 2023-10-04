@@ -42,9 +42,11 @@
     "react-textarea-autosize": "^8.5.3",
     "tailwind-variants": "^0.1.14",
     "tailwindcss": "3.3.3",
-    "typescript": "5.2.2"
+    "typescript": "5.2.2",
+    "yet-another-react-lightbox": "^3.12.2"
   },
   "devDependencies": {
+    "@types/react-image-gallery": "^1.2.1",
     "@types/react-infinite-scroller": "^1.2.3"
   }
 }
